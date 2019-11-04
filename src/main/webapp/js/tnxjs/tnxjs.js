@@ -46,10 +46,12 @@ function namespace(namespace) {
 }
 
 // Prototype
-Object.prototype.extend = function() {
-    var args = [this].concat(arguments);
-    return extend(args);
-}
+extend(Object.prototype, {
+    extend: function() {
+        var args = [this].concat(arguments);
+        return extend(args);
+    }
+});
 
 extend(String.prototype, {
     firstToLowerCase: function() {
@@ -64,6 +66,25 @@ extend(String.prototype, {
     }
 });
 
+extend(Element.prototype, {
+    prependChild: function(child) {
+        if (this.hasChildNodes()) {
+            this.insertBefore(child, this.firstChild);
+        } else {
+            this.appendChild(child);
+        }
+        return this;
+    },
+    insertAfter: function(element) {
+        if (this.nextSibling != null) {
+            this.parentNode.insertBefore(element, this.nextSibling);
+        } else {
+            this.parentNode.appendChild(element);
+        }
+        return this;
+    }
+});
+
 tnx = {
     version: "3.0",
     encoding: "UTF-8",
@@ -75,15 +96,24 @@ tnx.util = {}
 
 tnx.app = {
     context: "",
-    init: function(appContext, pageContext) {
-        if (appContext) {
-            this.context = appContext;
+    init: function(options) {
+        options = options || {};
+        if (options.context) {
+            this.context = options.context;
         }
-        this.page.app = this;
-        if (pageContext) {
-            this.page.context = pageContext;
+        if (options.page) {
+            if (options.page.context) {
+                this.page.context = options.page.context;
+            }
         }
-        this.loadScripts();
+        var _this = this;
+        this.loadLinks(function() {
+            _this.loadScripts(function() {
+                if (typeof (options.onLoad) == "function") {
+                    options.onLoad.call();
+                }
+            });
+        });
     },
     getAction: function(url) {
         var href = url || window.location.href;
@@ -117,64 +147,107 @@ tnx.app = {
         }
         return href;
     },
-    loadScripts: function(container) {
+    loadedResources: {}, // 保存加载中和加载完成的资源
+    loadResources: function(resourceType, container, loadOneFunction, callback) {
+        if (typeof (container) == "function") {
+            callback = loadOneFunction;
+            loadOneFunction = container;
+            container = undefined;
+        }
         container = container || document.body;
-        var scripts = container.getAttribute("js");
-        if (scripts) {
-            scripts = scripts.split(",");
+
+        var resources = container.getAttribute(resourceType);
+        if (resources) {
+            resources = resources.split(",");
             var _this = this;
-            scripts.forEach(function(script, i) {
-                script = script.trim();
-                if (script == "true" || script == "default") {
+            resources.forEach(function(resource, i) {
+                resource = resource.trim();
+                if (resource == "true" || resource == "default") {
                     var action = _this.getAction();
                     if (!action.endsWith("/")) {
-                        script = action + ".js";
-                        if (script.startsWith("/")) {
-                            script = script.substr(1);
+                        resource = action + "." + resourceType;
+                        if (resource.startsWith("/")) {
+                            resource = resource.substr(1);
                         }
                     }
                 }
-                if (script.toLowerCase().endsWith(".js")) {
-                    if (!script.startsWith("/")) {
-                        scripts[i] = _this.context + _this.page.context + "/" + script;
+                if (resource.toLowerCase().endsWith("." + resourceType)) {
+                    if (!resource.startsWith("/")) {
+                        resources[i] = _this.context + _this.page.context + "/" + resource;
                     }
                     if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
-                        scripts[i] += "?v=" + _this.version;
+                        resources[i] += "?v=" + _this.version;
                     }
+                    _this.loadedResources[resource] = false;
                 } else { // 无效的脚本文件置空
-                    scripts[i] = undefined;
+                    resources[i] = undefined;
                 }
             });
 
-            scripts.forEach(function(script) {
-                if (script) {
-                    _this.loadScript(script, container);
+            resources.forEach(function(resource) {
+                if (resource) {
+                    loadOneFunction.call(_this, resource, container, function(url) {
+                        _this.loadedResources[url] = true;
+                        if (typeof (callback) == "function" && _this.isAllLoaded(resources)) {
+                            callback.call(_this);
+                        }
+                    });
                 }
             });
         }
     },
-    loadScript: function(url, container, callback) {
-        if (callback == undefined && typeof (container) == "function") {
-            callback = container;
-            container = undefined;
+    isAllLoaded: function(resources) {
+        var _this = this;
+        for (var i = 0; i < resources.length; i++) {
+            var resource = resources[i];
+            if (_this.loadedResources[resource] !== true) {
+                return false;
+            }
         }
-        container = container || document.body;
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        if (typeof (callback) == "function") {
-            if (script.readyState) {
-                script.onreadystatechange = function() {
-                    if (script.readyState == "loaded" || script.readyState == "complete") {
-                        script.onreadystatechange = null;
-                        callback(url);
+        return true;
+    },
+    bindResourceLoad: function(element, url, onLoad) {
+        if (typeof (onLoad) == "function") {
+            if (element.readyState) {
+                element.onreadystatechange = function() {
+                    if (element.readyState == "loaded" || element.readyState == "complete") {
+                        element.onreadystatechange = null;
+                        onLoad(url);
                     }
                 }
             } else {
-                script.onload = function() {
-                    callback(url);
+                element.onload = function() {
+                    onLoad(url);
                 }
             }
         }
+    },
+    loadLinks: function(container, callback) {
+        if (typeof (container) == "function") {
+            callback = container;
+            container = undefined;
+        }
+        this.loadResources("css", container, this.loadLink, callback);
+    },
+    loadLink: function(url, container, callback) {
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        this.bindResourceLoad(link, url, callback);
+        link.href = url;
+        container.prependChild(link);
+    },
+    loadScripts: function(container, callback) {
+        if (typeof (container) == "function") {
+            callback = container;
+            container = undefined;
+        }
+        this.loadResources("js", container, this.loadScript, callback);
+    },
+    loadScript: function(url, container, callback) {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        this.bindResourceLoad(script, url, callback);
         script.src = url;
         container.appendChild(script);
     }
