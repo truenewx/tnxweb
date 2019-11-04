@@ -75,13 +75,19 @@ extend(Element.prototype, {
         }
         return this;
     },
-    insertAfter: function(element) {
-        if (this.nextSibling != null) {
-            this.parentNode.insertBefore(element, this.nextSibling);
-        } else {
-            this.parentNode.appendChild(element);
+    /**
+     * 获取不是指定标签的第一个子节点
+     * @param tagName 标签名
+     * @return ChildNode 不是指定标签的第一个子节点，没有则返回undefined
+     */
+    getFirstChildWithoutTagName: function(tagName) {
+        var children = this.childNodes;
+        for (var i = 0; i < children.length; i++) {
+            if (children[i].tagName && children[i].tagName != tagName.toUpperCase()) {
+                return children[i];
+            }
         }
-        return this;
+        return undefined;
     }
 });
 
@@ -235,7 +241,13 @@ tnx.app = {
         link.rel = "stylesheet";
         this.bindResourceLoad(link, url, callback);
         link.href = url;
-        container.prependChild(link);
+
+        var node = container.getFirstChildWithoutTagName("link");
+        if (node) {
+            container.insertBefore(link, node);
+        } else {
+            container.appendChild(link);
+        }
     },
     loadScripts: function(container, callback) {
         if (typeof (container) == "function") {
@@ -249,6 +261,7 @@ tnx.app = {
         script.type = "text/javascript";
         this.bindResourceLoad(script, url, callback);
         script.src = url;
+
         container.appendChild(script);
     }
 };
