@@ -102,11 +102,13 @@ tnx.util = {}
 
 tnx.app = {
     context: "",
+    version: undefined,
     init: function(options) {
         options = options || {};
         if (options.context) {
             this.context = options.context;
         }
+        this.version = options.version;
         if (options.page) {
             if (options.page.context) {
                 this.page.context = options.page.context;
