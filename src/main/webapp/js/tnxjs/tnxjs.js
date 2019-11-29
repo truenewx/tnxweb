@@ -98,7 +98,7 @@ tnx = {
     context: "/tnxweb",
 };
 
-tnx.util = {}
+tnx.util = {};
 
 tnx.app = {
     context: "",
