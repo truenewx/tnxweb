@@ -46,13 +46,7 @@ function namespace(namespace) {
 }
 
 // Prototype
-extend(Object.prototype, {
-    extend: function() {
-        var args = [this].concat(arguments);
-        return extend(args);
-    }
-});
-
+// 不要在Object.prototype中添加函数，否则vue会报错
 extend(String.prototype, {
     firstToLowerCase: function() {
         return this.substring(0, 1).toLowerCase() + this.substring(1);
