@@ -1,30 +1,33 @@
 // 基础工具方法
-/**
- * 扩展对象，将参数列表中的非首个参数对象中的属性依次赋值到首个参数对象中
- * @return 首个参数对象（被扩展后的）
- */
-function extend() {
-    var length = arguments.length;
-    if (length == 0) {
-        return undefined;
-    }
-    var target = arguments[0] || {};
-    if (typeof target != "object" && typeof target != "function") {
-        target = {};
-    }
-    if (length == 1) {
-        return target;
-    }
-    for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
-        for (var key in source) {
-            if (Object.prototype.hasOwnProperty.call(source, key)) {
-                target[key] = source[key];
+if (typeof Object.assign != "function") {
+    /**
+     * 合并对象，将参数列表中的非首个参数对象中的属性依次合并到首个参数对象中
+     * @return 合并的目标对象，即参数列表中的首个参数对象
+     */
+    Object.assign = function() {
+        var length = arguments.length;
+        if (length == 0) {
+            return undefined;
+        }
+        var target = arguments[0] || {};
+        if (typeof target != "object" && typeof target != "function") {
+            target = {};
+        }
+        if (length == 1) {
+            return target;
+        }
+        for (var i = 1; i < arguments.length; i++) {
+            var source = arguments[i];
+            for (var key in source) {
+                if (Object.prototype.hasOwnProperty.call(source, key)) {
+                    target[key] = source[key];
+                }
             }
         }
-    }
-    return target;
+        return target;
+    };
 }
+
 
 /**
  * 设定命名空间
@@ -47,7 +50,7 @@ function namespace(namespace) {
 
 // Prototype
 // 不要在Object.prototype中添加函数，否则vue会报错
-extend(String.prototype, {
+Object.assign(String.prototype, {
     firstToLowerCase: function() {
         return this.substring(0, 1).toLowerCase() + this.substring(1);
     },
@@ -60,7 +63,7 @@ extend(String.prototype, {
     }
 });
 
-extend(Element.prototype, {
+Object.assign(Element.prototype, {
     prependChild: function(child) {
         if (this.hasChildNodes()) {
             this.insertBefore(child, this.firstChild);
@@ -111,7 +114,7 @@ tnx.app = {
         var _this = this;
         this.loadLinks(function() {
             _this.loadScripts(function() {
-                if (typeof (options.onLoad) == "function") {
+                if (typeof options.onLoad == "function") {
                     options.onLoad.call();
                 }
             });
@@ -151,7 +154,7 @@ tnx.app = {
     },
     loadedResources: {}, // 保存加载中和加载完成的资源
     loadResources: function(resourceType, container, loadOneFunction, callback) {
-        if (typeof (container) == "function") {
+        if (typeof container == "function") {
             callback = loadOneFunction;
             loadOneFunction = container;
             container = undefined;
@@ -190,7 +193,7 @@ tnx.app = {
                 if (resource) {
                     loadOneFunction.call(_this, resource, container, function(url) {
                         _this.loadedResources[url] = true;
-                        if (typeof (callback) == "function" && _this.isAllLoaded(resources)) {
+                        if (typeof callback == "function" && _this.isAllLoaded(resources)) {
                             callback.call(_this);
                         }
                     });
@@ -209,7 +212,7 @@ tnx.app = {
         return true;
     },
     bindResourceLoad: function(element, url, onLoad) {
-        if (typeof (onLoad) == "function") {
+        if (typeof onLoad == "function") {
             if (element.readyState) {
                 element.onreadystatechange = function() {
                     if (element.readyState == "loaded" || element.readyState == "complete") {
@@ -225,7 +228,7 @@ tnx.app = {
         }
     },
     loadLinks: function(container, callback) {
-        if (typeof (container) == "function") {
+        if (typeof container == "function") {
             callback = container;
             container = undefined;
         }
@@ -246,7 +249,7 @@ tnx.app = {
         }
     },
     loadScripts: function(container, callback) {
-        if (typeof (container) == "function") {
+        if (typeof container == "function") {
             callback = container;
             container = undefined;
         }
