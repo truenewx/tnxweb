@@ -88,187 +88,193 @@ Object.assign(Element.prototype, {
     }
 });
 
-tnx = {
-    version: "3.0",
-    encoding: "UTF-8",
-    locale: "zh_CN",
-    context: "/tnxweb",
-};
+define(function() {
+    var tnx = {
+        version: "3.0",
+        encoding: "UTF-8",
+        locale: "zh_CN",
+        context: "/tnxweb",
+    };
 
-tnx.util = {};
+    tnx.util = {};
 
-tnx.app = {
-    context: "",
-    version: undefined,
-    init: function(options) {
-        options = options || {};
-        if (options.context) {
-            this.context = options.context;
-        }
-        this.version = options.version;
-        if (options.page) {
-            if (options.page.context) {
-                this.page.context = options.page.context;
+    tnx.app = {
+        context: "",
+        version: undefined,
+        init: function(options) {
+            options = options || {};
+            if (options.context) {
+                this.context = options.context;
             }
-        }
-        var _this = this;
-        this.loadLinks(function() {
-            _this.loadScripts(function() {
-                if (typeof options.onLoad == "function") {
-                    options.onLoad.call();
+            this.version = options.version;
+            if (options.page) {
+                if (options.page.context) {
+                    this.page.context = options.page.context;
                 }
-            });
-        });
-    },
-    getAction: function(url) {
-        var href = url || window.location.href;
-        // 去掉参数
-        var index = href.indexOf("?");
-        if (index >= 0) {
-            href = href.substr(0, index);
-        }
-        // 去掉协议
-        if (href.startsWith("//")) {
-            href = href.substr(2);
-        } else {
-            index = href.indexOf("://");
-            if (index >= 0) {
-                href = href.substr(index + 3);
             }
-        }
-        // 去掉域名和端口
-        index = href.indexOf("/");
-        if (index >= 0) {
-            href = href.substr(index);
-        }
-        // 去掉contextPath
-        if (this.context != "" && this.context != "/" && href.startsWith(this.context)) {
-            href = href.substr(this.context.length);
-        }
-        // 去掉后缀
-        index = href.lastIndexOf(".");
-        if (index >= 0) {
-            href = href.substr(0, index);
-        }
-        return href;
-    },
-    loadedResources: {}, // 保存加载中和加载完成的资源
-    loadResources: function(resourceType, container, loadOneFunction, callback) {
-        if (typeof container == "function") {
-            callback = loadOneFunction;
-            loadOneFunction = container;
-            container = undefined;
-        }
-        container = container || document.body;
-
-        var resources = container.getAttribute(resourceType);
-        if (resources) {
-            resources = resources.split(",");
             var _this = this;
-            resources.forEach(function(resource, i) {
-                resource = resource.trim();
-                if (resource == "true" || resource == "default") {
-                    var action = _this.getAction();
-                    if (!action.endsWith("/")) {
-                        resource = action + "." + resourceType;
-                        if (resource.startsWith("/")) {
-                            resource = resource.substr(1);
-                        }
+            this.loadLinks(function() {
+                _this.loadScripts(function() {
+                    if (typeof options.onLoad == "function") {
+                        options.onLoad.call();
                     }
-                }
-                if (resource.toLowerCase().endsWith("." + resourceType)) {
-                    if (!resource.startsWith("/")) {
-                        resources[i] = _this.context + _this.page.context + "/" + resource;
-                    }
-                    if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
-                        resources[i] += "?v=" + _this.version;
-                    }
-                    _this.loadedResources[resource] = false;
-                } else { // 无效的脚本文件置空
-                    resources[i] = undefined;
-                }
+                });
             });
-
-            resources.forEach(function(resource) {
-                if (resource) {
-                    loadOneFunction.call(_this, resource, container, function(url) {
-                        _this.loadedResources[url] = true;
-                        if (typeof callback == "function" && _this.isAllLoaded(resources)) {
-                            callback.call(_this);
-                        }
-                    });
-                }
-            });
-        }
-    },
-    isAllLoaded: function(resources) {
-        var _this = this;
-        for (var i = 0; i < resources.length; i++) {
-            var resource = resources[i];
-            if (_this.loadedResources[resource] !== true) {
-                return false;
+        },
+        getAction: function(url) {
+            var href = url || window.location.href;
+            // 去掉参数
+            var index = href.indexOf("?");
+            if (index >= 0) {
+                href = href.substr(0, index);
             }
-        }
-        return true;
-    },
-    bindResourceLoad: function(element, url, onLoad) {
-        if (typeof onLoad == "function") {
-            if (element.readyState) {
-                element.onreadystatechange = function() {
-                    if (element.readyState == "loaded" || element.readyState == "complete") {
-                        element.onreadystatechange = null;
+            // 去掉协议
+            if (href.startsWith("//")) {
+                href = href.substr(2);
+            } else {
+                index = href.indexOf("://");
+                if (index >= 0) {
+                    href = href.substr(index + 3);
+                }
+            }
+            // 去掉域名和端口
+            index = href.indexOf("/");
+            if (index >= 0) {
+                href = href.substr(index);
+            }
+            // 去掉contextPath
+            if (this.context != "" && this.context != "/" && href.startsWith(this.context)) {
+                href = href.substr(this.context.length);
+            }
+            // 去掉后缀
+            index = href.lastIndexOf(".");
+            if (index >= 0) {
+                href = href.substr(0, index);
+            }
+            return href;
+        },
+        loadedResources: {}, // 保存加载中和加载完成的资源
+        loadResources: function(resourceType, container, loadOneFunction, callback) {
+            if (typeof container == "function") {
+                callback = loadOneFunction;
+                loadOneFunction = container;
+                container = undefined;
+            }
+            container = container || document.body;
+
+            var resources = container.getAttribute(resourceType);
+            if (resources) {
+                resources = resources.split(",");
+                var _this = this;
+                resources.forEach(function(resource, i) {
+                    resource = resource.trim();
+                    if (resource == "true" || resource == "default") {
+                        var action = _this.getAction();
+                        if (!action.endsWith("/")) {
+                            resource = action + "." + resourceType;
+                            if (resource.startsWith("/")) {
+                                resource = resource.substr(1);
+                            }
+                        }
+                    }
+                    if (resource.toLowerCase().endsWith("." + resourceType)) {
+                        if (!resource.startsWith("/")) {
+                            resources[i] = _this.context + _this.page.context + "/" + resource;
+                        }
+                        if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
+                            resources[i] += "?v=" + _this.version;
+                        }
+                        _this.loadedResources[resource] = false;
+                    } else { // 无效的脚本文件置空
+                        resources[i] = undefined;
+                    }
+                });
+
+                resources.forEach(function(resource) {
+                    if (resource) {
+                        loadOneFunction.call(_this, resource, container, function(url) {
+                            _this.loadedResources[url] = true;
+                            if (typeof callback == "function" && _this.isAllLoaded(resources)) {
+                                callback.call(_this);
+                            }
+                        });
+                    }
+                });
+            }
+        },
+        isAllLoaded: function(resources) {
+            var _this = this;
+            for (var i = 0; i < resources.length; i++) {
+                var resource = resources[i];
+                if (_this.loadedResources[resource] !== true) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        bindResourceLoad: function(element, url, onLoad) {
+            if (typeof onLoad == "function") {
+                if (element.readyState) {
+                    element.onreadystatechange = function() {
+                        if (element.readyState == "loaded" || element.readyState == "complete") {
+                            element.onreadystatechange = null;
+                            onLoad(url);
+                        }
+                    }
+                } else {
+                    element.onload = function() {
                         onLoad(url);
                     }
                 }
-            } else {
-                element.onload = function() {
-                    onLoad(url);
-                }
             }
-        }
-    },
-    loadLinks: function(container, callback) {
-        if (typeof container == "function") {
-            callback = container;
-            container = undefined;
-        }
-        this.loadResources("css", container, this.loadLink, callback);
-    },
-    loadLink: function(url, container, callback) {
-        var link = document.createElement("link");
-        link.type = "text/css";
-        link.rel = "stylesheet";
-        this.bindResourceLoad(link, url, callback);
-        link.href = url;
+        },
+        loadLinks: function(container, callback) {
+            if (typeof container == "function") {
+                callback = container;
+                container = undefined;
+            }
+            this.loadResources("css", container, this.loadLink, callback);
+        },
+        loadLink: function(url, container, callback) {
+            var link = document.createElement("link");
+            link.type = "text/css";
+            link.rel = "stylesheet";
+            this.bindResourceLoad(link, url, callback);
+            link.href = url;
 
-        var node = container.getFirstChildWithoutTagName("link");
-        if (node) {
-            container.insertBefore(link, node);
-        } else {
-            container.appendChild(link);
-        }
-    },
-    loadScripts: function(container, callback) {
-        if (typeof container == "function") {
-            callback = container;
-            container = undefined;
-        }
-        this.loadResources("js", container, this.loadScript, callback);
-    },
-    loadScript: function(url, container, callback) {
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        this.bindResourceLoad(script, url, callback);
-        script.src = url;
+            var node = container.getFirstChildWithoutTagName("link");
+            if (node) {
+                container.insertBefore(link, node);
+            } else {
+                container.appendChild(link);
+            }
+        },
+        loadScripts: function(container, callback) {
+            if (typeof container == "function") {
+                callback = container;
+                container = undefined;
+            }
+            this.loadResources("js", container, this.loadScript, callback);
+        },
+        loadScript: function(url, container, callback) {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            this.bindResourceLoad(script, url, callback);
+            script.src = url;
 
-        container.appendChild(script);
-    }
-};
+            container.appendChild(script);
+        }
+    };
 
-tnx.app.page = {
-    app: tnx.app,
-    context: "/pages",
-    init: function(options) {
-    }
-};
+    tnx.app.page = {
+        app: tnx.app,
+        context: "/pages",
+        init: function(options) {
+        }
+    };
+
+    return tnx;
+});
+
+
 
