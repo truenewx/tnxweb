@@ -88,19 +88,25 @@ Object.assign(Element.prototype, {
     }
 });
 
+app_config = Object.assign({
+    locale: "zh_CN",
+    path: "",
+    lib: "/tnxweb",
+}, app_config);
+
 define(function() {
     var tnx = {
         version: "3.0",
         encoding: "UTF-8",
-        locale: "zh_CN",
-        context: "/tnxweb",
+        locale: app_config.locale,
+        context: app_config.lib,
     };
 
     tnx.util = {};
 
     tnx.app = {
-        context: "",
-        version: undefined,
+        context: app_config.path,
+        version: app_config.version,
         init: function(options) {
             options = options || {};
             if (options.context) {
