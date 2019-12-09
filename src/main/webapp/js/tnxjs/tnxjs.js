@@ -102,11 +102,16 @@ var tnx = {
 };
 
 tnx.util = {
-    _upper: tnx,
+    upper: tnx,
+    depends: function(target, depends) {
+        target.depends = target.depends || {};
+        Object.assign(target.depends, depends);
+        return target;
+    }
 };
 
 tnx.app = {
-    _upper: tnx,
+    upper: tnx,
     context: app_config.path,
     version: app_config.version,
     init: function(options) {
@@ -283,7 +288,7 @@ tnx.app = {
 };
 
 tnx.app.page = {
-    _upper: tnx.app,
+    upper: tnx.app,
     context: "/pages",
     init: function(options) {
     }

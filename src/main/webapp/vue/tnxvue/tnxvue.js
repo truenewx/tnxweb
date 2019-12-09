@@ -8,9 +8,9 @@ require.config({
 });
 
 define(["tnxjs", "vue", "vue-router"], function(tnx, Vue, VueRouter) {
-    // 为tnx附加vue相关能力
-    tnx.app.page.vue = function(options) {
-        return new Vue(options);
-    };
+    Vue.use(VueRouter);
+    // 附加vue相关能力
+    tnx.app.Vue = Vue;
+    tnx.app.VueRouter = VueRouter;
     return tnx;
 });
