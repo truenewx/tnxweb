@@ -63,6 +63,18 @@ Object.assign(String.prototype, {
     }
 });
 
+String.prototype.startsWith = String.prototype.startsWith || function(searchString, position) {
+    position = position > 0 ? position|0 : 0;
+    return this.substring(position, position + searchString.length) === searchString;
+};
+
+String.prototype.endsWith = String.prototype.endsWith || function(searchString, endPosition) {
+    if (endPosition === undefined || endPosition > this.length) {
+        endPosition = this.length;
+    }
+    return this.substring(endPosition - searchString.length, endPosition) === searchString;
+};
+
 Object.assign(Element.prototype, {
     prependChild: function(child) {
         if (this.hasChildNodes()) {
