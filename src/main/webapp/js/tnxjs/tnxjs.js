@@ -1,3 +1,7 @@
+/**
+ * 对原生JavaScript的扩展支持，兼容ES5
+ */
+
 // 基础工具方法
 if (typeof Object.assign != "function") {
     /**
@@ -115,39 +119,6 @@ var tnx = {
 
 tnx.util = {
     upper: tnx,
-    depends: function(target, depends) {
-        target.depends = target.depends || {};
-        Object.assign(target.depends, depends);
-        return target;
-    }
-};
-
-tnx.app = {
-    upper: tnx,
-    context: app_config.path,
-    version: app_config.version,
-    init: function(options) {
-        options = options || {};
-        if (options.context) {
-            this.context = options.context;
-        }
-        if (options.version) {
-            this.version = options.version;
-        }
-        if (options.page) {
-            if (options.page.context) {
-                this.page.context = options.page.context;
-            }
-        }
-        var _this = this;
-        this.loadLinks(function() {
-            _this.loadScripts(function() {
-                if (typeof options.onLoad == "function") {
-                    options.onLoad.call();
-                }
-            });
-        });
-    },
     getAction: function(url) {
         var href = url || window.location.href;
         // 去掉参数
@@ -180,6 +151,78 @@ tnx.app = {
         }
         return href;
     },
+    bindResourceLoad: function(element, url, onLoad) {
+        if (typeof onLoad == "function") {
+            if (element.readyState) {
+                element.onreadystatechange = function() {
+                    if (element.readyState == "loaded" || element.readyState == "complete") {
+                        element.onreadystatechange = null;
+                        onLoad(url);
+                    }
+                }
+            } else {
+                element.onload = function() {
+                    onLoad(url);
+                }
+            }
+        }
+    },
+    loadLink: function(url, container, callback) {
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        this.bindResourceLoad(link, url, callback);
+        link.href = url;
+
+        var node = container.getFirstChildWithoutTagName("link");
+        if (node) {
+            container.insertBefore(link, node);
+        } else {
+            container.appendChild(link);
+        }
+    },
+    loadScript: function(url, container, callback) {
+        if (typeof require == "function") {
+            require([url], function(page) {
+                callback(url);
+                page.onLoad();
+            });
+        } else {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            this.bindResourceLoad(script, url, callback);
+            script.src = url;
+            container.appendChild(script);
+        }
+    }
+};
+
+tnx.app = {
+    upper: tnx,
+    context: app_config.path,
+    version: app_config.version,
+    init: function(options) {
+        options = options || {};
+        if (options.context) {
+            this.context = options.context;
+        }
+        if (options.version) {
+            this.version = options.version;
+        }
+        if (options.page) {
+            if (options.page.context) {
+                this.page.context = options.page.context;
+            }
+        }
+        var _this = this;
+        this.loadLinks(function() {
+            _this.loadScripts(function() {
+                if (typeof options.onLoad == "function") {
+                    options.onLoad.call();
+                }
+            });
+        });
+    },
     loadedResources: {}, // 保存加载中和加载完成的资源
     loadResources: function(resourceType, container, loadOneFunction, callback) {
         if (typeof container == "function") {
@@ -196,7 +239,7 @@ tnx.app = {
             resources.forEach(function(resource, i) {
                 resource = resource.trim();
                 if (resource == "true" || resource == "default") {
-                    var action = _this.getAction();
+                    var action = _this.util.getAction();
                     if (!action.endsWith("/")) {
                         resource = action + "." + resourceType;
                         if (resource.startsWith("/")) {
@@ -219,7 +262,7 @@ tnx.app = {
 
             resources.forEach(function(resource) {
                 if (resource) {
-                    loadOneFunction.call(_this, resource, container, function(url) {
+                    loadOneFunction.call(_this.upper.util, resource, container, function(url) {
                         _this.loadedResources[url] = true;
                         if (typeof callback == "function" && _this.isAllLoaded(resources)) {
                             callback.call(_this);
@@ -239,63 +282,19 @@ tnx.app = {
         }
         return true;
     },
-    bindResourceLoad: function(element, url, onLoad) {
-        if (typeof onLoad == "function") {
-            if (element.readyState) {
-                element.onreadystatechange = function() {
-                    if (element.readyState == "loaded" || element.readyState == "complete") {
-                        element.onreadystatechange = null;
-                        onLoad(url);
-                    }
-                }
-            } else {
-                element.onload = function() {
-                    onLoad(url);
-                }
-            }
-        }
-    },
     loadLinks: function(container, callback) {
         if (typeof container == "function") {
             callback = container;
             container = undefined;
         }
-        this.loadResources("css", container, this.loadLink, callback);
-    },
-    loadLink: function(url, container, callback) {
-        var link = document.createElement("link");
-        link.type = "text/css";
-        link.rel = "stylesheet";
-        this.bindResourceLoad(link, url, callback);
-        link.href = url;
-
-        var node = container.getFirstChildWithoutTagName("link");
-        if (node) {
-            container.insertBefore(link, node);
-        } else {
-            container.appendChild(link);
-        }
+        this.loadResources("css", container, this.upper.util.loadLink, callback);
     },
     loadScripts: function(container, callback) {
         if (typeof container == "function") {
             callback = container;
             container = undefined;
         }
-        this.loadResources("js", container, this.loadScript, callback);
-    },
-    loadScript: function(url, container, callback) {
-        if (typeof require == "function") {
-            require([url], function(page) {
-                callback(url);
-                page.onLoad();
-            });
-        } else {
-            var script = document.createElement("script");
-            script.type = "text/javascript";
-            this.bindResourceLoad(script, url, callback);
-            script.src = url;
-            container.appendChild(script);
-        }
+        this.loadResources("js", container, this.upper.util.loadScript, callback);
     }
 };
 
@@ -311,6 +310,3 @@ if (typeof define == "function" && define.amd) {
         return tnx;
     });
 }
-
-
-

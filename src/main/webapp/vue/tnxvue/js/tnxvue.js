@@ -9,7 +9,7 @@ require.config({
 
 define(["tnxjs", "vue", "vue-router"], function(tnx, Vue, VueRouter) {
     Vue.use(VueRouter);
-    Vue.component("tnx-text", {
+    Vue.component("tnx-span", {
         template: "<span><slot></slot></span>"
     });
     // 附加vue相关能力
