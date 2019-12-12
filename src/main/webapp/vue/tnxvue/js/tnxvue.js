@@ -15,5 +15,12 @@ define(["tnxjs", "vue", "vue-router"], function(tnx, Vue, VueRouter) {
     // 附加vue相关能力
     tnx.app.Vue = Vue;
     tnx.app.VueRouter = VueRouter;
+    tnx.util.loadPage = function(page) {
+        if (typeof page.onLoad == "function") {
+            page.onLoad();
+        } else { // 未提供onLoad方法，则将页面对象视为Vue构建参数对象
+            new Vue(page);
+        }
+    }
     return tnx;
 });

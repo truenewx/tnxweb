@@ -68,7 +68,7 @@ Object.assign(String.prototype, {
 });
 
 String.prototype.startsWith = String.prototype.startsWith || function(searchString, position) {
-    position = position > 0 ? position|0 : 0;
+    position = position > 0 ? position | 0 : 0;
     return this.substring(position, position + searchString.length) === searchString;
 };
 
@@ -182,10 +182,11 @@ tnx.util = {
         }
     },
     loadScript: function(url, container, callback) {
+        var _this = this;
         if (typeof require == "function") {
             require([url], function(page) {
                 callback(url);
-                page.onLoad();
+                _this.loadPage(page);
             });
         } else {
             var script = document.createElement("script");
@@ -194,6 +195,9 @@ tnx.util = {
             script.src = url;
             container.appendChild(script);
         }
+    },
+    loadPage: function(page) {
+        page.onLoad();
     }
 };
 
