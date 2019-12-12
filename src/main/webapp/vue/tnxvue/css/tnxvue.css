@@ -1,4 +1,4 @@
 /* tnxvue.css */
-tnx-span {
+tnx-div, tnx-span {
     visibility: hidden;
 }
