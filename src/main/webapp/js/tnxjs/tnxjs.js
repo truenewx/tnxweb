@@ -108,6 +108,7 @@ app_config = Object.assign({
     locale: "zh_CN",
     path: "",
     lib: "/tnxweb",
+    min: "",
 }, app_config);
 
 var tnx = {
