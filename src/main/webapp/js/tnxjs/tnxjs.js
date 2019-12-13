@@ -32,25 +32,23 @@ if (typeof Object.assign != "function") {
     };
 }
 
-
-/**
- * 设定命名空间
- * @param namespace 以.分隔的命名空间名称
- */
-function namespace(namespace) {
-    var names = namespace.split(".");
-    var space = undefined;
-    // 判断第一级对象是否已存在，若不存在则初始化为{}
-    eval("if(typeof " + names[0] + " === 'undefined'){" + names[0] + " = {};}");
-    // 取得第一级对象的引用
-    eval("space = " + names[0] + ";");
-    // 创建剩余级次的对象
-    for (var i = 1; i < names.length; i++) {
-        var name = names[i];
-        space[name] = space[name] || {};
-        space = space[name];
+Function.weave = function(before, target, after) {
+    return function() {
+        var args = [target];
+        for (var i = 0; i < arguments.length; i++) {
+            args.push(arguments[i]);
+        }
+        var result = before.apply(this, args);
+        if (after) {
+            args = [result];
+            for (var i = 0; i < arguments.length; i++) {
+                args.push(arguments[i]);
+            }
+            result = after.apply(this, args);
+        }
+        return result;
     }
-}
+};
 
 // Prototype
 // 不要在Object.prototype中添加函数，否则vue会报错
@@ -120,38 +118,6 @@ var tnx = {
 
 tnx.util = {
     upper: tnx,
-    getAction: function(url) {
-        var href = url || window.location.href;
-        // 去掉参数
-        var index = href.indexOf("?");
-        if (index >= 0) {
-            href = href.substr(0, index);
-        }
-        // 去掉协议
-        if (href.startsWith("//")) {
-            href = href.substr(2);
-        } else {
-            index = href.indexOf("://");
-            if (index >= 0) {
-                href = href.substr(index + 3);
-            }
-        }
-        // 去掉域名和端口
-        index = href.indexOf("/");
-        if (index >= 0) {
-            href = href.substr(index);
-        }
-        // 去掉contextPath
-        if (this.context != "" && this.context != "/" && href.startsWith(this.context)) {
-            href = href.substr(this.context.length);
-        }
-        // 去掉后缀
-        index = href.lastIndexOf(".");
-        if (index >= 0) {
-            href = href.substr(0, index);
-        }
-        return href;
-    },
     bindResourceLoad: function(element, url, onLoad) {
         if (typeof onLoad == "function") {
             if (element.readyState) {
@@ -187,7 +153,7 @@ tnx.util = {
         if (typeof require == "function") {
             require([url], function(page) {
                 callback(url);
-                _this.loadPage(page);
+                _this.loadPage(page, container);
             });
         } else {
             var script = document.createElement("script");
@@ -197,8 +163,12 @@ tnx.util = {
             container.appendChild(script);
         }
     },
-    loadPage: function(page) {
-        page.onLoad();
+    loadPage: function(page, container) {
+        if (typeof page == "function") {
+            page(container);
+        } else {
+            page.onLoad(container);
+        }
     }
 };
 
@@ -206,6 +176,10 @@ tnx.app = {
     upper: tnx,
     context: app_config.path,
     version: app_config.version,
+    min: app_config.min,
+    rpc: {
+        upper: tnx.app,
+    },
     init: function(options) {
         options = options || {};
         if (options.context) {
@@ -228,6 +202,38 @@ tnx.app = {
             });
         });
     },
+    getAction: function(url) {
+        var href = url || window.location.href;
+        // 去掉参数
+        var index = href.indexOf("?");
+        if (index >= 0) {
+            href = href.substr(0, index);
+        }
+        // 去掉协议
+        if (href.startsWith("//")) {
+            href = href.substr(2);
+        } else {
+            index = href.indexOf("://");
+            if (index >= 0) {
+                href = href.substr(index + 3);
+            }
+        }
+        // 去掉域名和端口
+        index = href.indexOf("/");
+        if (index >= 0) {
+            href = href.substr(index);
+        }
+        // 去掉contextPath
+        if (this.context != "" && this.context != "/" && href.startsWith(this.context)) {
+            href = href.substr(this.context.length);
+        }
+        // 去掉后缀
+        index = href.lastIndexOf(".");
+        if (index >= 0) {
+            href = href.substr(0, index);
+        }
+        return href;
+    },
     loadedResources: {}, // 保存加载中和加载完成的资源
     loadResources: function(resourceType, container, loadOneFunction, callback) {
         if (typeof container == "function") {
@@ -244,7 +250,7 @@ tnx.app = {
             resources.forEach(function(resource, i) {
                 resource = resource.trim();
                 if (resource == "true" || resource == "default") {
-                    var action = _this.util.getAction();
+                    var action = _this.getAction();
                     if (!action.endsWith("/")) {
                         resource = action + "." + resourceType;
                         if (resource.startsWith("/")) {
@@ -267,7 +273,7 @@ tnx.app = {
 
             resources.forEach(function(resource) {
                 if (resource) {
-                    loadOneFunction.call(_this.upper.util, resource, container, function(url) {
+                    loadOneFunction.call(tnx.util, resource, container, function(url) {
                         _this.loadedResources[url] = true;
                         if (typeof callback == "function" && _this.isAllLoaded(resources)) {
                             callback.call(_this);
@@ -292,16 +298,49 @@ tnx.app = {
             callback = container;
             container = undefined;
         }
-        this.loadResources("css", container, this.upper.util.loadLink, callback);
+        this.loadResources("css", container, tnx.util.loadLink, callback);
     },
     loadScripts: function(container, callback) {
         if (typeof container == "function") {
             callback = container;
             container = undefined;
         }
-        this.loadResources("js", container, this.upper.util.loadScript, callback);
+        this.loadResources("js", container, tnx.util.loadScript, callback);
     }
 };
+
+Object.assign(tnx.app.rpc, {
+    get: function(url, params, resolve, reject) {
+        return this.request("get", url, params, resolve, reject);
+    },
+    post: function(url, params, resolve, reject) {
+        return this.request("post", url, params, resolve, reject);
+    },
+    request: function(method, url, params, resolve, reject) {
+        if (typeof params == "function") {
+            reject = resolve;
+            resolve = params;
+            params = undefined;
+        }
+        if (url.startsWith("/")) { // 相对URL需添加上下文路径
+            url = tnx.app.context + url;
+        }
+        var config = {
+            method: method,
+            url: url,
+        };
+        if (method == "post") { // POST请求一律使用Body传递参数
+            config.data = params;
+        } else { // 其它请求均视为GET请求，一律使用URL传递参数
+            config.params = params;
+        }
+        this.axios(config).then(function(response) {
+            resolve(response.data);
+        }).catch(function(error) {
+            debugger
+        });
+    },
+});
 
 tnx.app.page = {
     upper: tnx.app,
@@ -311,7 +350,8 @@ tnx.app.page = {
 };
 
 if (typeof define == "function" && define.amd) {
-    define(function() {
+    define([tnx.context + "/js/vendor/axios-0.19.0/axios.js"], function(axios) {
+        tnx.app.rpc.axios = axios;
         return tnx;
     });
 }
