@@ -32,21 +32,13 @@ if (typeof Object.assign != "function") {
     };
 }
 
-Function.weave = function(before, target, after) {
+Function.around = function(target, around) {
     return function() {
         var args = [target];
         for (var i = 0; i < arguments.length; i++) {
             args.push(arguments[i]);
         }
-        var result = before.apply(this, args);
-        if (after) {
-            args = [result];
-            for (var i = 0; i < arguments.length; i++) {
-                args.push(arguments[i]);
-            }
-            result = after.apply(this, args);
-        }
-        return result;
+        return around.apply(this, args);
     }
 };
 
@@ -306,6 +298,32 @@ tnx.app = {
             container = undefined;
         }
         this.loadResources("js", container, tnx.util.loadScript, callback);
+    },
+    alert: function(title, message, callback) {
+        if (message == undefined && callback == undefined) {
+            message = title;
+            title = undefined;
+        } else if (typeof message == "function") {
+            callback = message;
+            message = title;
+            title = undefined;
+        }
+        alert(title + ":\n" + message);
+        if (typeof callback == "function") {
+            callback();
+        }
+    },
+    confirm: function(title, message, callback) {
+        if (message == undefined && callback == undefined) {
+            message = title;
+            title = undefined;
+        } else if (typeof message == "function") {
+            callback = message;
+            message = title;
+            title = undefined;
+        }
+        var yes = confirm(title + ":\n" + message);
+        callback(yes);
     }
 };
 
@@ -334,12 +352,35 @@ Object.assign(tnx.app.rpc, {
         } else { // 其它请求均视为GET请求，一律使用URL传递参数
             config.params = params;
         }
+        var _this = this;
         this.axios(config).then(function(response) {
             resolve(response.data);
         }).catch(function(error) {
-            debugger
+            var errors = error.response.data.errors;
+            if (errors) {
+                if (typeof reject == "function") {
+                    reject(errors);
+                } else {
+                    _this.error(errors);
+                }
+            } else {
+                console.error(error.stack);
+            }
         });
     },
+    getErrorMessage: function(errors) {
+        var message = "";
+        if (errors instanceof Array) {
+            for (var i = 0; i < errors.length; i++) {
+                message += errors[i].message + "\n";
+            }
+        }
+        return message.trim();
+    },
+    error: function(errors) {
+        var message = this.getErrorMessage(errors);
+        tnx.app.alert("错误", message);
+    }
 });
 
 tnx.app.page = {

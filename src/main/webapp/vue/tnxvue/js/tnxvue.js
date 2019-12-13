@@ -18,5 +18,17 @@ define(["tnxjs", "vue", "vue-router"], function(tnx, Vue, VueRouter) {
     // 附加vue相关能力
     tnx.app.Vue = Vue;
     tnx.app.VueRouter = VueRouter;
+    tnx.util.loadPage = Function.around(tnx.util.loadPage, function(loadPage, page, container) {
+        if (container.tagName == "BODY") { // vue不支持以body为容器，故从body下获取第一个div作为容器
+            for (var i = 0; i < container.children.length; i++) {
+                var child = container.children[i];
+                if (child.tagName == "DIV") {
+                    container = child;
+                    break;
+                }
+            }
+        }
+        loadPage.call(this, page, container);
+    });
     return tnx;
 });
