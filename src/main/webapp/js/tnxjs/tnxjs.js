@@ -109,7 +109,7 @@ var tnx = {
 };
 
 tnx.util = {
-    upper: tnx,
+    owner: tnx,
     bindResourceLoad: function(element, url, onLoad) {
         if (typeof onLoad == "function") {
             if (element.readyState) {
@@ -145,7 +145,7 @@ tnx.util = {
         if (typeof require == "function") {
             require([url], function(page) {
                 callback(url);
-                _this.loadPage(page, container);
+                _this.initPage(page, container);
             });
         } else {
             var script = document.createElement("script");
@@ -155,22 +155,22 @@ tnx.util = {
             container.appendChild(script);
         }
     },
-    loadPage: function(page, container) {
+    initPage: function(page, container) {
         if (typeof page == "function") {
             page(container);
-        } else {
+        } else { // 如果页面js组件不是初始化方法，则必须包含onLoad()方法，没有则报错
             page.onLoad(container);
         }
     }
 };
 
 tnx.app = {
-    upper: tnx,
+    owner: tnx,
     context: app_config.path,
     version: app_config.version,
     min: app_config.min,
     rpc: {
-        upper: tnx.app,
+        owner: tnx.app,
     },
     init: function(options) {
         options = options || {};
@@ -299,6 +299,20 @@ tnx.app = {
         }
         this.loadResources("js", container, tnx.util.loadScript, callback);
     },
+    buildCsrfField: function(form) {
+        var meta = document.querySelector("meta[name='csrf']");
+        if (meta) {
+            var name = meta.getAttribute("parameter");
+            var value = meta.getAttribute("content");
+            if (name && value) {
+                var input = document.createElement("input");
+                input.type = "hidden";
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            }
+        }
+    },
     alert: function(title, message, callback) {
         if (message == undefined && callback == undefined) {
             message = title;
@@ -346,12 +360,19 @@ Object.assign(tnx.app.rpc, {
         var config = {
             method: method,
             url: url,
+            headers: {},
         };
-        if (method == "post") { // POST请求一律使用Body传递参数
-            config.data = params;
-        } else { // 其它请求均视为GET请求，一律使用URL传递参数
-            config.params = params;
+        params = params || {};
+        if (method == "post") { // POST请求
+            config.data = params; // 默认使用Body传递参数
+            if (Object.keys(params).length <= 3) { // 参数个数不超过3个时，同时通过URL传递参数
+                config.params = params;
+            }
+            Object.assign(config.headers, this.getCsrfHeader()); // 加入csrf抵御配置
+        } else { // 其它请求均视为GET请求
+            config.params = params; // 一律使用URL传递参数
         }
+
         var _this = this;
         this.axios(config).then(function(response) {
             resolve(response.data);
@@ -367,6 +388,19 @@ Object.assign(tnx.app.rpc, {
                 console.error(error.stack);
             }
         });
+    },
+    getCsrfHeader: function() {
+        var meta = document.querySelector("meta[name='csrf']");
+        if (meta) {
+            var name = meta.getAttribute("header");
+            var value = meta.getAttribute("content");
+            if (name && value) {
+                var result = {};
+                result[name] = value;
+                return result;
+            }
+        }
+        return undefined;
     },
     getErrorMessage: function(errors) {
         var message = "";
@@ -384,14 +418,15 @@ Object.assign(tnx.app.rpc, {
 });
 
 tnx.app.page = {
-    upper: tnx.app,
+    owner: tnx.app,
     context: "/pages",
     init: function(options) {
     }
 };
 
 if (typeof define == "function" && define.amd) {
-    define([tnx.context + "/js/vendor/axios-0.19.0/axios.js"], function(axios) {
+    define([tnx.context + "/js/vendor/md5-2.1/md5.js", tnx.context + "/js/vendor/axios-0.19.0/axios.js"], function(md5, axios) {
+        tnx.util.md5 = md5;
         tnx.app.rpc.axios = axios;
         return tnx;
     });
