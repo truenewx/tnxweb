@@ -6,7 +6,7 @@ var components = {
 
 require.config({
     paths: Object.assign({
-        "tnxjs": app_config.lib + "/js/tnxjs/tnxjs",
+        "tnxjs": app_config.lib + "/core/tnxjs/tnxjs",
         "vue": app_config.lib + "/vue/vendor/vue-2.6.10/vue" + app_config.min,
         "vue-router": app_config.lib + "/vue/vendor/vue-router-3.1.3/vue-router" + app_config.min,
     }, components)

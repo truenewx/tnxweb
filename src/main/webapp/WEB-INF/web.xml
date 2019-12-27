@@ -6,7 +6,16 @@
 
     <display-name>tnxweb</display-name>
 
-    <!-- IE9新的安全机制要求web server送过来的 HTTP response header中的content-type必需指明css文件的MIME-type为'text/css'，否则IE9不会把它作为css文件来处理 -->
+    <!--允许跨域访问 -->
+    <filter>
+        <filter-name>CorsFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CorsFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <mime-mapping>
         <extension>css</extension>
         <mime-type>text/css</mime-type>
