@@ -9,7 +9,7 @@
     <!--允许跨域访问 -->
     <filter>
         <filter-name>CorsFilter</filter-name>
-        <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+        <filter-class>org.truenewx.tnxweb.filter.CorsFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>CorsFilter</filter-name>
