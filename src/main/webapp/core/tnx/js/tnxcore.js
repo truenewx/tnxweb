@@ -1,6 +1,4 @@
-/**
- * 对原生JavaScript的扩展支持，兼容ES5
- */
+// tnxcore.js，原生JavaScript的扩展支持，兼容ES5
 
 // 基础工具方法
 if (typeof Object.assign != "function") {
@@ -101,15 +99,15 @@ app_config = Object.assign({
     min: "",
 }, app_config);
 
-var tnx = {
+var tnxcore = {
     version: "3.0",
     encoding: "UTF-8",
     locale: app_config.locale,
     context: app_config.lib,
 };
 
-tnx.util = {
-    owner: tnx,
+tnxcore.util = {
+    owner: tnxcore,
     bindResourceLoad: function(element, url, onLoad) {
         if (typeof onLoad == "function") {
             if (element.readyState) {
@@ -164,13 +162,13 @@ tnx.util = {
     }
 };
 
-tnx.app = {
-    owner: tnx,
+tnxcore.app = {
+    owner: tnxcore,
     context: app_config.path,
     version: app_config.version,
     min: app_config.min,
     rpc: {
-        owner: tnx.app,
+        owner: tnxcore.app,
     },
     init: function(options) {
         options = options || {};
@@ -265,7 +263,7 @@ tnx.app = {
 
             resources.forEach(function(resource) {
                 if (resource) {
-                    loadOneFunction.call(tnx.util, resource, container, function(url) {
+                    loadOneFunction.call(tnxcore.util, resource, container, function(url) {
                         _this.loadedResources[url] = true;
                         if (typeof callback == "function" && _this.isAllLoaded(resources)) {
                             callback.call(_this);
@@ -290,14 +288,14 @@ tnx.app = {
             callback = container;
             container = undefined;
         }
-        this.loadResources("css", container, tnx.util.loadLink, callback);
+        this.loadResources("css", container, tnxcore.util.loadLink, callback);
     },
     loadScripts: function(container, callback) {
         if (typeof container == "function") {
             callback = container;
             container = undefined;
         }
-        this.loadResources("js", container, tnx.util.loadScript, callback);
+        this.loadResources("js", container, tnxcore.util.loadScript, callback);
     },
     buildCsrfField: function(form) {
         var meta = document.querySelector("meta[name='csrf']");
@@ -341,7 +339,7 @@ tnx.app = {
     }
 };
 
-Object.assign(tnx.app.rpc, {
+Object.assign(tnxcore.app.rpc, {
     get: function(url, params, resolve, reject) {
         return this.request("get", url, params, resolve, reject);
     },
@@ -355,7 +353,7 @@ Object.assign(tnx.app.rpc, {
             params = undefined;
         }
         if (url.startsWith("/")) { // 相对URL需添加上下文路径
-            url = tnx.app.context + url;
+            url = tnxcore.app.context + url;
         }
         var config = {
             method: method,
@@ -413,21 +411,21 @@ Object.assign(tnx.app.rpc, {
     },
     error: function(errors) {
         var message = this.getErrorMessage(errors);
-        tnx.app.alert("错误", message);
+        tnxcore.app.alert("错误", message);
     }
 });
 
-tnx.app.page = {
-    owner: tnx.app,
+tnxcore.app.page = {
+    owner: tnxcore.app,
     context: "/pages",
     init: function(options) {
     }
 };
 
 if (typeof define == "function" && define.amd) {
-    define([tnx.context + "/core/vendor/md5-2.1/md5.js", tnx.context + "/core/vendor/axios-0.19.0/axios.js"], function(md5, axios) {
-        tnx.util.md5 = md5;
-        tnx.app.rpc.axios = axios;
-        return tnx;
+    define([tnxcore.context + "/core/vendor/md5-2.1/md5.js", tnxcore.context + "/core/vendor/axios-0.19.0/axios.js"], function(md5, axios) {
+        tnxcore.util.md5 = md5;
+        tnxcore.app.rpc.axios = axios;
+        return tnxcore;
     });
 }
