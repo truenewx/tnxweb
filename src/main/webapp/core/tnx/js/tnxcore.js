@@ -199,6 +199,11 @@ tnx.app = {
         if (index >= 0) {
             href = href.substr(0, index);
         }
+        // 去掉锚点
+        index = href.indexOf("#");
+        if (index >= 0) {
+            href = href.substr(0, index);
+        }
         // 去掉协议
         if (href.startsWith("//")) {
             href = href.substr(2);
@@ -340,37 +345,40 @@ tnx.app = {
 };
 
 Object.assign(tnx.app.rpc, {
-    get: function(url, params, resolve, reject) {
-        return this.request("get", url, params, resolve, reject);
+    get: function(url, params, body, resolve, reject) {
+        return this.request("get", url, params, body, resolve, reject);
     },
-    post: function(url, params, resolve, reject) {
-        return this.request("post", url, params, resolve, reject);
+    post: function(url, params, body, resolve, reject) {
+        return this.request("post", url, params, body, resolve, reject);
     },
-    request: function(method, url, params, resolve, reject) {
-        if (typeof params == "function") {
-            reject = resolve;
+    request: function(method, url, params, body, resolve, reject) {
+        if (typeof params == "function" && typeof body == "function") {
+            reject = body;
             resolve = params;
+            body = undefined;
             params = undefined;
+        } else {
+            if (typeof body == "function") { // params不是函数而body是函数，说明没有body
+                reject = resolve;
+                resolve = body;
+                body = undefined;
+            } else if (typeof params == "function") { // params是函数而body不是函数，此时body只可以为undefined
+                reject = undefined; // 此处本应该为body，但body此时只能为undefined
+                resolve = params;
+                body = undefined;
+                params = undefined;
+            }
         }
         if (url.startsWith("/")) { // 相对URL需添加上下文路径
-            url = tnx.app.context + url;
+            url = this.owner.context + url;
         }
         var config = {
             method: method,
             url: url,
             headers: {},
+            params: params,
+            data: body
         };
-        params = params || {};
-        if (method == "post") { // POST请求
-            config.data = params; // 默认使用Body传递参数
-            if (Object.keys(params).length <= 3) { // 参数个数不超过3个时，同时通过URL传递参数
-                config.params = params;
-            }
-            Object.assign(config.headers, this.getCsrfHeader()); // 加入csrf抵御配置
-        } else { // 其它请求均视为GET请求
-            config.params = params; // 一律使用URL传递参数
-        }
-
         var _this = this;
         this.axios(config).then(function(response) {
             resolve(response.data);
@@ -411,7 +419,7 @@ Object.assign(tnx.app.rpc, {
     },
     error: function(errors) {
         var message = this.getErrorMessage(errors);
-        tnx.app.alert("错误", message);
+        this.owner.alert("错误", message);
     }
 });
 
