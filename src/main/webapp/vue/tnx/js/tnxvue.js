@@ -11,12 +11,11 @@ require.config({
     }, components)
 });
 
-define(["tnxcore", "vue", "vue-router"], function(tnx, Vue, VueRouter) {
+define(["tnxcore", "vue", "vue-router"], function(tnx, v, vr) {
     require(Object.keys(components));
+    Vue = v;
+    VueRouter = vr;
     Vue.use(VueRouter);
-    // 附加vue相关能力
-    tnx.app.Vue = Vue;
-    tnx.app.VueRouter = VueRouter;
     tnx.util.initPage = Function.around(tnx.util.initPage, function(initPage, page, container) {
         if (container.tagName == "BODY") { // vue不支持以body为容器，故从body下获取第一个div作为容器
             for (var i = 0; i < container.children.length; i++) {
