@@ -108,6 +108,11 @@ var tnx = {
 
 tnx.util = {
     owner: tnx,
+    replaceTag: function(html, sourceTag, targetTag) {
+        return html.replace(new RegExp("<" + sourceTag + " ", "i"), "<" + targetTag + " ")
+        .replace(new RegExp("<" + sourceTag + ">", "i"), "<" + targetTag + ">")
+        .replace(new RegExp("<\/" + sourceTag + ">", "i"), "</" + targetTag + ">")
+    },
     bindResourceLoad: function(element, url, onLoad) {
         if (typeof onLoad == "function") {
             if (element.readyState) {
@@ -164,30 +169,22 @@ tnx.util = {
 
 tnx.app = {
     owner: tnx,
-    context: app_config.path,
+    context: app_config.path, // app_config不能使用context，否则会出现不明错误
     version: app_config.version,
     min: app_config.min,
     rpc: {
         owner: tnx.app,
     },
-    init: function(options) {
-        options = options || {};
-        if (options.context) {
-            this.context = options.context;
-        }
-        if (options.version) {
-            this.version = options.version;
-        }
-        if (options.page) {
-            if (options.page.context) {
-                this.page.context = options.page.context;
-            }
+    init: function(container, callback) {
+        if (typeof container == "function") {
+            callback = container;
+            container = undefined;
         }
         var _this = this;
-        this.loadLinks(function() {
-            _this.loadScripts(function() {
-                if (typeof options.onLoad == "function") {
-                    options.onLoad.call();
+        this.loadLinks(container, function() {
+            _this.loadScripts(container, function() {
+                if (typeof callback == "function") {
+                    callback.call();
                 }
             });
         });
@@ -238,6 +235,7 @@ tnx.app = {
         }
         container = container || document.body;
 
+        var empty = true;
         var resources = container.getAttribute(resourceType);
         if (resources) {
             resources = resources.split(",");
@@ -245,7 +243,8 @@ tnx.app = {
             resources.forEach(function(resource, i) {
                 resource = resource.trim();
                 if (resource == "true" || resource == "default") {
-                    var action = _this.getAction();
+                    var url = container.getAttribute("url");
+                    var action = _this.getAction(url);
                     if (!action.endsWith("/")) {
                         resource = action + "." + resourceType;
                         if (resource.startsWith("/")) {
@@ -268,6 +267,7 @@ tnx.app = {
 
             resources.forEach(function(resource) {
                 if (resource) {
+                    empty = false;
                     loadOneFunction.call(tnx.util, resource, container, function(url) {
                         _this.loadedResources[url] = true;
                         if (typeof callback == "function" && _this.isAllLoaded(resources)) {
@@ -276,6 +276,9 @@ tnx.app = {
                     });
                 }
             });
+        }
+        if (empty && typeof callback == "function") {
+            callback.call(this);
         }
     },
     isAllLoaded: function(resources) {

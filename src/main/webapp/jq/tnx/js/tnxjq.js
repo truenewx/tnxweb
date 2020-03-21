@@ -6,8 +6,8 @@ require.config({
     }
 });
 
-define(["tnxcore", "jquery"], function(tnx) {
-    Object.assign(tnx.util, {
+var tnxjq = {
+    util: {
         maxZIndex: function(objs) {
             var result = -1;
             $.each(objs, function(i, obj) {
@@ -29,7 +29,71 @@ define(["tnxcore", "jquery"], function(tnx) {
             } else {
                 return maxZIndex + step;
             }
-        },
-    });
+        }
+    },
+    app: {
+        ajax: function(url, params, callback, options) {
+            var _this = this;
+            var resp = $.ajax(url, {
+                cache: false,
+                data: params,
+                type: options.type,
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=" + this.encoding, // 不能更改
+                error: options.error,
+                success: function(html) {
+                    html = html.trim();
+                    if (html.startsWith("<!DOCTYPE html>")) {
+                        html = html.replace("<!DOCTYPE html>", "").trim();
+                    }
+                    html = tnx.util.replaceTag(html, "html", "tnx-html");
+                    html = tnx.util.replaceTag(html, "head", "tnx-head");
+                    html = tnx.util.replaceTag(html, "body", "tnx-body");
+                    html = $(html);
+                    var title = options.title;
+                    if (!title) {
+                        title = $("tnx-head title", html).text();
+                        if (!title) {
+                            title = html.children(":first").attr("title");
+                        }
+                    }
+                    var links = $("tnx-head link", html);
+
+                    var container = $("tnx-body", html);
+                    if (container.length == 0) { // 没有BODY
+                        if (html.length > 1) { // 确保单根
+                            html.wrap("<div></div>");
+                            container = html.parent();
+                            container.prepend(links);
+                            html = container.html();
+                        } else {
+                            container = html;
+                            container.prepend(links);
+                        }
+                    } else { // 有BODY
+                        html = container[0].outerHTML;
+                        container = $(tnx.util.replaceTag(html, "tnx-body", "div"));
+                        container.prepend(links);
+                        html = container.html();
+                    }
+                    container.attr("url", url);
+                    _this.init(container[0], function() {
+                        if (typeof callback == "function") {
+                            callback.call(_this, title, html, {
+                                width: options.width || container.attr("width"),
+                                events: options.events,
+                            });
+                        }
+                    });
+                }
+            });
+            resp.fail(options.error);
+        }
+    }
+};
+
+define(["tnxcore", "jquery"], function(tnx) {
+    Object.assign(tnx.util, tnxjq.util);
+    Object.assign(tnx.app, tnxjq.app);
     return tnx;
 });
