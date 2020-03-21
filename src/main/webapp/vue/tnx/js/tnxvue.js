@@ -11,12 +11,12 @@ require.config({
     }, components)
 });
 
-define(["tnxcore", "vue", "vue-router"], function(tnx, v, vr) {
+define(["tnxcore", "vue", "vue-router"], function(tnxcore, v, vr) {
     require(Object.keys(components));
     Vue = v;
     VueRouter = vr;
     Vue.use(VueRouter);
-    tnx.util.initPage = Function.around(tnx.util.initPage, function(initPage, page, container) {
+    tnxcore.util.initPage = Function.around(tnxcore.util.initPage, function(initPage, page, container) {
         if (container.tagName == "BODY") { // vue不支持以body为容器，故从body下获取第一个div作为容器
             for (var i = 0; i < container.children.length; i++) {
                 var child = container.children[i];
@@ -28,5 +28,6 @@ define(["tnxcore", "vue", "vue-router"], function(tnx, v, vr) {
         }
         initPage.call(this, page, container);
     });
+    tnx = tnxcore;
     return tnx;
 });

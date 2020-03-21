@@ -221,7 +221,8 @@ var tnxbs = {
     }
 };
 
-define(["tnxjq", "bootstrap"], function(tnx) {
-    Object.assign(tnx.app, tnxbs.app);
+define(["tnxjq", "bootstrap"], function(tnxjq) {
+    Object.assign(tnxjq.app, tnxbs.app);
+    tnx = tnxjq;
     return tnx;
 });

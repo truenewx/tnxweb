@@ -92,8 +92,9 @@ var tnxjq = {
     }
 };
 
-define(["tnxcore", "jquery"], function(tnx) {
-    Object.assign(tnx.util, tnxjq.util);
-    Object.assign(tnx.app, tnxjq.app);
+define(["tnxcore", "jquery"], function(tnxcore) {
+    Object.assign(tnxcore.util, tnxjq.util);
+    Object.assign(tnxcore.app, tnxjq.app);
+    tnx = tnxcore;
     return tnx;
 });
