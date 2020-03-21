@@ -12,9 +12,9 @@ require.config({
 });
 
 define(["tnxcore", "vue", "vue-router"], function(tnxcore, v, vr) {
-    require(Object.keys(components));
     Vue = v;
     VueRouter = vr;
+    require(Object.keys(components));
     Vue.use(VueRouter);
     tnxcore.util.initPage = Function.around(tnxcore.util.initPage, function(initPage, page, container) {
         if (container.tagName == "BODY") { // vue不支持以body为容器，故从body下获取第一个div作为容器

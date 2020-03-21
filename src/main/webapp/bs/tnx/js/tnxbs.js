@@ -14,8 +14,8 @@ require.config({
     }
 });
 
-var tnxbs = {
-    app: {
+define(["tnxjq", "bootstrap"], function(tnxjq) {
+    Object.assign(tnxjq.app, {
         templates: {
             dialog: '<div class="modal fade" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">\n' +
@@ -218,11 +218,7 @@ var tnxbs = {
                 _this.dialog(title, content, buttons, options);
             }, options);
         }
-    }
-};
-
-define(["tnxjq", "bootstrap"], function(tnxjq) {
-    Object.assign(tnxjq.app, tnxbs.app);
+    });
     tnx = tnxjq;
     return tnx;
 });

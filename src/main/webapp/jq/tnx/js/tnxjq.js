@@ -6,8 +6,8 @@ require.config({
     }
 });
 
-var tnxjq = {
-    util: {
+define(["tnxcore", "jquery"], function(tnxcore) {
+    Object.assign(tnxcore.util, {
         maxZIndex: function(objs) {
             var result = -1;
             $.each(objs, function(i, obj) {
@@ -30,8 +30,8 @@ var tnxjq = {
                 return maxZIndex + step;
             }
         }
-    },
-    app: {
+    });
+    Object.assign(tnxcore.app, {
         ajax: function(url, params, callback, options) {
             var _this = this;
             var resp = $.ajax(url, {
@@ -89,12 +89,7 @@ var tnxjq = {
             });
             resp.fail(options.error);
         }
-    }
-};
-
-define(["tnxcore", "jquery"], function(tnxcore) {
-    Object.assign(tnxcore.util, tnxjq.util);
-    Object.assign(tnxcore.app, tnxjq.app);
+    });
     tnx = tnxcore;
     return tnx;
 });
