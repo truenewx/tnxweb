@@ -79,10 +79,8 @@ define(["tnxcore", "jquery"], function(tnxcore) {
                     container.attr("url", url);
                     _this.init(container[0], function() {
                         if (typeof callback == "function") {
-                            callback.call(_this, title, html, {
-                                width: options.width || container.attr("width"),
-                                events: options.events,
-                            });
+                            var width = options.width || container.attr("width");
+                            callback.call(_this, title, html, width);
                         }
                     });
                 }

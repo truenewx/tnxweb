@@ -214,8 +214,11 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             }
 
             var _this = this;
-            this.ajax(url, params, function(title, content, options) {
-                _this.dialog(title, content, buttons, options);
+            this.ajax(url, params, function(title, content, width) {
+                _this.dialog(title, content, buttons, {
+                    width: width,
+                    events: options.events
+                });
             }, options);
         }
     });
