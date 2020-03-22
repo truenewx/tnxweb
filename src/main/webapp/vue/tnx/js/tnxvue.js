@@ -11,6 +11,9 @@ require.config({
     }, components)
 });
 
+var Vue;
+var VueRouter;
+
 define(["tnxcore", "vue", "vue-router"], function(tnxcore, v, vr) {
     Vue = v;
     VueRouter = vr;
