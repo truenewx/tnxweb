@@ -18,7 +18,7 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
     $.extend(tnxjq.app, {
         templates: {
             dialog: '<div class="modal fade" tabindex="-1" role="dialog">\n' +
-                '  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">\n' +
+                '  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">\n' +
                 '    <div class="modal-content">\n' +
                 '      <div class="modal-header">\n' +
                 '        <h5 class="modal-title">${title}</h5>\n' +
@@ -30,28 +30,33 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 '      <div class="modal-footer"></div>\n' +
                 '    </div>\n' +
                 '  </div>\n' +
-                '</div>'
+                '</div>',
+            doing: '<div class="modal modal-doing" tabindex="-1" role="dialog">\n' +
+                '  <div class="modal-dialog modal-dialog-centered" role="document">\n' +
+                '    <div class="modal-content">${content}</div>\n' +
+                '  </div>\n' +
+                '</div>',
         },
         dialog: function(title, content, buttons, options) {
-            var dialogObj = $(this.templates.dialog);
-            $(".modal-title", dialogObj).html(title);
-            $(".modal-body", dialogObj).html(content);
-            $("body").append(dialogObj);
-            dialogObj.close = function() {
-                dialogObj.modal("hide");
+            var modalObject = $(this.templates.dialog);
+            $(".modal-title", modalObject).html(title);
+            $(".modal-body", modalObject).html(content);
+            $("body").append(modalObject);
+            modalObject.close = function() {
+                modalObject.modal("hide");
             };
             // 处理标题
             if (typeof title == "string") {
-                $(".modal-title", dialogObj).text(title);
+                $(".modal-title", modalObject).text(title);
             } else if (title instanceof jQuery) {
-                title.replaceAll($(".modal-title", dialogObj));
+                title.replaceAll($(".modal-title", modalObject));
                 title.addClass(".modal-title");
             } else {
-                $(".modal-header", dialogObj).remove();
+                $(".modal-header", modalObject).remove();
             }
             // 处理按钮
             var focusBtnObj = undefined;
-            var footerObj = dialogObj.find(".modal-footer");
+            var footerObj = modalObject.find(".modal-footer");
             if ($.isArray(buttons)) { // buttons必须为数组形式，否则不会生成按钮
                 footerObj.html(""); // 先清空可能已有的按钮
                 $.each(buttons, function(index, button) {
@@ -66,11 +71,11 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                         }
                         if (button.click) {
                             btnObj.click(function() {
-                                button.click.call(dialogObj);
+                                button.click.call(modalObject);
                             });
                         } else {
                             btnObj.click(function() {
-                                dialogObj.close();
+                                modalObject.close();
                             });
                         }
                         if (button.focus === true) {
@@ -86,45 +91,45 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             options = options || {};
             // 处理宽度
             if (options.width) {
-                $(".modal-dialog", dialogObj).addClass("modal-" + options.width);
+                $(".modal-dialog", modalObject).addClass("modal-" + options.width);
             }
             var events = options.events;
             // 注册事件
-            dialogObj.on("shown.bs.modal", function() { // shown事件特殊处理
+            modalObject.on("shown.bs.modal", function() { // shown事件特殊处理
                 if (focusBtnObj) {
                     focusBtnObj.focus();
                 }
                 if (events && typeof events.shown == "function") {
-                    events.shown.call(dialogObj);
+                    events.shown.call(modalObject);
                 }
-                dialogObj.off("shown.bs.modal");
+                modalObject.off("shown.bs.modal");
             });
-            dialogObj.on("hidden.bs.modal", function() { // hidden事件特殊处理
+            modalObject.on("hidden.bs.modal", function() { // hidden事件特殊处理
                 if (events && typeof events.hidden == "function") {
-                    events.hidden.call(dialogObj);
+                    events.hidden.call(modalObject);
                 }
-                dialogObj.remove(); // 对话框关闭后清除对话框DOM元素
+                modalObject.remove(); // 对话框关闭后清除对话框DOM元素
             });
             if (events) {
                 if (typeof events.close == "function") {
-                    var btnClose = $(".close", dialogObj);
+                    var btnClose = $(".close", modalObject);
                     btnClose.click(function() {
-                        events.close.call(dialogObj);
+                        events.close.call(modalObject);
                     });
                 } else if (typeof events.show == "function") {
-                    dialogObj.on("show.bs.modal", function() {
-                        events.show.call(dialogObj);
+                    modalObject.on("show.bs.modal", function() {
+                        events.show.call(modalObject);
                     });
                 } else if (typeof events.hide == "function") {
-                    dialogObj.on("hide.bs.modal", function() {
-                        events.hide.call(dialogObj);
+                    modalObject.on("hide.bs.modal", function() {
+                        events.hide.call(modalObject);
                     });
                 }
             }
-            dialogObj.modal(options);
+            modalObject.modal(options);
             var zIndex = tnx.util.minTopZIndex(20);
-            dialogObj.css("zIndex", zIndex);
-            dialogObj.next(".modal-backdrop").css("zIndex", zIndex - 10);
+            modalObject.css("zIndex", zIndex);
+            modalObject.next(".modal-backdrop").css("zIndex", zIndex - 10);
         },
         alert: function(title, message, callback, options) {
             if (typeof message == "function") {
@@ -259,6 +264,41 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 type: "get", // 打开对话框链接一定是GET方式
                 error: undefined // TODO
             });
+        },
+        doing: function(content, timeout, callback) {
+            if (typeof timeout == "function") {
+                callback = timeout;
+                timeout = undefined;
+            }
+            var modalObject = $(this.templates.doing);
+            var contentObject = $(".modal-content", modalObject).html(content);
+            modalObject.close = function() {
+                modalObject.modal("hide");
+            };
+            // 注册事件
+            modalObject.on("shown.bs.modal", function() {
+                modalObject.off("shown.bs.modal");
+                if (timeout) {
+                    setTimeout(function() {
+                        modalObject.close();
+                    }, timeout);
+                }
+            });
+            modalObject.on("hidden.bs.modal", function() {
+                if (typeof callback == "function") {
+                    callback.call(modalObject);
+                }
+                modalObject.remove();
+            });
+            modalObject.modal({
+                backdrop: false,
+                keyboard: false,
+            });
+            var zIndex = tnx.util.minTopZIndex(20);
+            modalObject.css("zIndex", zIndex);
+        },
+        closeDoing: function() {
+            $(".modal-doing").modal("hide");
         }
     });
     tnx = tnxjq;

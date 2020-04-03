@@ -1,0 +1,12 @@
+/**
+ * tnxbs.css
+ */
+.modal-doing .modal-content {
+    text-align: center;
+    padding: 30px;
+    margin: 0 auto;
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: auto;
+    min-width: 100px;
+}
