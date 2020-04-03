@@ -1,8 +1,8 @@
 /* tnxvue.css */
-tv-div[mode='v'], tv-span[mode='v'] {
+tv-div, tv-span {
     visibility: hidden;
 }
 
-tv-div[mode='d'], tv-span[mode='d'] {
+[v-if], [v-else-if], [v-else] {
     display: none;
 }
