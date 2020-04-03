@@ -172,9 +172,6 @@ tnx.app = {
     context: app_config.path, // app_config不能使用context，否则会出现不明错误
     version: app_config.version,
     min: app_config.min,
-    rpc: {
-        owner: tnx.app,
-    },
     init: function(container, callback) {
         if (typeof container == "function") {
             callback = container;
@@ -347,7 +344,8 @@ tnx.app = {
     }
 };
 
-Object.assign(tnx.app.rpc, {
+tnx.app.rpc = {
+    owner: tnx.app,
     get: function(url, params, body, resolve, reject) {
         return this.request("get", url, params, body, resolve, reject);
     },
@@ -424,7 +422,7 @@ Object.assign(tnx.app.rpc, {
         var message = this.getErrorMessage(errors);
         this.owner.alert("错误", message);
     }
-});
+};
 
 tnx.app.page = {
     owner: tnx.app,

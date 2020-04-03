@@ -7,7 +7,7 @@ require.config({
 });
 
 define(["tnxcore", "jquery"], function(tnxcore) {
-    Object.assign(tnxcore.util, {
+    $.extend(tnxcore.util, {
         maxZIndex: function(objs) {
             var result = -1;
             $.each(objs, function(i, obj) {
@@ -31,8 +31,13 @@ define(["tnxcore", "jquery"], function(tnxcore) {
             }
         }
     });
-    Object.assign(tnxcore.app, {
+    $.extend(tnxcore.app, {
         ajax: function(url, params, callback, options) {
+            if (typeof params == "function" || params instanceof jQuery) {
+                options = callback;
+                callback = params;
+                params = undefined;
+            }
             var _this = this;
             var resp = $.ajax(url, {
                 cache: false,
@@ -42,47 +47,11 @@ define(["tnxcore", "jquery"], function(tnxcore) {
                 contentType: "application/x-www-form-urlencoded; charset=" + this.encoding, // 不能更改
                 error: options.error,
                 success: function(html) {
-                    html = html.trim();
-                    if (html.startsWith("<!DOCTYPE html>")) {
-                        html = html.replace("<!DOCTYPE html>", "").trim();
+                    if (typeof callback == "function") {
+                        callback(html);
+                    } else if (callback instanceof jQuery) {
+                        callback.html(html);
                     }
-                    html = tnx.util.replaceTag(html, "html", "tnx-html");
-                    html = tnx.util.replaceTag(html, "head", "tnx-head");
-                    html = tnx.util.replaceTag(html, "body", "tnx-body");
-                    html = $(html);
-                    var title = options.title;
-                    if (!title) {
-                        title = $("tnx-head title", html).text();
-                        if (!title) {
-                            title = html.children(":first").attr("title");
-                        }
-                    }
-                    var links = $("tnx-head link", html);
-
-                    var container = $("tnx-body", html);
-                    if (container.length == 0) { // 没有BODY
-                        if (html.length > 1) { // 确保单根
-                            html.wrap("<div></div>");
-                            container = html.parent();
-                            container.prepend(links);
-                            html = container.html();
-                        } else {
-                            container = html;
-                            container.prepend(links);
-                        }
-                    } else { // 有BODY
-                        html = container[0].outerHTML;
-                        container = $(tnx.util.replaceTag(html, "tnx-body", "div"));
-                        container.prepend(links);
-                        html = container.html();
-                    }
-                    container.attr("url", url);
-                    _this.init(container[0], function() {
-                        if (typeof callback == "function") {
-                            var width = options.width || container.attr("width");
-                            callback.call(_this, title, html, width);
-                        }
-                    });
                 }
             });
             resp.fail(options.error);

@@ -15,7 +15,7 @@ require.config({
 });
 
 define(["tnxjq", "bootstrap"], function(tnxjq) {
-    Object.assign(tnxjq.app, {
+    $.extend(tnxjq.app, {
         templates: {
             dialog: '<div class="modal fade" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">\n' +
@@ -214,12 +214,51 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             }
 
             var _this = this;
-            this.ajax(url, params, function(title, content, width) {
-                _this.dialog(title, content, buttons, {
+            this.ajax(url, params, function(html) {
+                html = html.trim();
+                if (html.startsWith("<!DOCTYPE html>")) {
+                    html = html.replace("<!DOCTYPE html>", "").trim();
+                }
+                html = tnx.util.replaceTag(html, "html", "tnx-html");
+                html = tnx.util.replaceTag(html, "head", "tnx-head");
+                html = tnx.util.replaceTag(html, "body", "tnx-body");
+                html = $(html);
+                var title = options.title;
+                if (!title) {
+                    title = $("tnx-head title", html).text();
+                    if (!title) {
+                        title = html.children(":first").attr("title");
+                    }
+                }
+                var links = $("tnx-head link", html);
+
+                var container = $("tnx-body", html);
+                if (container.length == 0) { // 没有BODY
+                    if (html.length > 1) { // 确保单根
+                        html.wrap("<div></div>");
+                        container = html.parent();
+                    } else {
+                        container = html;
+                    }
+                } else { // 有BODY
+                    html = container[0].outerHTML;
+                    container = $(tnx.util.replaceTag(html, "tnx-body", "div"));
+                }
+                container.prepend(links);
+                container.attr("url", url); // 带上窗口的地址，以便于框架加载对应的css和js
+                var width = options.width || container.attr("width");
+                _this.dialog(title, container, buttons, {
                     width: width,
-                    events: options.events
+                    events: $.extend({}, options.events, {
+                        shown: function() {
+                            _this.init(container[0]);
+                        }
+                    })
                 });
-            }, options);
+            }, {
+                type: "get", // 打开对话框链接一定是GET方式
+                error: undefined // TODO
+            });
         }
     });
     tnx = tnxjq;
