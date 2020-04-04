@@ -31,7 +31,7 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 '    </div>\n' +
                 '  </div>\n' +
                 '</div>',
-            doing: '<div class="modal modal-doing" tabindex="-1" role="dialog">\n' +
+            loading: '<div class="modal modal-loading" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-centered" role="document">\n' +
                 '    <div class="modal-content">${content}</div>\n' +
                 '  </div>\n' +
@@ -265,12 +265,13 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 error: undefined // TODO
             });
         },
-        doing: function(content, timeout, callback) {
+        showLoading: function(content, timeout, callback) {
             if (typeof timeout == "function") {
                 callback = timeout;
                 timeout = undefined;
             }
-            var modalObject = $(this.templates.doing);
+            content = content || "加载中";
+            var modalObject = $(this.templates.loading);
             var contentObject = $(".modal-content", modalObject).html(content);
             modalObject.close = function() {
                 modalObject.modal("hide");
@@ -297,8 +298,8 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             var zIndex = tnx.util.minTopZIndex(20);
             modalObject.css("zIndex", zIndex);
         },
-        closeDoing: function() {
-            $(".modal-doing").modal("hide");
+        hideLoading: function() {
+            $(".modal-loading").modal("hide");
         }
     });
     tnx = tnxjq;
