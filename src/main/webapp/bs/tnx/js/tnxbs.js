@@ -15,7 +15,7 @@ require.config({
 });
 
 define(["tnxjq", "bootstrap"], function(tnxjq) {
-    $.extend(tnxjq.app, {
+    $.extend(tnxjq, {
         templates: {
             dialog: '<div class="modal fade" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">\n' +
@@ -261,7 +261,7 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                     width: width,
                     events: $.extend({}, options.events, {
                         shown: function() {
-                            _this.init(container[0]);
+                            _this.app.init(container[0]);
                         }
                     })
                 });

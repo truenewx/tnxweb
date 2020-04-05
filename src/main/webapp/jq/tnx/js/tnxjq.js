@@ -31,7 +31,7 @@ define(["tnxcore", "jquery"], function(tnxcore) {
             }
         }
     });
-    $.extend(tnxcore.app, {
+    $.extend(tnxcore, {
         ajax: function(url, params, callback, options) {
             if (typeof params == "function" || params instanceof jQuery) {
                 options = callback;
