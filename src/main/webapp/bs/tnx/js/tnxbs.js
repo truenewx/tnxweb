@@ -33,7 +33,12 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 '</div>',
             loading: '<div class="modal modal-loading" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-centered" role="document">\n' +
-                '    <div class="modal-content">${content}</div>\n' +
+                '    <div class="modal-content">\n' +
+                '      <div>\n' +
+                '        <img src="' + app_config.lib + '/assets/image/loading.gif">\n' +
+                '      </div>\n' +
+                '      <div class="mt-3">${content}</div>\n' +
+                '    </div>\n' +
                 '  </div>\n' +
                 '</div>',
         },
@@ -270,9 +275,12 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 callback = timeout;
                 timeout = undefined;
             }
-            content = content || "加载中";
             var modalObject = $(this.templates.loading);
-            var contentObject = $(".modal-content", modalObject).html(content);
+            if (content) {
+                $(".modal-content div:last", modalObject).html(content);
+            } else {
+                $(".modal-content div:last", modalObject).remove();
+            }
             modalObject.close = function() {
                 modalObject.modal("hide");
             };

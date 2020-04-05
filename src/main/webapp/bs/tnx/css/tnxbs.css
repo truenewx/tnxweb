@@ -10,3 +10,8 @@
     width: auto;
     min-width: 100px;
 }
+
+.modal-loading .modal-content img {
+    width: 56px;
+    height: 56px;
+}
