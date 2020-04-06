@@ -104,6 +104,32 @@ var tnx = {
     encoding: "UTF-8",
     locale: app_config.locale,
     context: app_config.lib,
+    alert: function(title, message, callback) {
+        if (message == undefined && callback == undefined) {
+            message = title;
+            title = undefined;
+        } else if (typeof message == "function") {
+            callback = message;
+            message = title;
+            title = undefined;
+        }
+        alert(title + ":\n" + message);
+        if (typeof callback == "function") {
+            callback();
+        }
+    },
+    confirm: function(title, message, callback) {
+        if (message == undefined && callback == undefined) {
+            message = title;
+            title = undefined;
+        } else if (typeof message == "function") {
+            callback = message;
+            message = title;
+            title = undefined;
+        }
+        var yes = confirm(title + ":\n" + message);
+        callback(yes);
+    }
 };
 
 tnx.util = {
@@ -315,32 +341,6 @@ tnx.app = {
                 form.appendChild(input);
             }
         }
-    },
-    alert: function(title, message, callback) {
-        if (message == undefined && callback == undefined) {
-            message = title;
-            title = undefined;
-        } else if (typeof message == "function") {
-            callback = message;
-            message = title;
-            title = undefined;
-        }
-        alert(title + ":\n" + message);
-        if (typeof callback == "function") {
-            callback();
-        }
-    },
-    confirm: function(title, message, callback) {
-        if (message == undefined && callback == undefined) {
-            message = title;
-            title = undefined;
-        } else if (typeof message == "function") {
-            callback = message;
-            message = title;
-            title = undefined;
-        }
-        var yes = confirm(title + ":\n" + message);
-        callback(yes);
     }
 };
 
@@ -358,7 +358,7 @@ tnx.app.rpc = {
             resolve = params;
             body = undefined;
             params = undefined;
-        } else {
+        } else { // params和body不都是函数
             if (typeof body == "function") { // params不是函数而body是函数，说明没有body
                 reject = resolve;
                 resolve = body;
@@ -420,7 +420,12 @@ tnx.app.rpc = {
     },
     error: function(errors) {
         var message = this.getErrorMessage(errors);
-        this.owner.alert("错误", message);
+        tnx.alert("错误", message);
+    },
+    getMeta: function(url, callback) {
+        this.get("/api-meta/post-body", {
+            url: url
+        }, callback);
     }
 };
 
