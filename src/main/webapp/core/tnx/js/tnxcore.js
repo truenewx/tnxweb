@@ -423,7 +423,7 @@ tnx.app.rpc = {
         tnx.alert("错误", message);
     },
     getMeta: function(url, callback) {
-        this.get("/api-meta/post-body", {
+        this.get("/api/meta", {
             url: url
         }, callback);
     }
