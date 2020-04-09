@@ -31,6 +31,14 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 '    </div>\n' +
                 '  </div>\n' +
                 '</div>',
+            toast: '<div class="modal modal-toast" tabindex="-1" role="dialog">\n' +
+                '  <div class="modal-dialog modal-dialog-centered" role="document">\n' +
+                '    <div class="modal-content">\n' +
+                '      <div><i class="fa fa-check-circle"></i></div>\n' +
+                '      <div class="mt-3">${content}</div>\n' +
+                '    </div>\n' +
+                '  </div>\n' +
+                '</div>',
             loading: '<div class="modal modal-loading" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-centered" role="document">\n' +
                 '    <div class="modal-content">\n' +
@@ -270,12 +278,8 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 error: undefined // TODO
             });
         },
-        showLoading: function(content, timeout, callback) {
-            if (typeof timeout == "function") {
-                callback = timeout;
-                timeout = undefined;
-            }
-            var modalObject = $(this.templates.loading);
+        _showToast: function(template, content, timeout, callback) {
+            var modalObject = $(template);
             if (content) {
                 $(".modal-content div:last", modalObject).html(content);
             } else {
@@ -285,14 +289,14 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 modalObject.modal("hide");
             };
             // 注册事件
-            modalObject.on("shown.bs.modal", function() {
-                modalObject.off("shown.bs.modal");
-                if (timeout) {
+            if (timeout) {
+                modalObject.on("shown.bs.modal", function() {
+                    modalObject.off("shown.bs.modal");
                     setTimeout(function() {
                         modalObject.close();
                     }, timeout);
-                }
-            });
+                });
+            }
             modalObject.on("hidden.bs.modal", function() {
                 if (typeof callback == "function") {
                     callback.call(modalObject);
@@ -306,6 +310,32 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             var zIndex = tnx.util.minTopZIndex(20);
             modalObject.css("zIndex", zIndex);
         },
+        /**
+         * 在指定时间后自动关闭的弹框提示，一般用于呈现操作结果
+         *
+         * @param content 提示内容
+         * @param timeout 关闭超时
+         * @param callback 关闭后的回调
+         */
+        toast: function(content, timeout, callback) {
+            if (typeof timeout == "function") {
+                callback = timeout;
+                timeout = undefined;
+            }
+            timeout = timeout || 1500; // 默认1.5秒后关闭
+            this._showToast(this.templates.toast, content, timeout, callback);
+        },
+        /**
+         * 不自动关闭而需要通过hideLoading()方法才会关闭的弹框提示，一般用于提示操作正在进行中
+         *
+         * @param content 提示内容
+         */
+        showLoading: function(content) {
+            this._showToast(this.templates.loading, content);
+        },
+        /**
+         * 关闭showLoading()的弹框，一般在正在进行的操作完成后调用
+         */
         hideLoading: function() {
             $(".modal-loading").modal("hide");
         }

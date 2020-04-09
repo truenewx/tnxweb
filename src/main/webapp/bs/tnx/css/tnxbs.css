@@ -1,6 +1,7 @@
 /**
  * tnxbs.css
  */
+.modal-toast .modal-content,
 .modal-loading .modal-content {
     text-align: center;
     padding: 30px;
@@ -11,6 +12,7 @@
     min-width: 100px;
 }
 
+.modal-toast .modal-content .fa,
 .modal-loading .modal-content img {
     width: 56px;
     height: 56px;
