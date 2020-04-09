@@ -346,48 +346,64 @@ tnx.app = {
 
 tnx.app.rpc = {
     owner: tnx.app,
-    get: function(url, params, body, resolve, reject) {
-        return this.request("get", url, params, body, resolve, reject);
-    },
-    post: function(url, params, body, resolve, reject) {
-        return this.request("post", url, params, body, resolve, reject);
-    },
-    request: function(method, url, params, body, resolve, reject) {
-        if (typeof params == "function" && typeof body == "function") {
-            reject = body;
-            resolve = params;
-            body = undefined;
+    get: function(url, params, callback, options) {
+        if (typeof params == "function" || typeof callback == "object") {
+            options = callback;
+            callback = params;
             params = undefined;
-        } else { // params和body不都是函数
-            if (typeof body == "function") { // params不是函数而body是函数，说明没有body
-                reject = resolve;
-                resolve = body;
-                body = undefined;
-            } else if (typeof params == "function") { // params是函数而body不是函数，此时body只可以为undefined
-                reject = undefined; // 此处本应该为body，但body此时只能为undefined
-                resolve = params;
-                body = undefined;
-                params = undefined;
-            }
         }
+        if (typeof options == "function") {
+            options = {
+                error: options
+            };
+        }
+        this.request(Object.assign({}, options, {
+            url: url,
+            method: "get",
+            params: params,
+            success: callback,
+        }));
+    },
+    post: function(url, body, callback, options) {
+        if (typeof body == "function" || typeof callback == "object") {
+            options = callback;
+            callback = body;
+            body = undefined;
+        }
+        if (typeof options == "function") {
+            options = {
+                error: options
+            };
+        }
+        this.request(Object.assign({}, options, {
+            url: url,
+            method: "post",
+            body: body,
+            success: callback,
+        }));
+    },
+    request: function(options) {
+        var url = options.url;
         if (url.startsWith("/")) { // 相对URL需添加上下文路径
             url = this.owner.context + url;
         }
         var config = {
-            method: method,
+            method: options.method,
             url: url,
             headers: {},
-            params: params,
-            data: body
+            params: options.params,
+            data: options.body,
         };
         var _this = this;
         this.axios(config).then(function(response) {
-            resolve(response.data);
+            if (typeof options.success == "function") {
+                options.success(response.data);
+            }
         }).catch(function(error) {
             var errors = error.response.data.errors;
             if (errors) {
-                if (typeof reject == "function") {
-                    reject(errors);
+                if (typeof options.error == "function") {
+                    options.error(errors);
                 } else {
                     _this.error(errors);
                 }
@@ -422,10 +438,23 @@ tnx.app.rpc = {
         var message = this.getErrorMessage(errors);
         tnx.alert("错误", message);
     },
+    metas: {},
     getMeta: function(url, callback) {
-        this.get("/api/meta", {
-            url: url
-        }, callback);
+        var _this = this;
+        if (this[url]) {
+            if (typeof callback == "function") {
+                callback(this[url]);
+            }
+        } else {
+            this.get("/api/meta", {
+                url: url
+            }, function(meta) {
+                _this[url] = meta;
+                if (typeof callback == "function") {
+                    callback(meta);
+                }
+            });
+        }
     }
 };
 

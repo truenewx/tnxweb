@@ -139,7 +139,9 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                     });
                 }
             }
-            modalObject.modal(options);
+            modalObject.modal($.extend({
+                backdrop: "static"
+            }, options));
             var zIndex = tnx.util.minTopZIndex(20);
             modalObject.css("zIndex", zIndex);
             modalObject.next(".modal-backdrop").css("zIndex", zIndex - 10);
@@ -269,6 +271,10 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                     width: width,
                     events: $.extend({}, options.events, {
                         shown: function() {
+                            var modalObject = this;
+                            container[0].close = function() {
+                                modalObject.close();
+                            };
                             _this.app.init(container[0]);
                         }
                     })

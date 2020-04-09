@@ -1,6 +1,14 @@
 /**
  * tnxbs.css
  */
+.form-group.row .col-form-label {
+    text-align: right;
+}
+
+.btn:not(:first-child) {
+    margin-left: 7px;
+}
+
 .modal-toast .modal-content,
 .modal-loading .modal-content {
     text-align: center;
@@ -12,7 +20,10 @@
     min-width: 100px;
 }
 
-.modal-toast .modal-content .fa,
+.modal-toast .modal-content .fa {
+    font-size: 56px;
+}
+
 .modal-loading .modal-content img {
     width: 56px;
     height: 56px;
