@@ -20,7 +20,14 @@
         this.owner = owner; // 所属的Vue实例
         this.model = model;
         this.meta = meta;
-        this.errors = {};
+        this.cleanResult();
+    };
+
+    TnxValidator.prototype.cleanResult = function() {
+        this.result = {
+            valid: {}, // 校验通过的字段映射集
+            invalid: {}, // 校验失败的字段映射集
+        };
     };
 
     /**
@@ -329,7 +336,7 @@
     };
 
     TnxValidator.prototype.validateModel = function() {
-        this.errors = {}; // 先清空原有的所有错误消息
+        this.cleanResult(); // 先清空原有的所有校验结果
         var _this = this;
         Object.keys(this.model).forEach(function(fieldName) {
             _this.validateField(fieldName);
@@ -341,7 +348,9 @@
         this._prepare();
         var fieldMeta = this.meta[fieldName];
         if (fieldMeta) {
-            this.errors[fieldName] = undefined; // 先清空字段原有的错误消息
+            // 先清空字段原有的校验结果
+            this.result.valid[fieldName] = undefined;
+            this.result.invalid[fieldName] = undefined;
             var validation = fieldMeta.validation;
             if (validation) {
                 var fieldValue = this.model[fieldName];
@@ -355,8 +364,11 @@
                     validator._validate(validationName, validationValue, fieldName, fieldValue);
                 });
             }
+            this.result.valid[fieldName] = !this.hasError(fieldName);
+            return this.result.valid[fieldName];
         }
-        return !this.hasError(fieldName);
+        // 指定字段没有对应的元数据，视为校验通过
+        return true;
     };
 
     TnxValidator.prototype._prepare = function() {
@@ -401,17 +413,17 @@
             args.forEach(function(arg, index) {
                 message = message.replaceAll("\\{" + index + "\\}", args[index]);
             });
-            this.errors[fieldName] = this.errors[fieldName] || [];
-            this.errors[fieldName].push(message);
+            this.result.invalid[fieldName] = this.result.invalid[fieldName] || [];
+            this.result.invalid[fieldName].push(message);
         }
     };
 
     TnxValidator.prototype.hasError = function(fieldName) {
         if (fieldName) {
-            var fieldErrors = this.errors[fieldName];
+            var fieldErrors = this.result.invalid[fieldName];
             return fieldErrors && fieldErrors.length;
         }
-        var fieldNames = Object.keys(this.errors);
+        var fieldNames = Object.keys(this.result);
         for (var i = 0; i < fieldNames.length; i++) {
             if (this.hasError(fieldNames[i])) {
                 return true;
@@ -427,7 +439,7 @@
             meta = meta || "meta";
             symbol = symbol || "$v";
             this[symbol] = new TnxValidator(this, model, meta);
-            return this[symbol].errors;
+            return this[symbol].result;
         };
     };
 
