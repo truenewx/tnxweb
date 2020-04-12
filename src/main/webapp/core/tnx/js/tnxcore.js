@@ -82,7 +82,7 @@ Object.assign(Element.prototype, {
     getFirstChildWithoutTagName: function(tagName) {
         var children = this.childNodes;
         for (var i = 0; i < children.length; i++) {
-            if (children[i].tagName && children[i].tagName != tagName.toUpperCase()) {
+            if (children[i].tagName && children[i].tagName !== tagName.toUpperCase()) {
                 return children[i];
             }
         }
@@ -103,7 +103,7 @@ var tnx = {
     locale: app_config.locale,
     context: app_config.lib,
     alert: function(title, message, callback) {
-        if (message == undefined && callback == undefined) {
+        if (message === undefined && callback === undefined) {
             message = title;
             title = undefined;
         } else if (typeof message == "function") {
@@ -117,7 +117,7 @@ var tnx = {
         }
     },
     confirm: function(title, message, callback) {
-        if (message == undefined && callback == undefined) {
+        if (message === undefined && callback === undefined) {
             message = title;
             title = undefined;
         } else if (typeof message == "function") {
@@ -126,7 +126,9 @@ var tnx = {
             title = undefined;
         }
         var yes = confirm(title + ":\n" + message);
-        callback(yes);
+        if (typeof callback == "function") {
+            callback(yes);
+        }
     }
 };
 
@@ -141,7 +143,7 @@ tnx.util = {
         if (typeof onLoad == "function") {
             if (element.readyState) {
                 element.onreadystatechange = function() {
-                    if (element.readyState == "loaded" || element.readyState == "complete") {
+                    if (element.readyState === "loaded" || element.readyState === "complete") {
                         element.onreadystatechange = null;
                         onLoad(url);
                     }
@@ -237,7 +239,7 @@ tnx.app = {
             href = href.substr(index);
         }
         // 去掉contextPath
-        if (this.context != "" && this.context != "/" && href.startsWith(this.context)) {
+        if (this.context !== "" && this.context !== "/" && href.startsWith(this.context)) {
             href = href.substr(this.context.length);
         }
         // 去掉后缀
@@ -263,7 +265,7 @@ tnx.app = {
             var _this = this;
             resources.forEach(function(resource, i) {
                 resource = resource.trim();
-                if (resource == "true" || resource == "default") {
+                if (resource === "true" || resource === "default") {
                     var url = container.getAttribute("url");
                     var action = _this.getAction(url);
                     if (!action.endsWith("/")) {
