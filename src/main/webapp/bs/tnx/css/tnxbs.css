@@ -28,3 +28,17 @@
     width: 56px;
     height: 56px;
 }
+
+.is-valid .valid-tooltip,
+.is-invalid .invalid-tooltip {
+    display: block;
+    top: 0;
+    margin-top: 4px;
+}
+
+.is-valid .valid-feedback,
+.is-invalid .invalid-feedback {
+    display: block;
+    top: 0;
+    margin-top: 8px;
+}

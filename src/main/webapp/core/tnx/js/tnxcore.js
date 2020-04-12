@@ -1,34 +1,32 @@
 // tnx.js，原生JavaScript的扩展支持，兼容ES5
 
 // 基础工具方法
-if (typeof Object.assign != "function") {
-    /**
-     * 合并对象，将参数列表中的非首个参数对象中的属性依次合并到首个参数对象中
-     * @return 合并的目标对象，即参数列表中的首个参数对象
-     */
-    Object.assign = function() {
-        var length = arguments.length;
-        if (length == 0) {
-            return undefined;
-        }
-        var target = arguments[0] || {};
-        if (typeof target != "object" && typeof target != "function") {
-            target = {};
-        }
-        if (length == 1) {
-            return target;
-        }
-        for (var i = 1; i < arguments.length; i++) {
-            var source = arguments[i];
-            for (var key in source) {
-                if (Object.prototype.hasOwnProperty.call(source, key)) {
-                    target[key] = source[key];
-                }
+/**
+ * 合并对象，将参数列表中的非首个参数对象中的属性依次合并到首个参数对象中
+ * @return 合并的目标对象，即参数列表中的首个参数对象
+ */
+Object.assign = Object.assign || function() {
+    var length = arguments.length;
+    if (length === 0) {
+        return undefined;
+    }
+    var target = arguments[0] || {};
+    if (typeof target != "object" && typeof target != "function") {
+        target = {};
+    }
+    if (length === 1) {
+        return target;
+    }
+    for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+            if (Object.prototype.hasOwnProperty.call(source, key)) {
+                target[key] = source[key];
             }
         }
-        return target;
-    };
-}
+    }
+    return target;
+};
 
 Function.around = function(target, around) {
     return function() {
@@ -357,8 +355,7 @@ tnx.app.rpc = {
                 error: options
             };
         }
-        this.request(Object.assign({}, options, {
-            url: url,
+        this.request(url, Object.assign({}, options, {
             method: "get",
             params: params,
             success: callback,
@@ -375,15 +372,13 @@ tnx.app.rpc = {
                 error: options
             };
         }
-        this.request(Object.assign({}, options, {
-            url: url,
+        this.request(url, Object.assign({}, options, {
             method: "post",
             body: body,
             success: callback,
         }));
     },
-    request: function(options) {
-        var url = options.url;
+    request: function(url, options) {
         if (url.startsWith("/")) { // 相对URL需添加上下文路径
             url = this.owner.context + url;
         }
@@ -400,16 +395,18 @@ tnx.app.rpc = {
                 options.success(response.data);
             }
         }).catch(function(error) {
-            var errors = error.response.data.errors;
-            if (errors) {
-                if (typeof options.error == "function") {
-                    options.error(errors);
-                } else {
-                    _this.error(errors);
+            if (error.response) {
+                var errors = error.response.data.errors;
+                if (errors) {
+                    if (typeof options.error == "function") {
+                        options.error(errors);
+                    } else {
+                        _this.error(errors);
+                    }
+                    return;
                 }
-            } else {
-                console.error(error.stack);
             }
+            console.error(error.stack);
         });
     },
     getCsrfHeader: function() {
