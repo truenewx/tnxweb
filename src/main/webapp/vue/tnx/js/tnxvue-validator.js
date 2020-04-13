@@ -7,14 +7,8 @@ define(["vue"], function(Vue) {
         options = options || {};
         this.meta = options.meta || "meta";
         this.model = options.model || "model";
-        this.valid = options.valid || "valid";
-        if (typeof this.valid == "string") {
-            this.valid = owner[this.valid];
-        }
-        this.invalid = options.invalid || "invalid";
-        if (typeof this.invalid == "string") {
-            this.invalid = owner[this.invalid];
-        }
+        this.valid = {};
+        this.invalid = {};
     };
 
     TnxValidator.install = function(Vue) {
