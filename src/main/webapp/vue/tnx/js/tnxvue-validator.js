@@ -1,58 +1,25 @@
 /**
  * 基于Vue的字段校验插件
  */
-define(["vue", "jquery"], function(Vue, $) {
-    var TnxValidator = function TnxValidator(owner, meta, model, form) {
-        if (!meta) {
-            throw new Error("The meta object is not defined.");
-        }
+define(["vue"], function(Vue) {
+    var TnxValidator = function TnxValidator(owner, options) {
         this.owner = owner;
-        this.meta = meta;
-        this.model = model;
-        this.form = form;
-        this._cleanResult();
-        this._bindEvents();
-    };
-
-    TnxValidator.prototype._cleanResult = function() {
-        this.result = {
-            valid: {}, // 校验通过的字段映射集
-            invalid: {}, // 校验失败的字段映射集
-        };
-    };
-
-    TnxValidator.prototype._bindEvents = function() {
-        var formObj;
-        if (this.form === true) {
-            formObj = $("form", this.owner.$el);
-        } else if (typeof this.form == "object") {
-            formObj = $(this.form);
+        options = options || {};
+        this.meta = options.meta || "meta";
+        this.model = options.model || "model";
+        this.valid = options.valid || "valid";
+        if (typeof this.valid == "string") {
+            this.valid = owner[this.valid];
         }
-        if (formObj && formObj.length) {
-            var _this = this;
-            Object.keys(this.meta).forEach(function(fieldName) {
-                var fieldObj = $("[name='" + fieldName + "']", formObj);
-                if (fieldObj.length) {
-                    fieldObj.blur(function() {
-                        _this.validateField(fieldName);
-                    });
-                }
-            });
-            formObj.submit(function(event) {
-                if (!_this.validateModel()) {
-                    event.preventDefault();
-                }
-            });
+        this.invalid = options.invalid || "invalid";
+        if (typeof this.invalid == "string") {
+            this.invalid = owner[this.invalid];
         }
     };
 
     TnxValidator.install = function(Vue) {
-        Vue.prototype.createValidator = function(meta, form, options) {
-            options = options || {};
-            var model = options.model || "model";
-            var symbol = options.symbol || "$v";
-            this[symbol] = new TnxValidator(this, meta, model, form);
-            return this[symbol].result;
+        Vue.prototype.createValidator = function(options) {
+            return new TnxValidator(this, options);
         };
     };
 
@@ -369,7 +336,9 @@ define(["vue", "jquery"], function(Vue, $) {
     };
 
     TnxValidator.prototype.validateModel = function() {
-        this._cleanResult(); // 先清空原有的所有校验结果
+        // 先清空原有的所有校验结果
+        this.valid = {};
+        this.invalid = {};
         var _this = this;
         Object.keys(this.model).forEach(function(fieldName) {
             _this.validateField(fieldName);
@@ -378,35 +347,39 @@ define(["vue", "jquery"], function(Vue, $) {
     };
 
     TnxValidator.prototype.validateField = function(fieldName) {
-        // 确保数据模型成为对象
+        // 确保元数据和数据模型成为对象，延时在此处才初始化是为了让校验器构建不依赖于元数据对象和数据模型对象
+        if (typeof this.meta == "string") {
+            this.meta = this.owner[this.meta];
+        }
         if (typeof this.model == "string") {
             this.model = this.owner[this.model];
         }
-
-        var fieldMeta = this.meta[fieldName];
-        if (fieldMeta) {
-            // 先清空字段原有的校验结果
-            this.result.valid[fieldName] = undefined;
-            this.result.invalid[fieldName] = undefined;
-            var validation = fieldMeta.validation;
-            if (validation) {
-                var fieldValue = this.model[fieldName];
-                var _this = this;
-                Object.keys(validation).forEach(function(validationName) {
-                    // 不能为空的校验规则在有最小长度限制时无效
-                    if ((validationName === "required" || validationName === "notBlank") && validation.minLength) {
-                        return false;
-                    }
-                    var validationValue = validation[validationName];
-                    _this._validate(validationName, validationValue, fieldName, fieldValue);
-                });
-            }
-            if (this.hasError(fieldName)) {
-                return false;
-            } else {
-                this.result.valid[fieldName] = true;
-            }
-        } // 指定字段没有对应的元数据，视为校验通过
+        if (this.meta && this.model) {
+            var fieldMeta = this.meta[fieldName];
+            if (fieldMeta) {
+                // 先清空字段原有的校验结果
+                this.valid[fieldName] = undefined;
+                this.invalid[fieldName] = undefined;
+                var validation = fieldMeta.validation;
+                if (validation) {
+                    var fieldValue = this.model[fieldName];
+                    var _this = this;
+                    Object.keys(validation).forEach(function(validationName) {
+                        // 不能为空的校验规则在有最小长度限制时无效
+                        if ((validationName === "required" || validationName === "notBlank") && validation.minLength) {
+                            return false;
+                        }
+                        var validationValue = validation[validationName];
+                        _this._validate(validationName, validationValue, fieldName, fieldValue);
+                    });
+                }
+                if (this.hasError(fieldName)) {
+                    return false;
+                } else {
+                    this.valid[fieldName] = true;
+                }
+            } // 指定字段没有对应的元数据，视为校验通过
+        }
         return true;
     };
 
@@ -443,14 +416,14 @@ define(["vue", "jquery"], function(Vue, $) {
             args.forEach(function(arg, index) {
                 message = message.replaceAll("\\{" + index + "\\}", args[index]);
             });
-            this.result.invalid[fieldName] = this.result.invalid[fieldName] || [];
-            this.result.invalid[fieldName].push(message);
+            this.invalid[fieldName] = this.invalid[fieldName] || [];
+            this.invalid[fieldName].push(message);
         }
     };
 
     TnxValidator.prototype.hasError = function(fieldName) {
         if (fieldName) {
-            var fieldErrors = this.result.invalid[fieldName];
+            var fieldErrors = this.invalid[fieldName];
             return fieldErrors && fieldErrors.length;
         } else {
             // 元数据中有的字段才能进行校验，这里取所有可校验的字段逐一判断
