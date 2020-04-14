@@ -44,12 +44,12 @@ define([], function() {
             this.meta = meta;
             this.required = {};
             var _this = this;
-            Object.keys(meta).forEach(function(fieldName) {
+            for (var fieldName in meta) {
                 var validation = meta[fieldName].validation;
                 if (validation && (validation.required || validation.notBlank)) {
                     _this.required[fieldName] = true;
                 }
-            });
+            }
         }
         return this;
     }
@@ -349,9 +349,9 @@ define([], function() {
         this.valid = {};
         this.invalid = {};
         var _this = this;
-        Object.keys(this.meta).forEach(function(fieldName) {
+        for (var fieldName in this.meta) {
             _this.validateField(fieldName);
-        });
+        }
         return !this.hasError();
     };
 
@@ -365,14 +365,14 @@ define([], function() {
             if (validation) {
                 var fieldValue = this.model[fieldName];
                 var _this = this;
-                Object.keys(validation).forEach(function(validationName) {
+                for (var validationName in validation) {
                     // 不能为空的校验规则在有最小长度限制时无效
                     if ((validationName === "required" || validationName === "notBlank") && validation.minLength) {
                         return false;
                     }
                     var validationValue = validation[validationName];
                     _this._validate(validationName, validationValue, fieldName, fieldValue);
-                });
+                }
             }
             if (this.hasError(fieldName)) {
                 return false;
@@ -427,8 +427,7 @@ define([], function() {
             return fieldErrors && fieldErrors.length;
         } else {
             // 元数据中有的字段才能进行校验，这里取所有可校验的字段逐一判断
-            var fieldNames = Object.keys(this.meta);
-            for (fieldName of fieldNames) {
+            for (var fieldName in this.meta) {
                 if (this.hasError(fieldName)) {
                     return true;
                 }
