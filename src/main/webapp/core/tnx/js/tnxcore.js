@@ -393,32 +393,23 @@ tnx.app.rpc = {
         };
         var _this = this;
         this.axios(config).then(function(response) {
-            var headers = response.headers;
-            if (headers && headers.error === "true") { // 错误
-                _this._handleResponseError(response.data, options);
-            } else { // 成功
-                if (typeof options.success == "function") {
-                    options.success(response.data);
-                }
+            if (typeof options.success == "function") {
+                options.success(response.data);
             }
         }).catch(function(error) {
-            if (error.response && _this._handleResponseError(error.response.data, options)) {
-                return;
+            if (error.response) {
+                var errors = error.response.data.errors;
+                if (errors) {
+                    if (typeof options.error == "function") {
+                        options.error(errors);
+                    } else {
+                        _this.error(errors);
+                    }
+                    return;
+                }
             }
             console.error(error.stack);
         });
-    },
-    _handleResponseError: function(responseData, options) {
-        var errors = responseData.errors;
-        if (errors) {
-            if (typeof options.error == "function") {
-                options.error(errors);
-            } else {
-                this.error(errors);
-            }
-            return true;
-        }
-        return false;
     },
     getCsrfHeader: function() {
         var meta = document.querySelector("meta[name='csrf']");
