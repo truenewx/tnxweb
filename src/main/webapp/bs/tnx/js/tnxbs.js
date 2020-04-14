@@ -285,6 +285,9 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             });
         },
         _showToast: function(template, content, timeout, callback) {
+            // 先关闭所有toast弹框
+            $(".modal-loading, .modal-toast").modal("hide");
+
             var modalObject = $(template);
             if (content) {
                 $(".modal-content div:last", modalObject).html(content);
