@@ -1,20 +1,13 @@
 /**
- * 基于Vue的字段校验插件
+ * 字段校验器组件
  */
-define(["vue"], function(Vue) {
-    var TnxValidator = function TnxValidator(owner, options) {
-        this.owner = owner;
-        options = options || {};
-        this.meta = options.meta || "meta";
-        this.model = options.model || "model";
+define([], function() {
+    var TnxValidator = function TnxValidator() {
+        this.model = {};
+        this.meta = {};
+        this.required = {};
         this.valid = {};
         this.invalid = {};
-    };
-
-    TnxValidator.install = function(Vue) {
-        Vue.prototype.createValidator = function(options) {
-            return new TnxValidator(this, options);
-        };
     };
 
     /**
@@ -37,6 +30,28 @@ define(["vue"], function(Vue) {
                 return true;
             };
         }
+    }
+
+    TnxValidator.prototype.setModel = function(model) {
+        if (typeof model == "object") {
+            this.model = model;
+        }
+        return this;
+    }
+
+    TnxValidator.prototype.setMeta = function(meta) {
+        if (typeof meta == "object") {
+            this.meta = meta;
+            this.required = {};
+            var _this = this;
+            Object.keys(meta).forEach(function(fieldName) {
+                var validation = meta[fieldName].validation;
+                if (validation && (validation.required || validation.notBlank)) {
+                    _this.required[fieldName] = true;
+                }
+            });
+        }
+        return this;
     }
 
     TnxValidator.prototype.checkers = {
@@ -334,46 +349,37 @@ define(["vue"], function(Vue) {
         this.valid = {};
         this.invalid = {};
         var _this = this;
-        Object.keys(this.model).forEach(function(fieldName) {
+        Object.keys(this.meta).forEach(function(fieldName) {
             _this.validateField(fieldName);
         });
         return !this.hasError();
     };
 
     TnxValidator.prototype.validateField = function(fieldName) {
-        // 确保元数据和数据模型成为对象，延时在此处才初始化是为了让校验器构建不依赖于元数据对象和数据模型对象
-        if (typeof this.meta == "string") {
-            this.meta = this.owner[this.meta];
-        }
-        if (typeof this.model == "string") {
-            this.model = this.owner[this.model];
-        }
-        if (this.meta && this.model) {
-            var fieldMeta = this.meta[fieldName];
-            if (fieldMeta) {
-                // 先清空字段原有的校验结果
-                this.valid[fieldName] = undefined;
-                this.invalid[fieldName] = undefined;
-                var validation = fieldMeta.validation;
-                if (validation) {
-                    var fieldValue = this.model[fieldName];
-                    var _this = this;
-                    Object.keys(validation).forEach(function(validationName) {
-                        // 不能为空的校验规则在有最小长度限制时无效
-                        if ((validationName === "required" || validationName === "notBlank") && validation.minLength) {
-                            return false;
-                        }
-                        var validationValue = validation[validationName];
-                        _this._validate(validationName, validationValue, fieldName, fieldValue);
-                    });
-                }
-                if (this.hasError(fieldName)) {
-                    return false;
-                } else {
-                    this.valid[fieldName] = true;
-                }
-            } // 指定字段没有对应的元数据，视为校验通过
-        }
+        var fieldMeta = this.meta[fieldName];
+        if (fieldMeta) {
+            // 先清空字段原有的校验结果
+            this.valid[fieldName] = undefined;
+            this.invalid[fieldName] = undefined;
+            var validation = fieldMeta.validation;
+            if (validation) {
+                var fieldValue = this.model[fieldName];
+                var _this = this;
+                Object.keys(validation).forEach(function(validationName) {
+                    // 不能为空的校验规则在有最小长度限制时无效
+                    if ((validationName === "required" || validationName === "notBlank") && validation.minLength) {
+                        return false;
+                    }
+                    var validationValue = validation[validationName];
+                    _this._validate(validationName, validationValue, fieldName, fieldValue);
+                });
+            }
+            if (this.hasError(fieldName)) {
+                return false;
+            } else {
+                this.valid[fieldName] = true;
+            }
+        } // 指定字段没有对应的元数据，视为校验通过
         return true;
     };
 
@@ -431,6 +437,5 @@ define(["vue"], function(Vue) {
         return false;
     }
 
-    Vue.use(TnxValidator);
     return TnxValidator;
 });

@@ -5,6 +5,13 @@
     text-align: right;
 }
 
+.form-group label.required::after {
+    content: "*";
+    color: #dc3545;
+    position: absolute;
+    right: 0;
+}
+
 .btn:not(:first-child) {
     margin-left: 7px;
 }
