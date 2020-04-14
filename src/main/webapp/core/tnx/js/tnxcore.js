@@ -20,9 +20,11 @@ Object.assign = Object.assign || function() {
     }
     for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i];
-        for (var key in source) {
-            if (Object.prototype.hasOwnProperty.call(source, key)) {
-                target[key] = source[key];
+        if (source) {
+            for (var key in source) {
+                if (source.hasOwnProperty(key) && source[key] !== undefined) {
+                    target[key] = source[key];
+                }
             }
         }
     }
