@@ -1,4 +1,5 @@
 // tnx.js，原生JavaScript的扩展支持，兼容ES5
+// 由于依赖的部分组件（如：axios）不支持ES6的export特性，仅仅使用let/const特性没有实际意义，故整个前端框架暂时只兼容ES5
 
 // 基础工具方法
 /**
