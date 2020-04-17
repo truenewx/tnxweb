@@ -350,7 +350,22 @@ tnx.app = {
 
 tnx.app.rpc = {
     owner: tnx.app,
-    context: app_config.rpc_context || tnx.app.context,
+    init: function(axios) {
+        this.axios = axios;
+        axios.defaults.baseURL = this.owner.context; // 默认用当前站点上下文作为基本路径
+        var _this = this;
+        this.get("/api/meta/context", function(context) {
+            if (context.baseUrl) {
+                axios.defaults.baseURL = context.baseUrl;
+            }
+            // 不以斜杠开头说明基本路径为跨域访问路径
+            if (!axios.defaults.baseURL.startsWith("/")) {
+                axios.defaults.withCredentials = true;
+            }
+            Object.assign(axios.defaults.headers.common, context.headers);
+            _this.context = context.context || {}; // 其它站点的上下文根路径
+        });
+    },
     get: function(url, params, callback, options) {
         if (typeof params == "function" || typeof callback == "object") {
             options = callback;
@@ -386,9 +401,9 @@ tnx.app.rpc = {
         }));
     },
     request: function(url, options) {
-        if (url.startsWith("/")) { // 相对URL需添加上下文路径
-            url = this.context + url;
-        }
+        // if (url.startsWith("/")) { // 相对URL需添加上下文路径
+        //     url = this.context + url;
+        // }
         var config = {
             method: options.method,
             url: url,
@@ -450,7 +465,7 @@ tnx.app.rpc = {
                 callback(this[url]);
             }
         } else {
-            this.get("/api/meta", {
+            this.get("/api/meta/method", {
                 url: url
             }, function(meta) {
                 _this[url] = meta;
@@ -472,8 +487,7 @@ tnx.app.page = {
 if (typeof define == "function" && define.amd) {
     define([tnx.context + "/core/vendor/md5-2.1/md5.js", tnx.context + "/core/vendor/axios-0.19.0/axios.js"], function(md5, axios) {
         tnx.util.md5 = md5;
-        axios.defaults.withCredentials = true;
-        tnx.app.rpc.axios = axios;
+        tnx.app.rpc.init(axios);
         return tnx;
     });
 }
