@@ -394,7 +394,7 @@ tnx.app.rpc = {
             url: url,
             params: options.params,
             data: options.body,
-            withCredentials: true,
+            headers: app_config.headers,
         };
         var _this = this;
         this.axios(config).then(function(response) {
@@ -472,6 +472,7 @@ tnx.app.page = {
 if (typeof define == "function" && define.amd) {
     define([tnx.context + "/core/vendor/md5-2.1/md5.js", tnx.context + "/core/vendor/axios-0.19.0/axios.js"], function(md5, axios) {
         tnx.util.md5 = md5;
+        axios.defaults.withCredentials = true;
         tnx.app.rpc.axios = axios;
         return tnx;
     });
