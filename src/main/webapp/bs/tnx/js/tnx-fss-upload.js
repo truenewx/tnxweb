@@ -13,13 +13,13 @@ define(["tnxbs"], function(tnx) {
     };
 
     FssUpload.defaults = {
-        baseUrl: tnx.app.rpc.context["fss"],
+        baseUrl: tnx.app.rpc.context ? tnx.app.rpc.context.fss : "",
         type: undefined, // 业务类型
         btnText: "选择...", //选择按钮的显示文本
         btnClass: "btn btn-light border", // 选择按钮的样式名称
         previewSize: { // 预览框尺寸
-            width: "64px",
-            height: "64px",
+            width: 64,
+            height: 64,
         }
     }
 
@@ -40,20 +40,26 @@ define(["tnxbs"], function(tnx) {
 
     FssUpload.prototype.render = function() {
         this.container.addClass("fss-upload").html(""); // 先清空
-        this.input = $("<input type='file'>").attr("accept", this.limit.mimeTypes.join(","));
-        if (this.limit.number > 1) {
-            this.input.attr("multiple", "true");
-        }
-        this.input.addClass("d-none");
-        var _this = this;
-        this.input.change(function() {
-            _this.upload(this.files);
-        });
-
-        this.container.append(this.input);
         this.button = $("<button type='button'></button>").addClass(this.options.btnClass).text(this.options.btnText);
+        var _this = this;
         this.button.click(function() {
-            _this.input.trigger("click");
+            var input = $("input[type='file']", _this.container);
+            if (!input.length) {
+                input = $("<input type='file'>").attr("accept", _this.limit.mimeTypes.join(","));
+                if (_this.limit.number !== 1) {
+                    input.attr("multiple", "true");
+                }
+                input.addClass("d-none");
+                input.change(function() {
+                    if (this.files.length) {
+                        _this.upload(this.files);
+                        // 发起上传后移除文件选择框，后续重新构建，为了解决已上传过的文件移除后再次选择无法再次触发上传的问题
+                        input.remove();
+                    }
+                });
+                _this.container.append(input);
+            }
+            input.trigger("click");
         });
         this.container.append(this.button);
     }
@@ -67,15 +73,48 @@ define(["tnxbs"], function(tnx) {
         var _this = this;
         tnx.app.rpc.post(url, formData, function(results) {
             results.forEach(function(result) {
-                _this.onUploaded(result);
+                _this.preview(result);
             });
         });
     }
 
-    FssUpload.prototype.onUploaded = function(result) {
+    FssUpload.prototype.preview = function(result) {
+        var fileId = result.id;
+        var div = $("<div></div>").addClass("preview border").attr("data-file-id", fileId).css({
+            width: (this.options.previewSize.width + 2) + "px",
+            height: (this.options.previewSize.height + 2) + "px",
+        }); // 边框占据宽度，所以需要多加2个px
+
+        var icon = $("<span></span>").addClass("remove text-muted").attr("title", "移除").html("&times;");
+        icon.css("margin-left", (this.options.previewSize.width / 2 - 10) + "px");
+        var _this = this;
+        icon.click(function() {
+            _this.remove(fileId);
+        });
+        div.append(icon);
+
         var image = $("<img>").attr("src", result.thumbnailReadUrl).attr("alt", result.filename);
-        image.addClass("border preview").css(this.options.previewSize);
-        this.button.before(image);
+        image.css({
+            maxWidth: this.options.previewSize.width + "px",
+            maxHeight: this.options.previewSize.height + "px",
+        });
+        div.append(image);
+        this.button.before(div);
+        this.refreshButton();
+    }
+
+    FssUpload.prototype.refreshButton = function() {
+        // 文件数量达到最大限制，则隐藏选择按钮
+        if (this.limit.number > 0 && $(".preview", this.container).length >= this.limit.number) {
+            this.button.addClass("d-none");
+        } else {
+            this.button.removeClass("d-none");
+        }
+    }
+
+    FssUpload.prototype.remove = function(fileId) {
+        $(".preview[data-file-id='" + fileId + "']", this.container).remove();
+        this.refreshButton();
     }
 
     var methods = {

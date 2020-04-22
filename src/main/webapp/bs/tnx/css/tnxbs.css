@@ -53,4 +53,21 @@
 .fss-upload .preview {
     margin-right: 8px;
     margin-bottom: 8px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    float: left;
+}
+
+.fss-upload .preview .remove {
+    position: absolute;
+    top: -6px;
+    font-size: 120%;
+    display: none;
+    cursor: pointer;
+}
+
+.fss-upload .preview:hover .remove {
+    display: block;
 }
