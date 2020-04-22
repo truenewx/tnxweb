@@ -401,15 +401,11 @@ tnx.app.rpc = {
         }));
     },
     request: function(url, options) {
-        // if (url.startsWith("/")) { // 相对URL需添加上下文路径
-        //     url = this.context + url;
-        // }
         var config = {
             method: options.method,
             url: url,
             params: options.params,
             data: options.body,
-            headers: app_config.headers,
         };
         var _this = this;
         this.axios(config).then(function(response) {
