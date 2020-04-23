@@ -194,6 +194,25 @@ tnx.util = {
         } else { // 如果页面js组件不是初始化方法，则必须包含onLoad()方法，没有则报错
             page.onLoad(container);
         }
+    },
+    createObjectUrl: function(file) {
+        if (window.createObjectURL) {
+            return window.createObjectURL(file);
+        } else if (window.URL && window.URL.createObjectURL) {
+            return window.URL.createObjectURL(file);
+        } else if (window.webkitURL && window.webkitURL.createObjectURL) {
+            return window.webkitURL.createObjectURL(file);
+        }
+        return undefined;
+    },
+    revokeObjectUrl: function(url) {
+        if (window.revokeObjectURL) {
+            window.revokeObjectURL(url);
+        } else if (window.URL && window.URL.revokeObjectURL) {
+            window.URL.revokeObjectURL(url);
+        } else if (window.webkitURL && window.webkitURL.revokeObjectURL) {
+            window.webkitURL.revokeObjectURL(url);
+        }
     }
 };
 

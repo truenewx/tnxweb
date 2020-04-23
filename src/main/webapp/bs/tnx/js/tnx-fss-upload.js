@@ -52,7 +52,11 @@ define(["tnxbs"], function(tnx) {
                 input.addClass("d-none");
                 input.change(function() {
                     if (this.files.length) {
-                        _this.upload(this.files);
+                        for (var file of this.files) {
+                            var url = tnx.util.createObjectUrl(file);
+                            _this.preview(url, file.name, url);
+                        }
+                        // _this.upload(this.files);
                         // 发起上传后移除文件选择框，后续重新构建，为了解决已上传过的文件移除后再次选择无法再次触发上传的问题
                         input.remove();
                     }
@@ -73,14 +77,13 @@ define(["tnxbs"], function(tnx) {
         var _this = this;
         tnx.app.rpc.post(url, formData, function(results) {
             results.forEach(function(result) {
-                _this.preview(result);
+                _this.preview(result.storageUrl, result.filename, result.thumbnailReadUrl);
             });
         });
     }
 
-    FssUpload.prototype.preview = function(result) {
-        var storageUrl = result.storageUrl;
-        var div = $("<div></div>").addClass("preview border").attr("storage-url", storageUrl).css({
+    FssUpload.prototype.preview = function(id, filename, imgSrc) {
+        var div = $("<div></div>").addClass("preview border").attr("data-id", id).css({
             width: (this.options.previewSize.width + 2) + "px",
             height: (this.options.previewSize.height + 2) + "px",
         }); // 边框占据宽度，所以需要多加2个px
@@ -89,11 +92,16 @@ define(["tnxbs"], function(tnx) {
         icon.css("margin-left", (this.options.previewSize.width / 2 - 10) + "px");
         var _this = this;
         icon.click(function() {
-            _this.remove(storageUrl);
+            _this.remove(id);
         });
         div.append(icon);
 
-        var image = $("<img>").attr("src", result.thumbnailReadUrl).attr("alt", result.filename);
+        var image = $("<img>").attr("src", imgSrc).attr("alt", filename);
+        if (imgSrc.startsWith("blob:")) {
+            image.load(function() {
+                tnx.util.revokeObjectUrl(this.src);
+            });
+        }
         image.css({
             maxWidth: this.options.previewSize.width + "px",
             maxHeight: this.options.previewSize.height + "px",
@@ -112,9 +120,11 @@ define(["tnxbs"], function(tnx) {
         }
     }
 
-    FssUpload.prototype.remove = function(storageUrl) {
-        $(".preview[storage-url='" + storageUrl + "']", this.container).remove();
-        this.refreshButton();
+    FssUpload.prototype.remove = function(id) {
+        if (id) {
+            $(".preview[data-id='" + id + "']", this.container).remove();
+            this.refreshButton();
+        }
     }
 
     var methods = {
