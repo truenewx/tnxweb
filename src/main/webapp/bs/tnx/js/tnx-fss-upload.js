@@ -79,8 +79,8 @@ define(["tnxbs"], function(tnx) {
     }
 
     FssUpload.prototype.preview = function(result) {
-        var fileId = result.id;
-        var div = $("<div></div>").addClass("preview border").attr("data-file-id", fileId).css({
+        var storageUrl = result.storageUrl;
+        var div = $("<div></div>").addClass("preview border").attr("storage-url", storageUrl).css({
             width: (this.options.previewSize.width + 2) + "px",
             height: (this.options.previewSize.height + 2) + "px",
         }); // 边框占据宽度，所以需要多加2个px
@@ -89,7 +89,7 @@ define(["tnxbs"], function(tnx) {
         icon.css("margin-left", (this.options.previewSize.width / 2 - 10) + "px");
         var _this = this;
         icon.click(function() {
-            _this.remove(fileId);
+            _this.remove(storageUrl);
         });
         div.append(icon);
 
@@ -112,8 +112,8 @@ define(["tnxbs"], function(tnx) {
         }
     }
 
-    FssUpload.prototype.remove = function(fileId) {
-        $(".preview[data-file-id='" + fileId + "']", this.container).remove();
+    FssUpload.prototype.remove = function(storageUrl) {
+        $(".preview[storage-url='" + storageUrl + "']", this.container).remove();
         this.refreshButton();
     }
 
