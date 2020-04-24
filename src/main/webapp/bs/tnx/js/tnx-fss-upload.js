@@ -52,11 +52,20 @@ define(["tnxbs"], function(tnx) {
                 input.addClass("d-none");
                 input.change(function() {
                     if (this.files.length) {
-                        for (var file of this.files) {
-                            var url = tnx.util.createObjectUrl(file);
-                            _this.preview(url, file.name, url);
+                        var files = []; // 转换后的文件数组
+                        for (var i = 0; i < this.files.length; i++) {
+                            var file = this.files[i];
+                            let readUrl = tnx.util.createObjectUrl(file);
+                            files[i] = {
+                                id: _this.generateFileId(file, i),
+                                name: file.name,
+                                readUrl: readUrl,
+                                thumbnailReadUrl: readUrl,
+                                source: file,
+                            };
+                            _this.preview(files[i]);
                         }
-                        // _this.upload(this.files);
+                        _this.upload(files);
                         // 发起上传后移除文件选择框，后续重新构建，为了解决已上传过的文件移除后再次选择无法再次触发上传的问题
                         input.remove();
                     }
@@ -68,39 +77,33 @@ define(["tnxbs"], function(tnx) {
         this.container.append(this.button);
     }
 
-    FssUpload.prototype.upload = function(files) {
-        var formData = new window.FormData();
-        for (var file of files) {
-            formData.append("files", file);
-        }
-        var url = this.options.baseUrl + "/upload/" + this.options.type;
-        var _this = this;
-        tnx.app.rpc.post(url, formData, function(results) {
-            results.forEach(function(result) {
-                _this.preview(result.storageUrl, result.filename, result.thumbnailReadUrl);
-            });
-        });
+    FssUpload.prototype.generateFileId = function(file, index) {
+        var text = Date.now() + "-" + index + "-" + file.name + "-" + file.size;
+        return tnx.util.md5(text);
     }
-
-    FssUpload.prototype.preview = function(id, filename, imgSrc) {
-        var div = $("<div></div>").addClass("preview border").attr("data-id", id).css({
+    FssUpload.prototype.preview = function(file) {
+        var div = $("<div></div>").addClass("preview border").attr("data-id", file.id).css({
             width: (this.options.previewSize.width + 2) + "px",
             height: (this.options.previewSize.height + 2) + "px",
         }); // 边框占据宽度，所以需要多加2个px
-
         var icon = $("<span></span>").addClass("remove text-muted").attr("title", "移除").html("&times;");
+
         icon.css("margin-left", (this.options.previewSize.width / 2 - 10) + "px");
         var _this = this;
         icon.click(function() {
-            _this.remove(id);
+            _this.remove(file.id);
         });
         div.append(icon);
 
-        var image = $("<img>").attr("src", imgSrc).attr("alt", filename);
+        var imgSrc = file.thumbnailReadUrl || file.readUrl;
+        var image = $("<img>").attr("src", imgSrc).attr("read-url", file.readUrl);
+        if (file.name) {
+            image.attr("alt", file.name).attr("title", file.name);
+        }
         if (imgSrc.startsWith("blob:")) {
-            image.load(function() {
+            image[0].onload = function() {
                 tnx.util.revokeObjectUrl(this.src);
-            });
+            };
         }
         image.css({
             maxWidth: this.options.previewSize.width + "px",
@@ -109,6 +112,23 @@ define(["tnxbs"], function(tnx) {
         div.append(image);
         this.button.before(div);
         this.refreshButton();
+    }
+
+    FssUpload.prototype.upload = function(files) {
+        var formData = new window.FormData();
+        formData.set("onlyStorage", "true"); // 本地可预览，只需服务端返回存储地址
+        for (var file of files) {
+            formData.append("fileIds", file.id);
+            formData.append("files", file.source);
+        }
+        var url = this.options.baseUrl + "/upload/" + this.options.type;
+        var _this = this;
+        tnx.app.rpc.post(url, formData, function(results) {
+            results.forEach(function(result) {
+                var div = $(".preview[data-id='" + result.id + "']", _this.container);
+                $("img", div).attr("storage-url", result.storageUrl);
+            })
+        });
     }
 
     FssUpload.prototype.refreshButton = function() {
@@ -120,9 +140,9 @@ define(["tnxbs"], function(tnx) {
         }
     }
 
-    FssUpload.prototype.remove = function(id) {
-        if (id) {
-            $(".preview[data-id='" + id + "']", this.container).remove();
+    FssUpload.prototype.remove = function(fileId) {
+        if (fileId) {
+            $(".preview[data-id='" + fileId + "']", this.container).remove();
             this.refreshButton();
         }
     }
