@@ -62,10 +62,10 @@
 
 .fss-upload .preview .remove {
     position: absolute;
-    top: -6px;
-    font-size: 120%;
+    top: 2px;
     display: none;
     cursor: pointer;
+    color: #6c757d;
 }
 
 .fss-upload .preview:hover .remove {
