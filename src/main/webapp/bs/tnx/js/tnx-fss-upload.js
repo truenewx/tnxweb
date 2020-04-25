@@ -18,6 +18,8 @@ define(["tnxbs"], function(tnx) {
         btnText: "选择...", //选择按钮的显示文本
         btnClass: "btn btn-light border", // 选择按钮的样式名称
         iconRemove: "<i class='far fa-times-circle'></i>", // 移除图标的内容
+        iconUploading: "<div class='spinner-border'></div>", // 上传中图标的内容
+        iconUploaded: "<i class='far fa-check-circle'></i>", // 上传完成图标的内容
         previewSize: { // 预览框尺寸
             width: 64,
             height: 64,
@@ -46,7 +48,7 @@ define(["tnxbs"], function(tnx) {
         this.button.addClass(this.options.btnClass).text(this.options.btnText);
         var _this = this;
         this.button.click(function() {
-            $(this).removeAttr("for");
+            $(this).removeAttr("data-for");
             _this.toSelectFile();
         });
         this.container.append(this.button);
@@ -56,9 +58,9 @@ define(["tnxbs"], function(tnx) {
         // 移除现有的文件选择框后重新构建，以解决已上传过的文件移除后再次选择无法再次触发上传的问题
         $("input[type='file']", this.container).remove();
         var input = $("<input type='file'>").attr("accept", this.limit.mimeTypes).addClass("d-none");
-        var forFileId = this.button.attr("for"); // 替换目标文件id
-        this.button.removeAttr("for");
-        if (this.limit.number !== 1 && forFileId) { // 有替换目标则只能单选
+        var forFileId = this.button.attr("data-for"); // 替换目标文件id
+        this.button.removeAttr("data-for");
+        if (this.limit.number !== 1 && !forFileId) { // 有替换目标则只能单选
             input.attr("multiple", "true");
         }
         var _this = this;
@@ -89,52 +91,57 @@ define(["tnxbs"], function(tnx) {
     FssUpload.prototype.preview = function(file, forFileId) {
         file.id = this.generateFileId(file);
         this.remove(file.id); // 如果存在同样的文件，则先移除
-        var _this = this;
-        var reader = new FileReader();
-        reader.onloadend = function() {
-            var div;
-            if (forFileId) {
-                div = $(".preview[data-id='" + forFileId + "']").html(""); // 清空替换目标的内容重建
-            }
-            if (!div || !div.length) {
-                div = $("<div></div>").addClass("preview border").css({
-                    width: (_this.options.previewSize.width + 2) + "px",
-                    height: (_this.options.previewSize.height + 2) + "px",
-                }); // 边框占据宽度，所以需要多加2个px
-                _this.button.before(div);
-            }
-            div.attr("data-id", file.id);
-
-            var image = $("<img>").attr("src", reader.result);
-            if (file.name) {
-                image.attr("alt", file.name).attr("title", file.name);
-            }
-            image.css({
-                maxWidth: _this.options.previewSize.width + "px",
-                maxHeight: _this.options.previewSize.height + "px",
-            });
-            image.click(function() {
-                _this.button.attr("for", file.id);
-                _this.toSelectFile();
-            });
-            div.append(image);
-
-            var icon = $(_this.options.iconRemove).addClass("remove").attr("title", "移除");
-            div.append(icon); // 先附着才能获得宽度
-            icon.css("margin-left", (_this.options.previewSize.width / 2 - icon.width() / 2 - 1) + "px");
-            icon.click(function() {
-                _this.remove(file.id);
-            });
-
-            _this.refreshButton();
+        var div;
+        if (forFileId) {
+            div = this.findPreviewDiv(forFileId).html(""); // 清空替换目标的内容重建
         }
-        reader.readAsDataURL(file);
+        if (!div || !div.length) {
+            div = $("<div></div>").addClass("preview border").css({
+                width: (this.options.previewSize.width + 2) + "px",
+                height: (this.options.previewSize.height + 2) + "px",
+            }); // 边框占据宽度，所以需要多加2个px
+            this.button.before(div);
+        }
+        div.attr("data-id", file.id);
+
+        var image = $("<img>").addClass("image").css({
+            maxWidth: this.options.previewSize.width + "px",
+            maxHeight: this.options.previewSize.height + "px",
+        });
+        if (file.name) {
+            image.attr("alt", file.name).attr("title", file.name);
+        }
+        var imgSrc = tnx.util.createObjectUrl(file);
+        image[0].onload = function() {
+            tnx.util.revokeObjectUrl(this.src);
+        };
+        image.attr("src", imgSrc);
+        var _this = this;
+        image.click(function() {
+            _this.button.attr("data-for", file.id);
+            _this.toSelectFile();
+        });
+        div.append(image);
+
+        var icon = $(this.options.iconRemove).addClass("icon text-secondary remove").attr("title", "移除");
+        div.append(icon); // 先附着才能获得宽度
+        icon.css("left", (div.position().left + div.width() - icon.width()) + "px");
+        icon.click(function() {
+            _this.remove(file.id);
+        });
+
+        this.refreshButton();
+    }
+
+    FssUpload.prototype.findPreviewDiv = function(fileId) {
+        return $(".preview[data-id='" + fileId + "']", this.container);
     }
 
     FssUpload.prototype.upload = function(files) {
         var formData = new window.FormData();
         formData.set("onlyStorage", "true"); // 本地可预览，只需服务端返回存储地址
         for (var file of files) {
+            this.showUploading(file.id);
             formData.append("fileIds", file.id);
             formData.append("files", file);
         }
@@ -142,10 +149,25 @@ define(["tnxbs"], function(tnx) {
         var _this = this;
         tnx.app.rpc.post(url, formData, function(results) {
             results.forEach(function(result) {
-                var div = $(".preview[data-id='" + result.id + "']", _this.container);
-                $("img", div).attr("storage-url", result.storageUrl);
-            })
+                var div = _this.findPreviewDiv(result.id);
+                $("img.image", div).attr("storage-url", result.storageUrl);
+                _this.showUploaded(div);
+            });
         });
+    }
+
+    FssUpload.prototype.showUploading = function(fileId) {
+        var div = this.findPreviewDiv(fileId);
+        var icon = $(this.options.iconUploading).addClass("icon text-secondary uploading").attr("title", "上传中");
+        icon.css("left", (div.position().left + 2) + "px");
+        div.append(icon);
+    }
+
+    FssUpload.prototype.showUploaded = function(div) {
+        $(".uploading", div).remove();
+        var icon = $(this.options.iconUploaded).addClass("icon text-secondary uploaded").attr("title", "已上传");
+        icon.css("left", (div.position().left + 2) + "px");
+        div.append(icon);
     }
 
     FssUpload.prototype.refreshButton = function() {
@@ -159,7 +181,7 @@ define(["tnxbs"], function(tnx) {
 
     FssUpload.prototype.remove = function(fileId) {
         if (fileId) {
-            $(".preview[data-id='" + fileId + "']", this.container).remove();
+            this.findPreviewDiv(fileId).remove();
             this.refreshButton();
         }
     }

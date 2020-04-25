@@ -426,6 +426,12 @@ tnx.app.rpc = {
             params: options.params,
             data: options.body,
         };
+        if (typeof options.onUploadProgress == "function") {
+            config.onUploadProgress = function(event) {
+                var ratio = (event.loaded / event.total) || 0;
+                options.onUploadProgress.call(event, ratio);
+            }
+        }
         var _this = this;
         this.axios(config).then(function(response) {
             if (typeof options.success == "function") {

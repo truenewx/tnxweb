@@ -50,6 +50,10 @@
     margin-top: 8px;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .fss-upload .preview {
     margin-right: 8px;
     margin-bottom: 8px;
@@ -60,14 +64,22 @@
     float: left;
 }
 
-.fss-upload .preview .remove {
+.fss-upload .preview .icon {
     position: absolute;
     top: 2px;
-    display: none;
+    width: 16px;
+    height: 16px;
+}
+
+.fss-upload .preview .remove {
     cursor: pointer;
-    color: #6c757d;
+    display: none;
 }
 
 .fss-upload .preview:hover .remove {
     display: block;
+}
+
+.fss-upload .preview .image {
+    cursor: pointer;
 }
