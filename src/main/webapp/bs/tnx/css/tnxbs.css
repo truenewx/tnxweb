@@ -57,7 +57,6 @@
 .fss-upload .preview {
     margin-right: 8px;
     margin-bottom: 8px;
-    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -67,8 +66,6 @@
 .fss-upload .preview .icon {
     position: absolute;
     top: 2px;
-    width: 16px;
-    height: 16px;
 }
 
 .fss-upload .preview .remove {
@@ -82,4 +79,13 @@
 
 .fss-upload .preview .image {
     cursor: pointer;
+}
+
+.fss-upload .preview .uploading {
+    position: absolute;
+    top: 1px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

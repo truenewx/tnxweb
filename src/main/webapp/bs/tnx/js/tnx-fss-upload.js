@@ -18,8 +18,6 @@ define(["tnxbs"], function(tnx) {
         btnText: "选择...", //选择按钮的显示文本
         btnClass: "btn btn-light border", // 选择按钮的样式名称
         iconRemove: "<i class='far fa-times-circle'></i>", // 移除图标的内容
-        iconUploading: "<div class='spinner-border'></div>", // 上传中图标的内容
-        iconUploaded: "<i class='far fa-check-circle'></i>", // 上传完成图标的内容
         previewSize: { // 预览框尺寸
             width: 64,
             height: 64,
@@ -123,18 +121,22 @@ define(["tnxbs"], function(tnx) {
         });
         div.append(image);
 
-        var icon = $(this.options.iconRemove).addClass("icon text-secondary remove").attr("title", "移除");
-        div.append(icon); // 先附着才能获得宽度
-        icon.css("left", (div.position().left + div.width() - icon.width()) + "px");
-        icon.click(function() {
-            _this.remove(file.id);
-        });
-
+        this.buildRemoveIcon(div, file.id);
         this.refreshButton();
     }
 
     FssUpload.prototype.findPreviewDiv = function(fileId) {
         return $(".preview[data-id='" + fileId + "']", this.container);
+    }
+
+    FssUpload.prototype.buildRemoveIcon = function(div, fileId) {
+        var icon = $(this.options.iconRemove).addClass("icon text-secondary remove").attr("title", "移除");
+        div.append(icon); // 先附着才能获得宽度
+        icon.css("left", (div.position().left + div.width() - icon.width()) + "px");
+        var _this = this;
+        icon.click(function() {
+            _this.remove(fileId);
+        });
     }
 
     FssUpload.prototype.upload = function(files) {
@@ -158,16 +160,21 @@ define(["tnxbs"], function(tnx) {
 
     FssUpload.prototype.showUploading = function(fileId) {
         var div = this.findPreviewDiv(fileId);
-        var icon = $(this.options.iconUploading).addClass("icon text-secondary uploading").attr("title", "上传中");
-        icon.css("left", (div.position().left + 2) + "px");
+        div.removeClass("border-success");
+        var icon = $("<div class='uploading'><div class='spinner-border text-light'></div></div>");
+        icon.css({
+            left: div.position().left + 1,
+            width: div.width(),
+            height: div.height(),
+        }).attr("title", "上传中");
         div.append(icon);
+        $(".remove", div).remove();
+        this.buildRemoveIcon(div, fileId);
     }
 
     FssUpload.prototype.showUploaded = function(div) {
         $(".uploading", div).remove();
-        var icon = $(this.options.iconUploaded).addClass("icon text-secondary uploaded").attr("title", "已上传");
-        icon.css("left", (div.position().left + 2) + "px");
-        div.append(icon);
+        div.addClass("border-success");
     }
 
     FssUpload.prototype.refreshButton = function() {

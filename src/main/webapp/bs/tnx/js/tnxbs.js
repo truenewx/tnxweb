@@ -34,7 +34,7 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             toast: '<div class="modal modal-toast" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-centered" role="document">\n' +
                 '    <div class="modal-content">\n' +
-                '      <div><i class="fa fa-check-circle"></i></div>\n' +
+                '      <div><i class="far fa-check-circle"></i></div>\n' +
                 '      <div class="mt-3">${content}</div>\n' +
                 '    </div>\n' +
                 '  </div>\n' +
@@ -42,9 +42,7 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             loading: '<div class="modal modal-loading" tabindex="-1" role="dialog">\n' +
                 '  <div class="modal-dialog modal-dialog-centered" role="document">\n' +
                 '    <div class="modal-content">\n' +
-                '      <div>\n' +
-                '        <img src="' + app_config.lib + '/assets/image/loading.gif">\n' +
-                '      </div>\n' +
+                '      <div class="spinner-border text-light" role="status"></div>' +
                 '      <div class="mt-3">${content}</div>\n' +
                 '    </div>\n' +
                 '  </div>\n' +
