@@ -9,11 +9,11 @@ define(["tnxbs"], function(tnx) {
         }
         this.container = container;
         this.options = $.extend({}, FssUpload.defaults, options);
+        this.baseUrlRetry = 0;
         this.config();
     };
 
     FssUpload.defaults = {
-        baseUrl: tnx.app.rpc.context ? tnx.app.rpc.context.fss : "",
         type: undefined, // 业务类型
         btnText: "选择...", //选择按钮的显示文本
         btnClass: "btn btn-light border", // 选择按钮的样式名称
@@ -25,14 +25,23 @@ define(["tnxbs"], function(tnx) {
     }
 
     FssUpload.prototype.config = function() {
-        if (!this.options.baseUrl) {
-            throw new Error("FssUpload缺少baseUrl配置项");
+        if (!this.options.baseUrl && tnx.app.rpc.context) {
+            this.options.baseUrl = tnx.app.rpc.context.fss;
+        }
+        var _this = this;
+        if (!this.options.baseUrl) { // 基本路径没设置则等待后再重试
+            if (++this.baseUrlRetry > 10) {
+                throw new Error("FssUpload无法获取baseUrl配置项");
+            }
+            setTimeout(function() {
+                _this.config();
+            }, 100);
+            return;
         }
         if (!this.options.type) {
             throw new Error("FssUpload缺少type配置项");
         }
         var url = this.options.baseUrl + "/upload-limit/" + this.options.type;
-        var _this = this;
         tnx.app.rpc.get(url, function(limit) {
             _this.limit = limit;
             _this.limit.mimeTypes = limit.mimeTypes.join(","); // 转换为字符串以便于使用
