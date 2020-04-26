@@ -10,8 +10,10 @@ define(["tnxbs"], function(tnx) {
         this.container = container;
         this.options = $.extend({}, FssUpload.defaults, options);
         this.baseUrlRetry = 0;
-        this.config();
+        this.init();
     };
+
+    FssUpload.name = "fssUpload";
 
     FssUpload.defaults = {
         type: undefined, // 业务类型
@@ -24,7 +26,10 @@ define(["tnxbs"], function(tnx) {
         }
     }
 
-    FssUpload.prototype.config = function() {
+    FssUpload.prototype.init = function() {
+        if (!this.options.type) {
+            throw new Error("FssUpload缺少type配置项");
+        }
         if (!this.options.baseUrl && tnx.app.rpc.context) {
             this.options.baseUrl = tnx.app.rpc.context.fss;
         }
@@ -34,12 +39,9 @@ define(["tnxbs"], function(tnx) {
                 throw new Error("FssUpload无法获取baseUrl配置项");
             }
             setTimeout(function() {
-                _this.config();
+                _this.init();
             }, 100);
             return;
-        }
-        if (!this.options.type) {
-            throw new Error("FssUpload缺少type配置项");
         }
         var url = this.options.baseUrl + "/upload-limit/" + this.options.type;
         tnx.app.rpc.get(url, function(limit) {
@@ -59,6 +61,7 @@ define(["tnxbs"], function(tnx) {
             _this.toSelectFile();
         });
         this.container.append(this.button);
+        this.container.data(FssUpload.name);
     }
 
     FssUpload.prototype.toSelectFile = function() {
@@ -103,7 +106,7 @@ define(["tnxbs"], function(tnx) {
             div = this.findPreviewDiv(forFileId).html(""); // 清空替换目标的内容重建
         }
         if (!div || !div.length) {
-            div = $("<div></div>").addClass("preview border").css({
+            div = $("<div></div>").addClass("fss-upload-preview border").css({
                 width: (this.options.previewSize.width + 2) + "px",
                 height: (this.options.previewSize.height + 2) + "px",
             }); // 边框占据宽度，所以需要多加2个px
@@ -111,7 +114,7 @@ define(["tnxbs"], function(tnx) {
         }
         div.attr("data-id", file.id);
 
-        var image = $("<img>").addClass("image").css({
+        var image = $("<img>").addClass("fss-upload-image").css({
             maxWidth: this.options.previewSize.width + "px",
             maxHeight: this.options.previewSize.height + "px",
         });
@@ -135,11 +138,11 @@ define(["tnxbs"], function(tnx) {
     }
 
     FssUpload.prototype.findPreviewDiv = function(fileId) {
-        return $(".preview[data-id='" + fileId + "']", this.container);
+        return $(".fss-upload-preview[data-id='" + fileId + "']", this.container);
     }
 
     FssUpload.prototype.buildRemoveIcon = function(div, fileId) {
-        var icon = $(this.options.iconRemove).addClass("icon text-secondary remove").attr("title", "移除");
+        var icon = $(this.options.iconRemove).addClass("fss-upload-icon text-secondary fss-upload-remove").attr("title", "移除");
         div.append(icon); // 先附着才能获得宽度
         icon.css("left", (div.position().left + div.width() - icon.width()) + "px");
         var _this = this;
@@ -161,7 +164,7 @@ define(["tnxbs"], function(tnx) {
         tnx.app.rpc.post(url, formData, function(results) {
             results.forEach(function(result) {
                 var div = _this.findPreviewDiv(result.id);
-                $("img.image", div).attr("storage-url", result.storageUrl);
+                $(".fss-upload-image", div).attr("storage-url", result.storageUrl);
                 _this.showUploaded(div);
             });
         });
@@ -170,25 +173,26 @@ define(["tnxbs"], function(tnx) {
     FssUpload.prototype.showUploading = function(fileId) {
         var div = this.findPreviewDiv(fileId);
         div.removeClass("border-success");
-        var icon = $("<div class='uploading'><div class='spinner-border text-light'></div></div>");
+        var icon = $("<div class='fss-upload-uploading'><div class='spinner-border text-light'></div></div>");
         icon.css({
             left: div.position().left + 1,
             width: div.width(),
             height: div.height(),
         }).attr("title", "上传中");
         div.append(icon);
-        $(".remove", div).remove();
+        // 删除移除按钮后重新构建，以确保移除按钮在上传中遮罩层上层
+        $(".fss-upload-remove", div).remove();
         this.buildRemoveIcon(div, fileId);
     }
 
     FssUpload.prototype.showUploaded = function(div) {
-        $(".uploading", div).remove();
+        $(".fss-upload-uploading", div).remove();
         div.addClass("border-success");
     }
 
     FssUpload.prototype.refreshButton = function() {
         // 文件数量达到最大限制，则隐藏选择按钮
-        if (this.limit.number > 0 && $(".preview", this.container).length >= this.limit.number) {
+        if (this.limit.number > 0 && $(".fss-upload-preview", this.container).length >= this.limit.number) {
             this.button.addClass("d-none");
         } else {
             this.button.removeClass("d-none");
@@ -207,10 +211,10 @@ define(["tnxbs"], function(tnx) {
             return new FssUpload($(this), options);
         },
         addFile: function(storageUrls) {
-            $(this).data("fssUpload").addFile(storageUrls);
+            $(this).data(FssUpload.name).addFile(storageUrls);
         },
         removeFile: function(fileId) {
-            $(this).data("fssUpload").removeFile(fileId);
+            $(this).data(FssUpload.name).removeFile(fileId);
         }
     };
 

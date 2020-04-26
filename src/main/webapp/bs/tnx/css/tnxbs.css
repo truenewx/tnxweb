@@ -54,7 +54,7 @@
     cursor: pointer;
 }
 
-.fss-upload .preview {
+.fss-upload .fss-upload-preview {
     margin-right: 8px;
     margin-bottom: 8px;
     display: flex;
@@ -63,25 +63,25 @@
     float: left;
 }
 
-.fss-upload .preview .icon {
+.fss-upload .fss-upload-preview .fss-upload-icon {
     position: absolute;
     top: 2px;
 }
 
-.fss-upload .preview .remove {
+.fss-upload .fss-upload-preview .fss-upload-remove {
     cursor: pointer;
     display: none;
 }
 
-.fss-upload .preview:hover .remove {
+.fss-upload .fss-upload-preview:hover .fss-upload-remove {
     display: block;
 }
 
-.fss-upload .preview .image {
+.fss-upload .fss-upload-preview .fss-upload-image {
     cursor: pointer;
 }
 
-.fss-upload .preview .uploading {
+.fss-upload .fss-upload-preview .fss-upload-uploading {
     position: absolute;
     top: 1px;
     background-color: rgba(0, 0, 0, 0.2);
