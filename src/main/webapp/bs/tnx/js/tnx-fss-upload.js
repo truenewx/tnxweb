@@ -13,8 +13,6 @@ define(["tnxbs"], function(tnx) {
         this.init();
     };
 
-    FssUpload.name = "fssUpload";
-
     FssUpload.defaults = {
         type: undefined, // 业务类型
         btnText: "选择...", //选择按钮的显示文本
@@ -23,7 +21,8 @@ define(["tnxbs"], function(tnx) {
         previewSize: { // 预览框尺寸
             width: 64,
             height: 64,
-        }
+        },
+        storageUrls: undefined, // 初始化加载预览的文件存储路径清单
     }
 
     FssUpload.prototype.init = function() {
@@ -62,6 +61,9 @@ define(["tnxbs"], function(tnx) {
         });
         this.container.append(this.button);
         this.container.data(FssUpload.name, this);
+        if (this.options.storageUrls) {
+            this.load(this.options.storageUrls);
+        }
     }
 
     FssUpload.prototype.toSelectFile = function() {
@@ -231,7 +233,9 @@ define(["tnxbs"], function(tnx) {
     FssUpload.prototype.load = function(storageUrls) {
         var url = this.options.baseUrl + "/metas";
         var _this = this;
-        tnx.app.rpc.get(url, storageUrls, function(files) {
+        tnx.app.rpc.get(url, {
+            storageUrls: storageUrls
+        }, function(files) {
             files.forEach(function(file) {
                 _this.preview(file);
                 _this.uploaded(file);
@@ -245,9 +249,6 @@ define(["tnxbs"], function(tnx) {
         },
         getStorageUrls: function(callback) {
             return $(this).data(FssUpload.name).getStorageUrls(callback);
-        },
-        load: function(storageUrls) {
-            return $(this).data(FssUpload.name).load(callback);
         }
     };
 

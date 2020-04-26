@@ -148,6 +148,9 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             if (typeof message == "function") {
                 options = callback;
                 callback = message;
+                message = undefined;
+            }
+            if (message === undefined) {
                 message = title;
                 title = "提示";
             }

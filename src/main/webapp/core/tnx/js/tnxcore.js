@@ -32,6 +32,29 @@ Object.assign = Object.assign || function() {
     return target;
 };
 
+/**
+ * 将指定对象中的所有字段拼凑成形如a=a1&b=b1的字符串
+ * @param object 对象
+ * @returns {string} 拼凑成的字符串
+ */
+Object.stringify = function(object) {
+    var s = "";
+    Object.keys(object).forEach(function(key) {
+        var value = object[key];
+        if (value instanceof Array) {
+            value.forEach(function(v) {
+                s += "&" + key + "=" + v;
+            });
+        } else {
+            s += "&" + key + "=" + value;
+        }
+    });
+    if (s.length > 0) {
+        s = s.substr(1);
+    }
+    return s;
+};
+
 Function.around = function(target, around) {
     return function() {
         var args = [target];
@@ -115,7 +138,8 @@ var tnx = {
             message = title;
             title = undefined;
         }
-        alert(title + ":\n" + message);
+        var content = title ? (title + ":\n" + message) : message;
+        alert(content);
         if (typeof callback == "function") {
             callback();
         }
@@ -426,6 +450,11 @@ tnx.app.rpc = {
             params: options.params,
             data: options.body,
         };
+        if (config.params) {
+            config.paramsSerializer = function(params) {
+                return Object.stringify(params);
+            };
+        }
         if (typeof options.onUploadProgress == "function") {
             config.onUploadProgress = function(event) {
                 var ratio = (event.loaded / event.total) || 0;
