@@ -61,7 +61,7 @@ define(["tnxbs"], function(tnx) {
             _this.toSelectFile();
         });
         this.container.append(this.button);
-        this.container.data(FssUpload.name);
+        this.container.data(FssUpload.name, this);
     }
 
     FssUpload.prototype.toSelectFile = function() {
@@ -121,10 +121,13 @@ define(["tnxbs"], function(tnx) {
         if (file.name) {
             image.attr("alt", file.name).attr("title", file.name);
         }
-        var imgSrc = tnx.util.createObjectUrl(file);
-        image[0].onload = function() {
-            tnx.util.revokeObjectUrl(this.src);
-        };
+        var imgSrc = file.thumbnailReadUrl || file.readUrl;
+        if (!imgSrc) { // 未指定读取地址，则视为本地预览
+            imgSrc = tnx.util.createObjectUrl(file);
+            image[0].onload = function() {
+                tnx.util.revokeObjectUrl(this.src);
+            };
+        }
         image.attr("src", imgSrc);
         var _this = this;
         image.click(function() {
@@ -163,11 +166,16 @@ define(["tnxbs"], function(tnx) {
         var _this = this;
         tnx.app.rpc.post(url, formData, function(results) {
             results.forEach(function(result) {
-                var div = _this.findPreviewDiv(result.id);
-                $(".fss-upload-image", div).attr("storage-url", result.storageUrl);
-                _this.showUploaded(div);
+                _this.uploaded(result);
             });
         });
+    }
+
+    FssUpload.prototype.uploaded = function(file) {
+        var div = this.findPreviewDiv(file.id);
+        $(".fss-upload-image", div).attr("storage-url", file.storageUrl);
+        $(".fss-upload-uploading", div).remove();
+        div.addClass("border-success");
     }
 
     FssUpload.prototype.showUploading = function(fileId) {
@@ -183,11 +191,6 @@ define(["tnxbs"], function(tnx) {
         // 删除移除按钮后重新构建，以确保移除按钮在上传中遮罩层上层
         $(".fss-upload-remove", div).remove();
         this.buildRemoveIcon(div, fileId);
-    }
-
-    FssUpload.prototype.showUploaded = function(div) {
-        $(".fss-upload-uploading", div).remove();
-        div.addClass("border-success");
     }
 
     FssUpload.prototype.refreshButton = function() {
@@ -206,15 +209,45 @@ define(["tnxbs"], function(tnx) {
         }
     }
 
+    FssUpload.prototype.getStorageUrls = function(callback) {
+        var storageUrls = [];
+        var uploadingFiles = [];
+        $.each($(".fss-upload-image", this.container), function() {
+            var image = $(this);
+            var storageUrl = image.attr("storage-url");
+            if (storageUrl) {
+                storageUrls.push(storageUrl);
+            } else {
+                uploadingFiles.push(image.attr("alt"));
+            }
+        });
+        if (typeof callback == "function") {
+            callback(storageUrls, uploadingFiles);
+        } else {
+            return storageUrls;
+        }
+    }
+
+    FssUpload.prototype.load = function(storageUrls) {
+        var url = this.options.baseUrl + "/metas";
+        var _this = this;
+        tnx.app.rpc.get(url, storageUrls, function(files) {
+            files.forEach(function(file) {
+                _this.preview(file);
+                _this.uploaded(file);
+            });
+        });
+    }
+
     var methods = {
         init: function(options) {
             return new FssUpload($(this), options);
         },
-        addFile: function(storageUrls) {
-            $(this).data(FssUpload.name).addFile(storageUrls);
+        getStorageUrls: function(callback) {
+            return $(this).data(FssUpload.name).getStorageUrls(callback);
         },
-        removeFile: function(fileId) {
-            $(this).data(FssUpload.name).removeFile(fileId);
+        load: function(storageUrls) {
+            return $(this).data(FssUpload.name).load(callback);
         }
     };
 
