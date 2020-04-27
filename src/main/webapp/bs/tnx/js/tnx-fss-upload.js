@@ -78,20 +78,54 @@ define(["tnxbs"], function(tnx) {
         var _this = this;
         input.change(function() {
             if (this.files.length) {
-                var files = [];
-                for (var i = 0; i < this.files.length; i++) {
-                    var file = this.files[i];
-                    _this.preview(file, forFileId);
-                    files.push(file);
-                    if (forFileId) {
-                        break; // 存在替换目标，则第一轮遍历即退出循环
+                var files = _this.validateFiles(this.files, forFileId);
+                if (files.length) {
+                    for (var file of files) {
+                        _this.preview(file, forFileId);
                     }
+                    _this.upload(files);
                 }
-                _this.upload(files);
             }
         });
         this.container.append(input);
         input.trigger("click");
+    }
+
+    FssUpload.prototype.validateFiles = function(files, forFileId) {
+        var files = []; // 用新的数组保存可以上传的文件清单
+        var errors = [];
+        for (var file of files) {
+            var fileErrors = this.validateFile(file);
+            if (fileErrors && fileErrors.length) {
+                errors = errors.concat(fileErrors);
+            } else {
+                files.push(file);
+            }
+            if (forFileId) {
+                break; // 存在替换目标，则第一轮遍历即退出循环
+            }
+        }
+        if (errors.length) {
+            this.showErrors(errors);
+            return [];
+        }
+        return files;
+    }
+
+    FssUpload.prototype.validateFile = function(file) {
+        var errors = [];
+        var extension = file.name.substr(file.name.lastIndexOf(".") + 1);
+        // 不是指定扩展名清单中的一员，或者是其中一员但是为扩展名拒绝模式，则说明扩展名不合法
+        if (!this.limit.extensions.contains(extension)) {
+            errors.push("仅支持 " + this.limit.extensions.join("、") + " 文件，不能上传“{1}”");
+        } else if (this.limit.extensionsRejected) {
+            errors.push("不支持 " + this.limit.extensions.join("、") + " 文件，不能上传“{1}”");
+        }
+        return errors;
+    }
+
+    FssUpload.prototype.showErrors = function(errors) {
+        tnx.error(errors.join("<br>"));
     }
 
     FssUpload.prototype.generateFileId = function(file) {

@@ -144,6 +144,9 @@ var tnx = {
             callback();
         }
     },
+    error: function(message, callback) {
+        this.alert("错误", message, callback);
+    },
     confirm: function(title, message, callback) {
         if (message === undefined && callback === undefined) {
             message = title;

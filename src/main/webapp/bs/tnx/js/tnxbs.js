@@ -169,6 +169,9 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             }];
             this.dialog(title, message, buttons, options);
         },
+        error: function(message, callback, options) {
+            this.alert("错误", message, callback, options);
+        },
         confirm: function(title, message, callback, options) {
             if (typeof message == "function") {
                 options = callback;
