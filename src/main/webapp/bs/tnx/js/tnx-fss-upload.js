@@ -10,6 +10,25 @@ define(["tnxbs"], function(tnx) {
         this.container = container;
         this.options = $.extend({}, FssUpload.defaults, options);
         this.baseUrlRetry = 0;
+        this.error = { // 校验错误
+            number: false, // 是否存在文件数量超限错误
+            capacity: [], // 容量大小超限的文件id清单
+            extensions: [], // 扩展名不合法的文件id清单
+            reset: function() {
+                this.number = false;
+                this.capacity = [];
+                this.extensions = [];
+            },
+            isEmpty: function() {
+                return this.number && !this.capacity.length && !this.extensions.length;
+            },
+            isNotEmpty: function() {
+                return !this.number || this.capacity.length || this.extensions.length;
+            },
+            contains: function(fileId) {
+                return this.number || this.capacity.contains(fileId) || this.extensions.contains(fileId);
+            }
+        };
         this.init();
     };
 
@@ -92,51 +111,42 @@ define(["tnxbs"], function(tnx) {
     }
 
     FssUpload.prototype.validateFiles = function(files, forFileId) {
-        var files = []; // 用新的数组保存可以上传的文件清单
-        var errors = [];
+        var result = []; // 用新的数组保存可以上传的文件清单
+        var number = $(".fss-upload-preview", this.container).length + files.length;
+        if (number > this.limit.number) { // 文件数量超限
+            this.error.number = true;
+            this.showErrorMessage("最多可以选择" + this.limit.number + "个文件，你已选了" + number + "个，请移除多余文件");
+        }
         for (var file of files) {
-            var fileErrors = this.validateFile(file);
-            if (fileErrors && fileErrors.length) {
-                errors = errors.concat(fileErrors);
-            } else {
-                files.push(file);
+            file.id = this.generateFileId(file);
+            if (this.limit.capacity < file.size) { // 文件大小超限
+                this.error.capacity.push(file.id);
             }
+            var extension = file.name.substr(file.name.lastIndexOf(".") + 1);
+            // 不是指定扩展名清单中的一员，或者是其中一员但是为扩展名拒绝模式，则说明扩展名不合法
+            if (!this.limit.extensions.containsIgnoreCase(extension)) {
+                this.error.extensions.push(file.id);
+            }
+            result.push(file);
             if (forFileId) {
                 break; // 存在替换目标，则第一轮遍历即退出循环
             }
         }
-        if (errors.length) {
-            this.showErrors(errors);
-            return [];
-        }
-        return files;
+        return result;
     }
 
-    FssUpload.prototype.validateFile = function(file) {
-        var errors = [];
-        var extension = file.name.substr(file.name.lastIndexOf(".") + 1);
-        // 不是指定扩展名清单中的一员，或者是其中一员但是为扩展名拒绝模式，则说明扩展名不合法
-        if (!this.limit.extensions.contains(extension)) {
-            errors.push("仅支持 " + this.limit.extensions.join("、") + " 文件，不能上传“{1}”");
-        } else if (this.limit.extensionsRejected) {
-            errors.push("不支持 " + this.limit.extensions.join("、") + " 文件，不能上传“{1}”");
-        }
-        return errors;
-    }
-
-    FssUpload.prototype.showErrors = function(errors) {
-        tnx.error(errors.join("<br>"));
+    FssUpload.prototype.showErrorMessage = function(message) {
+        tnx.error(message);
     }
 
     FssUpload.prototype.generateFileId = function(file) {
-        // 同样类型、文件名、大小、最近修改时间的文件视为同一个文件，实际上不同文件重复的概率极低
+        // 同样类型、文件名、大小、最近修改时间的文件视为同一个文件，实际上不同文件重复的概率极低，即使重复也没有太大影响
         var text = file.type + "-" + file.name + "-" + file.size + "-" + file.lastModified;
         return tnx.util.md5(text);
     }
 
     FssUpload.prototype.preview = function(file, forFileId) {
-        file.id = this.generateFileId(file);
-        this.remove(file.id); // 如果存在同样的文件，则先移除
+        this.findPreviewDiv(file.id).remove(); // 如果存在同样的文件，则先移除
         var div;
         if (forFileId) {
             div = this.findPreviewDiv(forFileId).html(""); // 清空替换目标的内容重建
@@ -192,41 +202,66 @@ define(["tnxbs"], function(tnx) {
 
     FssUpload.prototype.upload = function(files) {
         var formData = new window.FormData();
-        formData.set("onlyStorage", "true"); // 本地可预览，只需服务端返回存储地址
         for (var file of files) {
-            this.showUploading(file.id);
-            formData.append("fileIds", file.id);
-            formData.append("files", file);
+            if (this.error.contains(file.id)) {
+                this.showError(file);
+            } else {
+                this.showUploading(file.id);
+                formData.append("fileIds", file.id);
+                formData.append("files", file);
+            }
         }
-        var url = this.options.baseUrl + "/upload/" + this.options.type;
-        var _this = this;
-        tnx.app.rpc.post(url, formData, function(results) {
-            results.forEach(function(result) {
-                _this.uploaded(result);
+        if (formData.get("fileIds")) {
+            formData.set("onlyStorage", "true"); // 本地可预览，只需服务端返回存储地址
+            var url = this.options.baseUrl + "/upload/" + this.options.type;
+            var _this = this;
+            tnx.app.rpc.post(url, formData, function(results) {
+                results.forEach(function(result) {
+                    _this.uploaded(result);
+                });
             });
-        });
+        }
+    }
+
+    FssUpload.prototype.showError = function(file) {
+        var div = this.buildPreviewMask(file.id);
+        div.addClass("border-danger");
+        $(".fss-upload-preview-mask", div).append("<i class='fa fa-exclamation-circle text-danger'></i>");
+        div.data("file", file);
+    }
+
+    FssUpload.prototype.buildPreviewMask = function(fileId) {
+        var div = this.findPreviewDiv(fileId);
+        var mask = $(".fss-upload-preview-mask", div);
+        if (!mask.length) {
+            mask = $("<div class='fss-upload-preview-mask'></div>");
+            mask.css({
+                left: div.position().left + 1,
+                width: div.width(),
+                height: div.height(),
+                fontSize: div.width() / 3,
+            });
+            div.append(mask);
+            // 删除移除按钮后重新构建，以确保移除按钮在上传中遮罩层上层
+            $(".fss-upload-remove", div).remove();
+            this.buildRemoveIcon(div, fileId);
+        } else {
+            mask.html("");
+        }
+        return div;
     }
 
     FssUpload.prototype.uploaded = function(file) {
         var div = this.findPreviewDiv(file.id);
         $(".fss-upload-image", div).attr("storage-url", file.storageUrl);
-        $(".fss-upload-uploading", div).remove();
+        $(".fss-upload-preview-mask", div).remove();
         div.addClass("border-success");
     }
 
     FssUpload.prototype.showUploading = function(fileId) {
-        var div = this.findPreviewDiv(fileId);
-        div.removeClass("border-success");
-        var icon = $("<div class='fss-upload-uploading'><div class='spinner-border text-light'></div></div>");
-        icon.css({
-            left: div.position().left + 1,
-            width: div.width(),
-            height: div.height(),
-        }).attr("title", "上传中");
-        div.append(icon);
-        // 删除移除按钮后重新构建，以确保移除按钮在上传中遮罩层上层
-        $(".fss-upload-remove", div).remove();
-        this.buildRemoveIcon(div, fileId);
+        var div = this.buildPreviewMask(fileId);
+        div.removeClass("border-success border-danger").removeData("file");
+        $(".fss-upload-preview-mask", div).append("<div class='spinner-border text-light'></div>").attr("title", "上传中");
     }
 
     FssUpload.prototype.refreshButton = function() {
@@ -241,6 +276,21 @@ define(["tnxbs"], function(tnx) {
     FssUpload.prototype.remove = function(fileId) {
         if (fileId) {
             this.findPreviewDiv(fileId).remove();
+            if (this.error.number) {
+                // 如果原本文件数量超限，则移除一个文件后重新检查文件数量是否超限，不超限则重新发起上传
+                var divs = $(".fss-upload-preview", this.container);
+                if (divs.length <= this.limit.number) {
+                    this.error.number = false;
+                    var files = [];
+                    for (var div of divs) {
+                        var file = $(div).data("file");
+                        if (file) {
+                            files.push(file);
+                        }
+                    }
+                    this.upload(files);
+                }
+            }
             this.refreshButton();
         }
     }

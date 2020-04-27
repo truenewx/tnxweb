@@ -81,7 +81,7 @@
     cursor: pointer;
 }
 
-.fss-upload .fss-upload-preview .fss-upload-uploading {
+.fss-upload .fss-upload-preview .fss-upload-preview-mask {
     position: absolute;
     top: 1px;
     background-color: rgba(0, 0, 0, 0.2);

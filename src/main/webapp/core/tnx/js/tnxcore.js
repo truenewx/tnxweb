@@ -92,6 +92,27 @@ String.prototype.endsWith = String.prototype.endsWith || function(searchString, 
     return this.substring(endPosition - searchString.length, endPosition) === searchString;
 };
 
+Object.assign(Array.prototype, {
+    contains: function(element) {
+        for (var e of this) {
+            if (e === element) {
+                return true;
+            }
+        }
+        return false;
+    },
+    containsIgnoreCase: function(element) {
+        if (typeof element == "string") {
+            for (var e of this) {
+                if (typeof e == "string" && e.toLocaleLowerCase() === element.toLocaleLowerCase()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+});
+
 Object.assign(Element.prototype, {
     prependChild: function(child) {
         if (this.hasChildNodes()) {
