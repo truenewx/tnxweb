@@ -63,12 +63,9 @@
     float: left;
 }
 
-.fss-upload .fss-upload-preview .fss-upload-icon {
+.fss-upload .fss-upload-preview .fss-upload-remove {
     position: absolute;
     top: 2px;
-}
-
-.fss-upload .fss-upload-preview .fss-upload-remove {
     cursor: pointer;
     display: none;
 }
@@ -84,7 +81,7 @@
 .fss-upload .fss-upload-preview .fss-upload-preview-mask {
     position: absolute;
     top: 1px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;

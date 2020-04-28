@@ -8,35 +8,33 @@ define(["tnxbs"], function(tnx) {
             throw new Error("FssUpload must be based on DIV element");
         }
         this.container = container;
-        this.options = $.extend({}, FssUpload.defaults, options);
+        this.options = $.extend({}, this.defaults, options);
         this.baseUrlRetry = 0;
         this.error = { // 校验错误
-            number: false, // 是否存在文件数量超限错误
-            capacity: [], // 容量大小超限的文件id清单
-            extensions: [], // 扩展名不合法的文件id清单
-            reset: function() {
-                this.number = false;
+            number: 0, // 文件数量超限时的文件数量
+            capacity: [], // 容量大小超限的文件名清单
+            extensions: [], // 扩展名不合法的文件名清单
+            clean: function() {
+                this.number = 0;
                 this.capacity = [];
                 this.extensions = [];
-            },
-            isEmpty: function() {
-                return this.number && !this.capacity.length && !this.extensions.length;
-            },
-            isNotEmpty: function() {
-                return !this.number || this.capacity.length || this.extensions.length;
-            },
-            contains: function(fileId) {
-                return this.number || this.capacity.contains(fileId) || this.extensions.contains(fileId);
             }
         };
         this.init();
     };
 
-    FssUpload.defaults = {
+    FssUpload.prototype.templates = {
+        preview: '<div class="fss-upload-preview border">' +
+            '   <img class="fss-upload-image">' +
+            '   <div class="fss-upload-preview-mask d-none"></div>' +
+            '   <i class="fss-upload-remove text-secondary far fa-times-circle" title="移除"></i>' +
+            '</div>', // 预览框
+    };
+
+    FssUpload.prototype.defaults = {
         type: undefined, // 业务类型
         btnText: "选择...", //选择按钮的显示文本
         btnClass: "btn btn-light border", // 选择按钮的样式名称
-        iconRemove: "<i class='far fa-times-circle'></i>", // 移除图标的内容
         previewSize: { // 预览框尺寸
             width: 64,
             height: 64,
@@ -97,12 +95,15 @@ define(["tnxbs"], function(tnx) {
         var _this = this;
         input.change(function() {
             if (this.files.length) {
-                var files = _this.validateFiles(this.files, forFileId);
+                var files = _this.validate(this.files, forFileId);
+                _this.showErrorMessages();
                 if (files.length) {
                     for (var file of files) {
                         _this.preview(file, forFileId);
                     }
-                    _this.upload(files);
+                    if (!_this.error.number) { // 没有文件数量超限错误才开始上传
+                        _this.upload(files);
+                    }
                 }
             }
         });
@@ -110,33 +111,64 @@ define(["tnxbs"], function(tnx) {
         input.trigger("click");
     }
 
-    FssUpload.prototype.validateFiles = function(files, forFileId) {
-        var result = []; // 用新的数组保存可以上传的文件清单
-        var number = $(".fss-upload-preview", this.container).length + files.length;
-        if (number > this.limit.number) { // 文件数量超限
-            this.error.number = true;
-            this.showErrorMessage("最多可以选择" + this.limit.number + "个文件，你已选了" + number + "个，请移除多余文件");
-        }
+    FssUpload.prototype.validate = function(files, forFileId) {
+        this.error.clean(); // 先清空所有原有的错误信息
+        var number = $(".fss-upload-preview", this.container).length;
         for (var file of files) {
             file.id = this.generateFileId(file);
+            if (!forFileId && !this.findPreviewDiv(file.id).length) {
+                number++; // 没有指定替换目标，且新的文件没有已选，才增加已选数量
+            }
+        }
+        if (number > this.limit.number) { // 文件数量超限
+            this.error.number = number;
+            return files; // 文件数量超限预览所有文件，但不开始上传
+        }
+        var previewableFiles = []; // 用新的数组保存可以预览的文件清单
+        for (var file of files) {
+            var valid = true;
             if (this.limit.capacity < file.size) { // 文件大小超限
-                this.error.capacity.push(file.id);
+                this.error.capacity.push(file.name);
+                valid = false;
             }
             var extension = file.name.substr(file.name.lastIndexOf(".") + 1);
             // 不是指定扩展名清单中的一员，或者是其中一员但是为扩展名拒绝模式，则说明扩展名不合法
-            if (!this.limit.extensions.containsIgnoreCase(extension)) {
-                this.error.extensions.push(file.id);
+            if (!this.limit.extensions.containsIgnoreCase(extension) || this.limit.extensionsRejected) {
+                this.error.extensions.push(file.name);
+                valid = false;
             }
-            result.push(file);
+            if (valid) {
+                previewableFiles.push(file);
+            }
             if (forFileId) {
                 break; // 存在替换目标，则第一轮遍历即退出循环
             }
         }
-        return result;
+        return previewableFiles;
     }
 
-    FssUpload.prototype.showErrorMessage = function(message) {
-        tnx.error(message);
+    FssUpload.prototype.showErrorMessages = function() {
+        var messages = [];
+        if (this.error.number) {
+            messages.push("最多可以选择" + this.limit.number + "个文件，你已选了" + this.error.number + "个，请移除多余文件");
+        } else { // 文件数量未超限才考虑显示其它错误信息
+            if (this.error.capacity.length) { // 存在容量大小错误
+                var prefix = this.limit.number === 1 ? "" : "单个";
+                messages.push(prefix + "文件大小不能超过" + this.limit.capacity + "B，文件"
+                    + this.error.capacity.join("、") + "已超过该大小");
+            }
+            if (this.error.extensions.length) { // 存在扩展名错误
+                var prefix = this.limit.extensionsRejected ? "不" : "只";
+                messages.push(prefix + "支持" + this.limit.extensions.join("、") + "文件，文件"
+                    + this.error.extensions.join("、") + "不符合要求");
+            }
+            if (messages.length) {
+                messages.push("以上文件已被排除。");
+            }
+        }
+        if (messages.length) {
+            tnx.error(messages.join("<br>"));
+        }
     }
 
     FssUpload.prototype.generateFileId = function(file) {
@@ -145,28 +177,31 @@ define(["tnxbs"], function(tnx) {
         return tnx.util.md5(text);
     }
 
+    FssUpload.prototype.findPreviewDiv = function(fileId) {
+        return $(".fss-upload-preview[data-id='" + fileId + "']", this.container);
+    }
+
     FssUpload.prototype.preview = function(file, forFileId) {
-        this.findPreviewDiv(file.id).remove(); // 如果存在同样的文件，则先移除
+        var fileId = file.id;
+        this.findPreviewDiv(fileId).remove(); // 如果存在同样的文件，则先移除
         var div;
         if (forFileId) {
-            div = this.findPreviewDiv(forFileId).html(""); // 清空替换目标的内容重建
+            div = this.findPreviewDiv(forFileId);
         }
         if (!div || !div.length) {
-            div = $("<div></div>").addClass("fss-upload-preview border").css({
+            div = $(this.templates.preview).css({
                 width: (this.options.previewSize.width + 2) + "px",
                 height: (this.options.previewSize.height + 2) + "px",
             }); // 边框占据宽度，所以需要多加2个px
             this.button.before(div);
         }
-        div.attr("data-id", file.id);
+        div.attr("data-id", fileId);
 
-        var image = $("<img>").addClass("fss-upload-image").css({
+        var image = $(".fss-upload-image", div).css({
             maxWidth: this.options.previewSize.width + "px",
             maxHeight: this.options.previewSize.height + "px",
         });
-        if (file.name) {
-            image.attr("alt", file.name).attr("title", file.name);
-        }
+        image.attr("alt", file.name).attr("title", file.name);
         var imgSrc = file.thumbnailReadUrl || file.readUrl;
         if (!imgSrc) { // 未指定读取地址，则视为本地预览
             imgSrc = tnx.util.createObjectUrl(file);
@@ -177,91 +212,71 @@ define(["tnxbs"], function(tnx) {
         image.attr("src", imgSrc);
         var _this = this;
         image.click(function() {
-            _this.button.attr("data-for", file.id);
+            _this.button.attr("data-for", fileId);
             _this.toSelectFile();
         });
         div.append(image);
 
-        this.buildRemoveIcon(div, file.id);
-        this.refreshButton();
-    }
+        var mask = $(".fss-upload-preview-mask", div);
+        mask.css({
+            left: div.position().left + 1,
+            width: div.width(),
+            height: div.height(),
+            fontSize: div.width() / 3,
+        });
 
-    FssUpload.prototype.findPreviewDiv = function(fileId) {
-        return $(".fss-upload-preview[data-id='" + fileId + "']", this.container);
-    }
-
-    FssUpload.prototype.buildRemoveIcon = function(div, fileId) {
-        var icon = $(this.options.iconRemove).addClass("fss-upload-icon text-secondary fss-upload-remove").attr("title", "移除");
-        div.append(icon); // 先附着才能获得宽度
-        icon.css("left", (div.position().left + div.width() - icon.width()) + "px");
+        var icon = this.locateRemoveIcon(div);
         var _this = this;
         icon.click(function() {
             _this.remove(fileId);
         });
+
+        if (this.error.number) { // 存在文件数量超限错误，则所有文件预览全部加上警示样式
+            div.addClass("border-danger");
+            div.data("file", file); // 缓存文件对象，以便于用户移除多余文件后继续上传处理
+            mask.removeClass("d-none");
+        }
+
+        if (!forFileId) {
+            this.refreshButton();
+        }
+    }
+
+    FssUpload.prototype.locateRemoveIcon = function(div) {
+        var icon = $(".fss-upload-remove", div);
+        icon.css("left", (div.position().left + div.width() - icon.width()) + "px");
+        return icon;
     }
 
     FssUpload.prototype.upload = function(files) {
         var formData = new window.FormData();
         for (var file of files) {
-            if (this.error.contains(file.id)) {
-                this.showError(file);
-            } else {
-                this.showUploading(file.id);
-                formData.append("fileIds", file.id);
-                formData.append("files", file);
-            }
+            this.showUploading(file.id);
+            formData.append("fileIds", file.id);
+            formData.append("files", file);
         }
-        if (formData.get("fileIds")) {
-            formData.set("onlyStorage", "true"); // 本地可预览，只需服务端返回存储地址
-            var url = this.options.baseUrl + "/upload/" + this.options.type;
-            var _this = this;
-            tnx.app.rpc.post(url, formData, function(results) {
-                results.forEach(function(result) {
-                    _this.uploaded(result);
-                });
+        formData.set("onlyStorage", "true"); // 本地可预览，只需服务端返回存储地址
+        var url = this.options.baseUrl + "/upload/" + this.options.type;
+        var _this = this;
+        tnx.app.rpc.post(url, formData, function(results) {
+            results.forEach(function(result) {
+                _this.uploaded(result);
             });
-        }
+        });
     }
 
-    FssUpload.prototype.showError = function(file) {
-        var div = this.buildPreviewMask(file.id);
-        div.addClass("border-danger");
-        $(".fss-upload-preview-mask", div).append("<i class='fa fa-exclamation-circle text-danger'></i>");
-        div.data("file", file);
-    }
-
-    FssUpload.prototype.buildPreviewMask = function(fileId) {
+    FssUpload.prototype.showUploading = function(fileId) {
         var div = this.findPreviewDiv(fileId);
-        var mask = $(".fss-upload-preview-mask", div);
-        if (!mask.length) {
-            mask = $("<div class='fss-upload-preview-mask'></div>");
-            mask.css({
-                left: div.position().left + 1,
-                width: div.width(),
-                height: div.height(),
-                fontSize: div.width() / 3,
-            });
-            div.append(mask);
-            // 删除移除按钮后重新构建，以确保移除按钮在上传中遮罩层上层
-            $(".fss-upload-remove", div).remove();
-            this.buildRemoveIcon(div, fileId);
-        } else {
-            mask.html("");
-        }
-        return div;
+        div.removeClass("border-success border-danger").removeData("file");
+        var mask = $(".fss-upload-preview-mask", div).attr("title", "上传中");
+        mask.html("<div class='spinner-border text-light'></div>").removeClass("d-none");
     }
 
     FssUpload.prototype.uploaded = function(file) {
         var div = this.findPreviewDiv(file.id);
         $(".fss-upload-image", div).attr("storage-url", file.storageUrl);
-        $(".fss-upload-preview-mask", div).remove();
+        $(".fss-upload-preview-mask", div).addClass("d-none");
         div.addClass("border-success");
-    }
-
-    FssUpload.prototype.showUploading = function(fileId) {
-        var div = this.buildPreviewMask(fileId);
-        div.removeClass("border-success border-danger").removeData("file");
-        $(".fss-upload-preview-mask", div).append("<div class='spinner-border text-light'></div>").attr("title", "上传中");
     }
 
     FssUpload.prototype.refreshButton = function() {
@@ -274,25 +289,32 @@ define(["tnxbs"], function(tnx) {
     }
 
     FssUpload.prototype.remove = function(fileId) {
-        if (fileId) {
-            this.findPreviewDiv(fileId).remove();
-            if (this.error.number) {
-                // 如果原本文件数量超限，则移除一个文件后重新检查文件数量是否超限，不超限则重新发起上传
-                var divs = $(".fss-upload-preview", this.container);
-                if (divs.length <= this.limit.number) {
-                    this.error.number = false;
-                    var files = [];
-                    for (var div of divs) {
-                        var file = $(div).data("file");
-                        if (file) {
-                            files.push(file);
-                        }
+        this.findPreviewDiv(fileId).remove();
+        var divs = $(".fss-upload-preview", this.container);
+        if (this.error.number) {
+            // 如果原本文件数量超限，则移除一个文件后重新检查文件数量是否超限，不超限则重新发起上传
+            this.error.number = divs.length;
+            if (this.error.number <= this.limit.number) {
+                this.error.number = 0; // 文件数量已经不超限
+                var files = [];
+                for (var div of divs) {
+                    div = $(div);
+                    this.locateRemoveIcon(div); // 重新定位移除按钮的位置
+                    var file = div.data("file");
+                    if (file) {
+                        files.push(file);
                     }
-                    this.upload(files);
                 }
+                this.upload(files);
+                return;
             }
-            this.refreshButton();
         }
+        // 确保移除按钮都获得重新定位
+        for (var div of divs) {
+            div = $(div);
+            this.locateRemoveIcon(div); // 重新定位移除按钮的位置
+        }
+        this.refreshButton();
     }
 
     FssUpload.prototype.getStorageUrls = function(callback) {
