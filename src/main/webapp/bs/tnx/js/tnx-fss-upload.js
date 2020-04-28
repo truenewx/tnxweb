@@ -113,17 +113,6 @@ define(["tnxbs"], function(tnx) {
 
     FssUpload.prototype.validate = function(files, forFileId) {
         this.error.clean(); // 先清空所有原有的错误信息
-        var number = $(".fss-upload-preview", this.container).length;
-        for (var file of files) {
-            file.id = this.generateFileId(file);
-            if (!forFileId && !this.findPreviewDiv(file.id).length) {
-                number++; // 没有指定替换目标，且新的文件没有已选，才增加已选数量
-            }
-        }
-        if (number > this.limit.number) { // 文件数量超限
-            this.error.number = number;
-            return files; // 文件数量超限预览所有文件，但不开始上传
-        }
         var previewableFiles = []; // 用新的数组保存可以预览的文件清单
         for (var file of files) {
             var valid = true;
@@ -144,6 +133,17 @@ define(["tnxbs"], function(tnx) {
                 break; // 存在替换目标，则第一轮遍历即退出循环
             }
         }
+        // 排除掉不可预览的文件，剩下可预览文件再计算文件数量
+        var number = $(".fss-upload-preview", this.container).length;
+        for (var file of previewableFiles) {
+            file.id = this.generateFileId(file);
+            if (!forFileId && !this.findPreviewDiv(file.id).length) {
+                number++; // 没有指定替换目标，且新的文件没有已选，才增加已选数量
+            }
+        }
+        if (number > this.limit.number) { // 文件数量超限
+            this.error.number = number;
+        }
         return previewableFiles;
     }
 
@@ -154,13 +154,14 @@ define(["tnxbs"], function(tnx) {
         } else { // 文件数量未超限才考虑显示其它错误信息
             if (this.error.capacity.length) { // 存在容量大小错误
                 var prefix = this.limit.number === 1 ? "" : "单个";
-                messages.push(prefix + "文件大小不能超过" + this.limit.capacity + "B，文件"
-                    + this.error.capacity.join("、") + "已超过该大小");
+                var capacity = tnx.util.getCapacityCaption(this.limit.capacity);
+                messages.push(prefix + "文件大小不能超过" + capacity + "，文件："
+                    + this.error.capacity.join("、") + " 已超过该大小；");
             }
             if (this.error.extensions.length) { // 存在扩展名错误
                 var prefix = this.limit.extensionsRejected ? "不" : "只";
-                messages.push(prefix + "支持" + this.limit.extensions.join("、") + "文件，文件"
-                    + this.error.extensions.join("、") + "不符合要求");
+                messages.push(prefix + "支持" + this.limit.extensions.join("、") + "文件，文件："
+                    + this.error.extensions.join("、") + " 不符合要求；");
             }
             if (messages.length) {
                 messages.push("以上文件已被排除。");

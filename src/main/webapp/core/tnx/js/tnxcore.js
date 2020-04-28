@@ -113,6 +113,13 @@ Object.assign(Array.prototype, {
     }
 });
 
+Object.assign(Number.prototype, {
+    toFixed: function(scale) {
+        var p = Math.pow(10, scale);
+        return Math.round(this * p) / p;
+    }
+});
+
 Object.assign(Element.prototype, {
     prependChild: function(child) {
         if (this.hasChildNodes()) {
@@ -261,6 +268,18 @@ tnx.util = {
         } else if (window.webkitURL && window.webkitURL.revokeObjectURL) {
             window.webkitURL.revokeObjectURL(url);
         }
+    },
+    getCapacityCaption: function(byteValue) {
+        var unit = 1024;
+        if (byteValue < unit) {
+            return byteValue + "B";
+        }
+        var kB = byteValue / unit;
+        if (kB < unit) {
+            return kB.toFixed(3) + "KB";
+        }
+        var mB = kB / unit;
+        return mB.toFixed(3) + "MB";
     }
 };
 
