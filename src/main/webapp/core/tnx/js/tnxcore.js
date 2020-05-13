@@ -280,6 +280,22 @@ tnx.util = {
         }
         var mB = kB / unit;
         return mB.toFixed(3) + "MB";
+    },
+    appendExtension: function(url, extension) {
+        var index = url.indexOf("?");
+        var queryString = "";
+        if (index >= 0) {
+            queryString = url.substr(index);
+            url = url.substr(0, index);
+        }
+        index = url.lastIndexOf("/");
+        if (index >= 0 && url.indexOf(".", index + 1) < 0) {
+            if (!extension.startsWith(".")) {
+                extension = "." + extension;
+            }
+            url += extension;
+        }
+        return url + queryString;
     }
 };
 
@@ -448,7 +464,9 @@ tnx.app.rpc = {
             if (!axios.defaults.baseURL.startsWith("/")) {
                 axios.defaults.withCredentials = true;
             }
-            Object.assign(axios.defaults.headers.common, context.headers);
+            Object.assign(axios.defaults.headers.common, context.headers, {
+                "X-Requested-With": "XMLHttpRequest"
+            });
             _this.context = context.context || {}; // 其它站点的上下文根路径
         });
     },
@@ -504,25 +522,42 @@ tnx.app.rpc = {
                 options.onUploadProgress.call(event, ratio);
             }
         }
+        this.axiosRequest(config, options);
+    },
+    axiosRequest: function(config, options) {
         var _this = this;
         this.axios(config).then(function(response) {
-            if (typeof options.success == "function") {
+            if (response.headers.redirect) {
+                _this.axiosRequest(Object.assign({}, config, {
+                    url: response.headers.redirect
+                }), options);
+            } else if (typeof options.success == "function") {
                 options.success(response.data);
             }
         }).catch(function(error) {
-            if (error.response) {
-                var errors = error.response.data.errors;
-                if (errors) {
-                    if (typeof options.error == "function") {
-                        options.error(errors);
-                    } else {
-                        _this.error(errors);
-                    }
-                    return;
+            var response = error.response;
+            if (response) {
+                switch (response.status) {
+                    case 401:
+                        _this.toLoginForm();
+                        return;
+                    case 403:
+                        var errors = response.data.errors;
+                        if (errors) {
+                            if (typeof options.error == "function") {
+                                options.error(errors);
+                            } else {
+                                _this.error(errors);
+                            }
+                        }
+                        return;
                 }
             }
             console.error(error.stack);
         });
+    },
+    toLoginForm: function() {
+        debugger
     },
     getCsrfHeader: function() {
         var meta = document.querySelector("meta[name='csrf']");
