@@ -452,6 +452,7 @@ tnx.app = {
 
 tnx.app.rpc = {
     owner: tnx.app,
+    loginSuccessRedirectParameter: "_next",
     init: function(axios) {
         this.axios = axios;
         axios.defaults.baseURL = this.owner.context; // 默认用当前站点上下文作为基本路径
@@ -460,6 +461,7 @@ tnx.app.rpc = {
             if (context.baseUrl) {
                 axios.defaults.baseURL = context.baseUrl;
             }
+            this.loginSuccessRedirectParameter = context.loginSuccessRedirectParameter;
             // 不以斜杠开头说明基本路径为跨域访问路径
             if (!axios.defaults.baseURL.startsWith("/")) {
                 axios.defaults.withCredentials = true;
@@ -506,8 +508,8 @@ tnx.app.rpc = {
     },
     request: function(url, options) {
         var config = {
+            referer: url,
             method: options.method,
-            url: url,
             params: options.params,
             data: options.body,
         };
@@ -522,15 +524,15 @@ tnx.app.rpc = {
                 options.onUploadProgress.call(event, ratio);
             }
         }
-        this.axiosRequest(config, options);
+        this.axiosRequest(url, config, options);
     },
-    axiosRequest: function(config, options) {
+    axiosRequest: function(url, config, options) {
         var _this = this;
-        this.axios(config).then(function(response) {
+        this.axios(url, config).then(function(response) {
             if (response.headers.redirect) {
-                _this.axiosRequest(Object.assign({}, config, {
-                    url: response.headers.redirect
-                }), options);
+                config.params = config.params || {};
+                config.params[_this.loginSuccessRedirectParameter] = config.referer;
+                _this.axiosRequest(response.headers.redirect, config, options);
             } else if (typeof options.success == "function") {
                 options.success(response.data);
             }
