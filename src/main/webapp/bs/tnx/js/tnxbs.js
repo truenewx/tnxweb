@@ -257,7 +257,7 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                 var links = $("tnx-head link", html);
 
                 var container = $("tnx-body", html);
-                if (container.length == 0) { // 没有BODY
+                if (container.length === 0) { // 没有BODY
                     if (html.length > 1) { // 确保单根
                         html.wrap("<div></div>");
                         container = html.parent();
@@ -318,7 +318,7 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             });
             modalObject.modal({
                 backdrop: false,
-                keyboard: false,
+                keyboard: true,
             });
             var zIndex = tnx.util.minTopZIndex(20);
             modalObject.css("zIndex", zIndex);

@@ -84,7 +84,7 @@ define([], function() {
             return true; // 非字符串值，视为检查通过
         },
         maxLength: function(validationValue, fieldValue) {
-            if (typeof validationValue == "number") {
+            if (typeof validationValue == "number" && fieldValue) {
                 // 回车符计入长度
                 var enterLength = fieldValue.indexOf("\n") < 0 ? 0 : fieldValue.match(/\n/g).length;
                 var fieldLength = fieldValue.length + enterLength;
@@ -96,7 +96,7 @@ define([], function() {
             return undefined;
         },
         minLength: function(validationValue, fieldValue) {
-            if (typeof validationValue == "number") {
+            if (typeof validationValue == "number" && fieldValue) {
                 // 回车符计入长度
                 var enterLength = fieldValue.indexOf("\n") < 0 ? 0 : fieldValue.match(/\n/g).length;
                 var fieldLength = fieldValue.length + enterLength;
@@ -108,13 +108,13 @@ define([], function() {
             return undefined;
         },
         number: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 return typeof fieldValue == "number" || this.regExps.number.test(fieldValue);
             }
             return true; // 不要求为数字，则检查通过
         },
         integerLength: function(validationValue, fieldValue) {
-            if (typeof validationValue == "number") { // 校验值为数字才可校验
+            if (typeof validationValue == "number" && fieldValue) { // 校验值为数字才可校验
                 if (typeof fieldValue != "string") { // 字段值一律转换为字符串再进行校验
                     fieldValue = String(fieldValue);
                 }
@@ -135,7 +135,7 @@ define([], function() {
             return undefined;
         },
         scale: function(validationValue, fieldValue) {
-            if (typeof validationValue == "number" && validationValue > 0) { // 校验值为数字且大于0才可校验
+            if (typeof validationValue == "number" && validationValue > 0 && fieldValue) { // 校验值为数字且大于0才可校验
                 if (typeof fieldValue != "string") { // 字段值一律转换为字符串再进行校验
                     fieldValue = String(fieldValue);
                 }
@@ -153,7 +153,7 @@ define([], function() {
             return undefined;
         },
         integer: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 // 本身为数值时，四舍五入为整数时与原值相等，说明其为整数
                 return (typeof fieldValue == "number" && Math.ceil(fieldValue) === fieldValue)
                     || this.regExps.integer.test(fieldValue);
@@ -161,7 +161,7 @@ define([], function() {
             return true; // 不要求为整数，则检查通过
         },
         maxValue: function(validationValue, fieldValue) {
-            if (typeof validationValue == "number") {
+            if (typeof validationValue == "number" && fieldValue) {
                 if (typeof fieldValue == "number") {
                     return fieldValue <= validationValue;
                 } else if (this.regExps.number.test(fieldValue)) {
@@ -171,7 +171,7 @@ define([], function() {
             return true; // 校验值不为数字无法校验，忽略该检查器
         },
         minValue: function(validationValue, fieldValue) {
-            if (typeof validationValue == "number") {
+            if (typeof validationValue == "number" && fieldValue) {
                 if (typeof fieldValue == "number") {
                     return fieldValue >= validationValue;
                 } else if (this.regExps.number.test(fieldValue)) {
@@ -182,7 +182,7 @@ define([], function() {
         },
         regex: function(validationValue, fieldValue) {
             var checker = function(expression, fieldValue) {
-                if (expression && fieldValue !== "") {
+                if (expression && fieldValue) {
                     return new RegExp(expression).test(fieldValue);
                 }
                 return true;
@@ -205,25 +205,25 @@ define([], function() {
             return undefined;
         },
         email: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 return this.regExps.email.test(fieldValue);
             }
             return true;
         },
         mobilePhone: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 return this.regExps.mobilePhone.test(fieldValue);
             }
             return true;
         },
         url: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 return this.regExps.url.test(fieldValue);
             }
             return true;
         },
         notContains: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 var values = validationValue.split(" ");
                 for (var i = 0; i < values.length; i++) {
                     if (fieldValue.indexOf(values[i]) >= 0) {
@@ -234,7 +234,7 @@ define([], function() {
             return true;
         },
         notContainsAngleBracket: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 var values = ["<", ">"];
                 for (var i = 0; i < values.length; i++) {
                     if (fieldValue.indexOf(values[i]) >= 0) {
@@ -245,7 +245,7 @@ define([], function() {
             return true;
         },
         notContainsHtmlChars: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 var values = ["<", ">", "'", "\"", "/", "\\"];
                 for (var i = 0; i < values.length; i++) {
                     if (fieldValue.indexOf(values[i]) >= 0) {
@@ -256,14 +256,14 @@ define([], function() {
             return true;
         },
         rejectTags: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 fieldValue = fieldValue.trim();
                 var regExp = new RegExp("^.*<[a-z]+.*>.*$", "i");
                 return !regExp.test(fieldValue);
             }
         },
         allowedTags: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 fieldValue = fieldValue.trim();
                 var tags = validationValue.split(",");
                 var leftIndex = fieldValue.indexOf("<");
@@ -285,7 +285,7 @@ define([], function() {
             return true;
         },
         forbiddenTags: function(validationValue, fieldValue) {
-            if (validationValue && fieldValue !== "") {
+            if (validationValue && fieldValue) {
                 fieldValue = fieldValue.trim().toLowerCase();
                 var tags = validationValue.split(",");
                 for (var i = 0; i < tags.length; i++) {

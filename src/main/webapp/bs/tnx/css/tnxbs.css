@@ -27,7 +27,8 @@
     min-width: 100px;
 }
 
-.modal-toast .modal-content .fa {
+.modal-toast .modal-content .fa,
+.modal-toast .modal-content .far {
     font-size: 56px;
 }
 

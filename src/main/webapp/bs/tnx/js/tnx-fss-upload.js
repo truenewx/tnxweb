@@ -344,8 +344,10 @@ define(["tnxbs"], function(tnx) {
             storageUrls: storageUrls
         }, function(files) {
             files.forEach(function(file) {
-                _this.preview(file);
-                _this.uploaded(file);
+                if (file) {
+                    _this.preview(file);
+                    _this.uploaded(file);
+                }
             });
         });
     }
