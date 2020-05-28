@@ -53,8 +53,11 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
             $(".modal-title", modalObject).html(title);
             $(".modal-body", modalObject).html(content);
             $("body").append(modalObject);
-            modalObject.close = function() {
+            modalObject.close = function(callback) {
                 modalObject.modal("hide");
+                if (typeof callback == "function") {
+                    callback.call(modalObject);
+                }
             };
             // 处理标题
             if (typeof title == "string") {
@@ -276,8 +279,8 @@ define(["tnxjq", "bootstrap"], function(tnxjq) {
                     events: $.extend({}, options.events, {
                         shown: function() {
                             var modalObject = this;
-                            container[0].close = function() {
-                                modalObject.close();
+                            container[0].close = function(callback) {
+                                modalObject.close(callback);
                             };
                             _this.app.init(container[0]);
                         }
