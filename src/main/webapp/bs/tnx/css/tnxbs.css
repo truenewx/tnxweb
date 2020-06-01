@@ -55,6 +55,15 @@
     cursor: pointer;
 }
 
+.accordion .card-header .btn-link:hover,
+.accordion .card-header .btn-link:focus {
+    text-decoration: none;
+}
+
+.collapse .list-group .list-group-item:first-child {
+    border-radius: 0;
+}
+
 .fss-upload .fss-upload-preview {
     margin-right: 8px;
     margin-bottom: 8px;
