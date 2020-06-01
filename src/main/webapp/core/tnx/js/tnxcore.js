@@ -353,37 +353,49 @@ tnx.app = {
         if (index >= 0) {
             href = href.substr(0, index);
         }
+        if (href.endsWith("/")) {
+            href = href.substr(0, href.length - 1);
+        }
         return href;
     },
     loadedResources: {}, // 保存加载中和加载完成的资源
-    loadResources: function(resourceType, container, loadOneFunction, callback) {
+    loadResources: function(resourceType, container, loadOneFunction, callback, recursive) {
         if (typeof container == "function") {
+            recursive = callback;
             callback = loadOneFunction;
             loadOneFunction = container;
             container = undefined;
         }
         container = container || document.body;
 
+        var _this = this;
+        if (recursive !== false) {
+            var children = container.querySelectorAll("[" + resourceType + "]");
+            children.forEach(function(child) {
+                _this.loadResources(resourceType, child, loadOneFunction, null, false);
+            });
+        }
+
         var empty = true;
         var resources = container.getAttribute(resourceType);
         if (resources) {
             resources = resources.split(",");
-            var _this = this;
             resources.forEach(function(resource, i) {
                 resource = resource.trim();
+                var url = container.getAttribute("url");
+                var action = _this.getAction(url);
                 if (resource === "true" || resource === "default") {
-                    var url = container.getAttribute("url");
-                    var action = _this.getAction(url);
-                    if (!action.endsWith("/")) {
-                        resource = action + "." + resourceType;
-                        if (resource.startsWith("/")) {
-                            resource = resource.substr(1);
-                        }
-                    }
+                    resource = action + "." + resourceType;
                 }
                 if (resource.toLowerCase().endsWith("." + resourceType)) {
-                    if (!resource.startsWith("/")) {
-                        resources[i] = _this.context + _this.page.context + "/" + resource;
+                    // 不包含协议的为相对路径，才需要做路径转换
+                    if (resource.indexOf("://") < 0) {
+                        if (resource.startsWith("/")) { //以斜杠开头的为相对于站点根路径的相对路径
+                            resources[i] = _this.context + _this.page.context + resource;
+                        } else { // 否则为相对于当前目录的相对路径
+                            var index = action.lastIndexOf("/");
+                            resources[i] = _this.context + _this.page.context + action.substr(0, index + 1) + resource;
+                        }
                     }
                     if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
                         resources[i] += "?v=" + _this.version;
