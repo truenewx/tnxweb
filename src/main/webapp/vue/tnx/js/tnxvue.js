@@ -1,14 +1,18 @@
 // tnxvue.js
 var vue_components = {
-    "tv-div": app_config.lib + "/vue/component/div",
-    "tv-span": app_config.lib + "/vue/component/span",
+    "tv-div": app_config.lib + "/vue/component/div.js?v=" + app_config.libVersion,
+    "tv-span": app_config.lib + "/vue/component/span.js?v=" + app_config.libVersion,
 };
 require.config({
-    paths: Object.assign({
-        "tnxcore": app_config.lib + "/core/tnx/js/tnxcore",
+    paths: {
         "vue": app_config.lib + "/vue/vendor/vue-2.6.10/vue" + app_config.min,
         "vue-router": app_config.lib + "/vue/vendor/vue-router-3.1.3/vue-router" + app_config.min,
-    }, vue_components)
+    },
+    map:{
+        "*": Object.assign({
+            "tnxcore": app_config.lib + "/core/tnx/js/tnxcore.js?v=" + app_config.libVersion
+        }, vue_components)
+    }
 });
 
 var Vue;

@@ -1,8 +1,12 @@
 // tnxjq.js
 require.config({
     paths: {
-        "tnxcore": app_config.lib + "/core/tnx/js/tnxcore",
         "jquery": app_config.lib + "/jq/vendor/jquery-3.4.1/jquery" + app_config.min,
+    },
+    map: {
+        "*": {
+            "tnxcore": app_config.lib + "/core/tnx/js/tnxcore.js?v=" + app_config.libVersion
+        }
     }
 });
 

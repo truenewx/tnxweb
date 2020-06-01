@@ -507,6 +507,12 @@ tnx.app.rpc = {
         }));
     },
     request: function(url, options) {
+        if (options.context) {
+            var baseUrl = this.context[options.base];
+            if (baseUrl) {
+                url = baseUrl + url;
+            }
+        }
         var config = {
             referer: url,
             method: options.method,

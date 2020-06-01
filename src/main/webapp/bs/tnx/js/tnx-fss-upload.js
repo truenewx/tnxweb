@@ -9,7 +9,7 @@ define(["tnxbs"], function(tnx) {
         }
         this.container = container;
         this.options = $.extend({}, this.defaults, options);
-        this.baseUrlRetry = 0;
+        this.baseRetry = 0;
         this.error = { // 校验错误
             number: 0, // 文件数量超限时的文件数量
             capacity: [], // 容量大小超限的文件名清单
@@ -46,24 +46,23 @@ define(["tnxbs"], function(tnx) {
         if (!this.options.type) {
             throw new Error("FssUpload缺少type配置项");
         }
-        if (!this.options.baseUrl && tnx.app.rpc.context) {
-            this.options.baseUrl = tnx.app.rpc.context.fss;
-        }
         var _this = this;
-        if (!this.options.baseUrl) { // 基本路径没设置则等待后再重试
-            if (++this.baseUrlRetry > 10) {
-                throw new Error("FssUpload无法获取baseUrl配置项");
+        if (!tnx.app.rpc.context.fss) { // fss上下文根路径没设置则等待后再重试
+            if (++this.baseRetry > 10) {
+                throw new Error("FssUpload无法获取fss上下文根路径配置项");
             }
             setTimeout(function() {
                 _this.init();
             }, 100);
             return;
         }
-        var url = this.options.baseUrl + "/upload-limit/" + this.options.type;
+        var url = "/upload-limit/" + this.options.type;
         tnx.app.rpc.get(url, function(limit) {
             _this.limit = limit;
             _this.limit.mimeTypes = limit.mimeTypes.join(","); // 转换为字符串以便于使用
             _this.render();
+        }, {
+            base: "fss"
         });
     }
 
