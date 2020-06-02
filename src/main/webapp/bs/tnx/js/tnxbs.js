@@ -2,7 +2,7 @@
 require.config({
     paths: {
         // 在BootStrap之前声明jquery的路径，以确保BootStrap正常加载
-        "jquery": app_config.lib + "/jq/vendor/jquery-3.4.1/jquery" + app_config.min,
+        "jquery": app_config.lib + "/jq/vendor/jquery-3.5.1/jquery" + app_config.min,
         "popper": app_config.lib + "/bs/vendor/popper-1.16.0/js/popper.min",
         "bootstrap": app_config.lib + "/bs/vendor/bootstrap-4.4.1/js/bootstrap" + app_config.min,
     },
