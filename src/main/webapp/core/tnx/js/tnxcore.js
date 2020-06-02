@@ -519,7 +519,7 @@ tnx.app.rpc = {
         }));
     },
     request: function(url, options) {
-        if (options.context) {
+        if (options.base) {
             var baseUrl = this.context[options.base];
             if (baseUrl) {
                 url = baseUrl + url;

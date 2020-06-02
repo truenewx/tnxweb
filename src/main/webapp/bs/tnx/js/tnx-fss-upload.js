@@ -256,12 +256,14 @@ define(["tnxbs"], function(tnx) {
             formData.append("files", file);
         }
         formData.set("onlyStorage", "true"); // 本地可预览，只需服务端返回存储地址
-        var url = this.options.baseUrl + "/upload/" + this.options.type;
+        var url = "/upload/" + this.options.type;
         var _this = this;
         tnx.app.rpc.post(url, formData, function(results) {
             results.forEach(function(result) {
                 _this.uploaded(result);
             });
+        }, {
+            base: "fss"
         });
     }
 
@@ -337,9 +339,8 @@ define(["tnxbs"], function(tnx) {
     }
 
     FssUpload.prototype.load = function(storageUrls) {
-        var url = this.options.baseUrl + "/metas";
         var _this = this;
-        tnx.app.rpc.get(url, {
+        tnx.app.rpc.get("/metas", {
             storageUrls: storageUrls
         }, function(files) {
             files.forEach(function(file) {
@@ -348,6 +349,8 @@ define(["tnxbs"], function(tnx) {
                     _this.uploaded(file);
                 }
             });
+        }, {
+            base: "fss"
         });
     }
 
