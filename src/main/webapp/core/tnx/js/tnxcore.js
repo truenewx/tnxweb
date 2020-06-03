@@ -391,10 +391,13 @@ tnx.app = {
                     // 不包含协议的为相对路径，才需要做路径转换
                     if (resource.indexOf("://") < 0) {
                         if (resource.startsWith("/")) { //以斜杠开头的为相对于站点根路径的相对路径
-                            resources[i] = _this.context + _this.page.context + resource;
+                            resources[i] = _this.context + resource;
                         } else { // 否则为相对于当前目录的相对路径
                             var index = action.lastIndexOf("/");
-                            resources[i] = _this.context + _this.page.context + action.substr(0, index + 1) + resource;
+                            if (index >= 0) {
+                                action = action.substr(0, index);
+                            }
+                            resources[i] = _this.context + _this.page.context + action + "/" + resource;
                         }
                     }
                     if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
