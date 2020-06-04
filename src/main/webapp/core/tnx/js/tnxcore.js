@@ -635,6 +635,14 @@ tnx.app.page = {
     }
 };
 
+if (require && require.config) {
+    require.config({
+        paths: {
+            "text": tnx.context + "/core/vendor/require-text-2.0.16/text"
+        }
+    });
+}
+
 if (typeof define == "function" && define.amd) {
     define([tnx.context + "/core/vendor/md5-2.1/md5.js", tnx.context + "/core/vendor/axios-0.19.0/axios.js"], function(md5, axios) {
         tnx.util.md5 = md5;

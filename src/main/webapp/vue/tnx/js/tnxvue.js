@@ -18,10 +18,9 @@ require.config({
 var Vue;
 var VueRouter;
 
-define(["tnxcore", "vue", "vue-router"], function(tnxcore, v, vr) {
+define(["tnxcore", "vue", "vue-router"].concat(Object.keys(vue_components)), function(tnxcore, v, vr) {
     Vue = v;
     VueRouter = vr;
-    require(Object.keys(vue_components));
     Vue.use(VueRouter);
 
     tnxcore.util.initPage = Function.around(tnxcore.util.initPage, function(initPage, page, container) {
