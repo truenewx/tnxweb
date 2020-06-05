@@ -385,7 +385,7 @@ tnx.app = {
                 var url = container.getAttribute("url");
                 var action = _this.getAction(url);
                 if (resource === "true" || resource === "default") {
-                    resource = this.context + this.page.context + action + "." + resourceType;
+                    resource = _this.context + _this.page.context + action + "." + resourceType;
                 }
                 if (resource.toLowerCase().endsWith("." + resourceType)) {
                     // 不包含协议的为相对路径，才需要做路径转换
