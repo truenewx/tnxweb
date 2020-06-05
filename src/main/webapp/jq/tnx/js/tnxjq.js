@@ -42,6 +42,7 @@ define(["tnxcore", "jquery"], function(tnxcore) {
                 callback = params;
                 params = undefined;
             }
+            options = options || {};
             var _this = this;
             var resp = $.ajax(url, {
                 cache: false,
@@ -59,6 +60,44 @@ define(["tnxcore", "jquery"], function(tnxcore) {
                 }
             });
             resp.fail(options.error);
+        }
+    });
+    $.extend(tnxcore.app, {
+        router: {
+            owner: tnxcore.app,
+            viewContainer: null,
+            init: function(viewContainer, linkContainer) {
+                this.viewContainer = viewContainer;
+                var _this = this;
+                $("a[href]", linkContainer).each(function() {
+                    var link = $(this);
+                    var href = link.attr("href");
+                    if (href.startsWith("#/")) {
+                        var path = href.substr(1);
+                        link.click(function() {
+                            _this.show(path);
+                        });
+                    }
+                });
+            },
+            /**
+             * 展示指定路径的页面内容，浏览器地址栏不变化
+             * @param path 页面相对站点根目录的路径
+             */
+            show: function(path) {
+                var app = this.owner;
+                var url = this._toUrl(path);
+                var _this = this;
+                app.owner.ajax(url, function(html) {
+                    var container = $(_this.viewSelector);
+                    container.html(html);
+                    container.attr("url", app.context + path);
+                    app.init(container);
+                });
+            },
+            _toUrl: function(path) {
+                return this.owner.context + path + ".ajax";
+            }
         }
     });
     tnx = tnxcore;

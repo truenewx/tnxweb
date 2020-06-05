@@ -6,7 +6,6 @@ var vue_components = {
 require.config({
     paths: {
         "vue": app_config.lib + "/vue/vendor/vue-2.6.10/vue" + app_config.min,
-        "vue-router": app_config.lib + "/vue/vendor/vue-router-3.1.3/vue-router" + app_config.min,
     },
     map:{
         "*": Object.assign({
@@ -16,12 +15,9 @@ require.config({
 });
 
 var Vue;
-var VueRouter;
 
-define(["tnxcore", "vue", "vue-router"].concat(Object.keys(vue_components)), function(tnxcore, v, vr) {
+define(["tnxcore", "vue"].concat(Object.keys(vue_components)), function(tnxcore, v) {
     Vue = v;
-    VueRouter = vr;
-    Vue.use(VueRouter);
 
     tnxcore.util.initPage = Function.around(tnxcore.util.initPage, function(initPage, page, container) {
         if (container.tagName === "BODY") { // vue不支持以body为容器，故从body下获取第一个div作为容器
