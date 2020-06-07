@@ -5,36 +5,58 @@ define(["tnxjq"], function(tnx) {
 
     var TnxRouter = function TnxRouter(viewContainer) {
         this.viewContainer = $(viewContainer);
+        this.to(this.getCurrentPath());
     }
 
-    TnxRouter.prototype.to = function(path) {
-        if (typeof path === "object") { // event
-            var link = $(path.target);
-            var href = link.attr("href");
-            if (href.startsWith("#/")) {
-                path = href.substr(1);
+    TnxRouter.prototype.getCurrentPath = function() {
+        var href = window.location.href;
+        var index = href.indexOf("#");
+        if (index >= 0) {
+            var path = href.substr(index + 1);
+            if (path.startsWith("/")) {
+                return path;
             }
         }
-        if (typeof path === "string") {
+        return undefined;
+    }
+
+    TnxRouter.prototype.to = function(path, callback) {
+        if (typeof path === "string" && path.startsWith("/")) {
             var app = tnx.app;
             var url = this._toUrl(path);
             var _this = this;
             app.owner.ajax(url, function(html) {
                 _this.viewContainer.html(html);
+                callback = callback || _this.viewCallback;
                 var container = _this.viewContainer.children("[js],[css]");
                 container.each(function() {
                     $(this).attr("url", app.context + path);
-                    app.init(this);
+                    app.init(this, callback);
                 });
             });
         }
     }
 
-    TnxRouter.prototype.push = function(path) {
+    TnxRouter.prototype.navTo = function(path, callback) {
+        if (path.startsWith("/")) {
+            var href = window.location.href;
+            var index = href.indexOf("#");
+            if (index >= 0) {
+                href = href.substr(0, index);
+            } else if (!href.endsWith("/")) {
+                href += "/";
+            }
+            window.location.href = href + "#" + path;
+            this.to(path, callback);
+        }
     }
 
     TnxRouter.prototype._toUrl = function(path) {
         return tnx.app.context + path + ".ajax";
+    }
+
+    TnxRouter.prototype.setViewCallback = function(viewCallback) {
+        this.viewCallback = viewCallback;
     }
 
     return TnxRouter;

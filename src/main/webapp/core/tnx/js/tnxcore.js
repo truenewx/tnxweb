@@ -522,6 +522,13 @@ tnx.app.rpc = {
         }));
     },
     request: function(url, options) {
+        if (!this.context) { // 直到context被初始化好，才真正执行请求
+            // var _this = this;
+            // setTimeout(function() {
+            //     _this.request(url, options);
+            // }, 100);
+            // return;
+        }
         if (options.base) {
             var baseUrl = this.context[options.base];
             if (baseUrl) {
