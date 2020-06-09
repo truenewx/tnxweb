@@ -6,6 +6,10 @@ define(["tnxjq"], function(tnx) {
     var TnxRouter = function TnxRouter(viewContainer) {
         this.viewContainer = $(viewContainer);
         this.to(this.getCurrentPath());
+        var _this = this;
+        $(window).bind("hashchange", function(event) {
+            _this.to(_this.getCurrentPath());
+        });
     }
 
     TnxRouter.prototype.getCurrentPath = function() {
@@ -38,7 +42,7 @@ define(["tnxjq"], function(tnx) {
         }
     }
 
-    TnxRouter.prototype.navTo = function(path, callback) {
+    TnxRouter.prototype.navTo = function(path) {
         if (path.startsWith("/")) {
             var href = window.location.href;
             var index = href.indexOf("#");
@@ -48,7 +52,7 @@ define(["tnxjq"], function(tnx) {
                 href += "/";
             }
             window.location.href = href + "#" + path;
-            return this.to(path, callback);
+            return path;
         }
     }
 
