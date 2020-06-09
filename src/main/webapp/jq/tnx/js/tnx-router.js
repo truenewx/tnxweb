@@ -34,6 +34,7 @@ define(["tnxjq"], function(tnx) {
                     app.init(this, callback);
                 });
             });
+            return path;
         }
     }
 
@@ -47,7 +48,7 @@ define(["tnxjq"], function(tnx) {
                 href += "/";
             }
             window.location.href = href + "#" + path;
-            this.to(path, callback);
+            return this.to(path, callback);
         }
     }
 
