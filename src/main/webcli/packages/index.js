@@ -1,7 +1,7 @@
-import tnxcore from './core/tnxcore.js';
-
-export const tnx = tnxcore;
+import tnxcore from './core/tnxcore';
+import tnxjq from "./jquery/tnxjq";
 
 export default {
-    tnx: tnxcore
-}
+    core: tnxcore,
+    jquery: tnxjq,
+};

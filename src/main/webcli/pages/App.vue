@@ -1,15 +1,15 @@
 <template>
-    <div id="app">{{context}}</div>
+    <div id="app">base: {{base}}</div>
 </template>
 
 <script>
-    import {tnx} from '../packages';
+    import tnx from '../packages';
 
     export default {
         name: 'App',
         data () {
             return {
-                context: tnx.context
+                base: tnx.jquery.base
             }
         }
     }
