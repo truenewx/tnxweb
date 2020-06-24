@@ -1,0 +1,55 @@
+{
+  "name": "@truenewx/tnxweb",
+  "version": "0.1.0",
+  "description": "互联网技术解决方案：Web扩展支持",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "packages/index.js",
+  "keywords": [
+    "truenewx",
+    "tnxweb",
+    "tnx"
+  ],
+  "author": "truenewx",
+  "license": "Apache License 2.0",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --modern --dest ../webapp/static",
+    "lib": "vue-cli-service build --modern --target lib --name tnxweb --dest lib packages/index.js"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "core-js": "^3.6.5",
+    "md5": "^2.2.1",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.4.0",
+    "@vue/cli-plugin-eslint": "~4.4.0",
+    "@vue/cli-service": "~4.4.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
