@@ -4,7 +4,18 @@
  */
 
 const tnxcore = {
-    base: 'core'
+    base: 'core',
+    init: config => {
+        if (config) {
+            if (config.app) {
+                this.app.name = config.app || this.app.name;
+            }
+        }
+    },
+};
+
+tnxcore.app = {
+    name: 'tnx.app',
 };
 
 export default tnxcore;
