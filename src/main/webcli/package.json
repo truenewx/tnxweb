@@ -1,7 +1,8 @@
 {
   "name": "@truenewx/tnxweb",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "互联网技术解决方案：Web扩展支持",
+  "private": false,
   "publishConfig": {
     "access": "public"
   },
@@ -15,7 +16,7 @@
   "license": "Apache License 2.0",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --modern --dest ../webapp/static",
+    "build": "vue-cli-service build --modern",
     "lib": "vue-cli-service build --modern --target lib --name tnxweb --dest lib packages/index.js"
   },
   "dependencies": {

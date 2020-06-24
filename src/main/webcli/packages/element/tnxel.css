@@ -1,0 +1,12 @@
+/*!
+ * tnxel.css
+ * 对Element UI CSS的通用调整
+ */
+body {
+    margin: 0;
+}
+
+.el-divider__text, .el-link {
+    font-weight: unset;
+    font-size: unset;
+}

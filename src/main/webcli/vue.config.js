@@ -2,7 +2,7 @@
 module.exports = {
     publicPath: "/tnxweb",
     devServer: {
-        port: 80
+        port: 8080
     },
     // 修改/src为/pages
     pages: {
@@ -15,6 +15,7 @@ module.exports = {
     // 扩展 webpack 配置，使 /modules 加入编译
     chainWebpack: config => {
         let path = require('path');
+
         config.module
         .rule('js')
         .include
