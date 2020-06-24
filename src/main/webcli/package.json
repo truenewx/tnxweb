@@ -6,7 +6,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "packages/index.js",
+  "main": "component/index.js",
   "keywords": [
     "truenewx",
     "tnxweb",
@@ -17,7 +17,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --modern",
-    "lib": "vue-cli-service build --modern --target lib --name tnxweb --dest lib packages/index.js"
+    "lib": "vue-cli-service build --modern --target lib --name tnxweb --dest lib component/index.js"
   },
   "dependencies": {
     "axios": "^0.19.2",

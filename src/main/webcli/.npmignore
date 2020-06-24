@@ -2,7 +2,8 @@
 node_modules
 /dist
 /lib
-/pages
+/sample
 /public
 .*
 *.config.js
+README.md

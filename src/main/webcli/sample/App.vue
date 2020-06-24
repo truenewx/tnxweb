@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import tnx from '../packages';
+    import tnx from '../component';
 
     export default {
         name: 'App',

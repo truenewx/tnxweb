@@ -4,10 +4,10 @@ module.exports = {
     devServer: {
         port: 8080
     },
-    // 修改/src为/pages
+    // 修改/src为/sample
     pages: {
         index: {
-            entry: 'pages/main.js',
+            entry: 'sample/main.js',
             template: 'public/index.html',
             filename: 'index.html'
         }
@@ -19,7 +19,7 @@ module.exports = {
         config.module
         .rule('js')
         .include
-        .add(path.resolve(__dirname, './packages'))
+        .add(path.resolve(__dirname, './component'))
         .end()
         .use('babel')
         .loader('babel-loader')
