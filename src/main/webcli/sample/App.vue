@@ -1,16 +1,19 @@
 <template>
-    <div id="app">base: {{base}}</div>
+    <div id="app">
+        <page-index/>
+    </div>
 </template>
 
 <script>
-    import tnx from '../components';
+    import index from './pages/index.vue';
 
     export default {
         name: 'App',
+        components: {
+            'page-index': index,
+        },
         data () {
-            return {
-                base: tnx.jquery.base
-            }
+            return {}
         }
     }
 </script>

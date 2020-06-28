@@ -1,11 +1,3 @@
 # tnxweb
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
+## [《WEB前端开发规约》](./doc/dev-std.md)
