@@ -19,7 +19,7 @@ module.exports = {
         config.module
         .rule('js')
         .include
-        .add(path.resolve(__dirname, './component'))
+        .add(path.resolve(__dirname, './components'))
         .end()
         .use('babel')
         .loader('babel-loader')

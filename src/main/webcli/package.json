@@ -1,12 +1,12 @@
 {
   "name": "@truenewx/tnxweb",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "description": "互联网技术解决方案：Web扩展支持",
   "private": false,
   "publishConfig": {
     "access": "public"
   },
-  "main": "component/index.js",
+  "main": "components/index.js",
   "keywords": [
     "truenewx",
     "tnxweb",
@@ -17,7 +17,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --modern",
-    "lib": "vue-cli-service build --modern --target lib --name tnxweb --dest lib component/index.js"
+    "lib": "vue-cli-service build --modern --target lib --name tnxweb --dest lib components/index.js"
   },
   "dependencies": {
     "axios": "^0.19.2",
