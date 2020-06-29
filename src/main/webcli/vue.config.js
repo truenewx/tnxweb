@@ -12,10 +12,9 @@ module.exports = {
             filename: 'index.html'
         }
     },
-    // 扩展 webpack 配置，使 /modules 加入编译
+    // 扩展 webpack 配置，使 /components 加入编译
     chainWebpack: config => {
-        let path = require('path');
-
+        const path = require('path');
         config.module
         .rule('js')
         .include

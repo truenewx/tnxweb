@@ -171,14 +171,14 @@ tnxcore.app.rpc = {
                 switch (response.status) {
                     case 401: {
                         const util = _this.owner.owner.util;
-                        const redirectTo = util.getHeader(response.headers, 'Redirect-To');
+                        const redirectTo = util.getHeader(response.headers, "Redirect-To");
                         if (redirectTo) {
                             config.params = config.params || {};
                             config.params[_this.loginSuccessRedirectParameter] = config.referer;
                             _this.axiosRequest(redirectTo, config, options);
                             return;
                         } else {
-                            let loginFormUrl = util.getHeader(response.headers, 'Login-Form-Url');
+                            let loginFormUrl = util.getHeader(response.headers, "Login-Form-Url");
                             if (loginFormUrl) { // 默认登录后跳转回当前页面
                                 loginFormUrl += "&" + _this.loginSuccessRedirectParameter + "=" + window.location.href;
                             }
