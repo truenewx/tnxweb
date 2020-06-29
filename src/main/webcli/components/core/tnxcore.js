@@ -171,19 +171,24 @@ tnxcore.app.rpc = {
                 const util = _this.owner.owner.util;
                 switch (response.status) {
                     case 401: {
-                        let loginFormUrl = util.getHeader(response.headers, 'Login-Form-Url');
-                        if (loginFormUrl) { // 默认登录后跳转回当前页面
-                            loginFormUrl += "&" + _this.loginSuccessRedirectParameter + "=" + window.location.href;
-                        }
-                        let originalMethod;
-                        let originalUrl;
-                        const originalRequest = util.getHeader(response.headers, 'Original-Request');
-                        if (originalRequest) {
-                            const array = originalRequest.split(' ');
-                            originalMethod = array[0];
-                            originalUrl = array[1];
-                        }
-                        if (_this.toLoginForm(loginFormUrl, originalUrl, originalMethod)) {
+                        let loginUrl = util.getHeader(response.headers, 'Login-Url');
+                        if (loginUrl) { // 如果指定了登录页面地址，则需进行特殊处理
+                            const originalRequest = util.getHeader(response.headers, 'Original-Request');
+                            if (!originalRequest) { // 没有指定原始请求，说明前一个请求即为原始请求，带上原始请求信息重定向至登录页面
+                                config.headers = config.headers || {};
+                                config.headers['Original-Request'] = options.method + ' ' + config.referer;
+                                config.method = 'GET'; // 重定向一定是GET请求
+                                _this.axiosRequest(loginUrl, config, options);
+                            } else { // 指定了原始请求，说明已是多次跳转，交给toLogin()方法决定下一步处理
+                                // 默认登录后跳转回当前页面
+                                loginUrl += "&" + _this.loginSuccessRedirectParameter + "=" + window.location.href;
+                                const array = originalRequest.split(' ');
+                                const originalMethod = array[0];
+                                const originalUrl = array[1];
+                                if (_this.toLogin(loginUrl, originalUrl, originalMethod)) {
+                                    return;
+                                }
+                            }
                             return;
                         }
                         break;
@@ -196,18 +201,6 @@ tnxcore.app.rpc = {
                             } else {
                                 _this.error(errors);
                             }
-                            return;
-                        }
-                        break;
-                    }
-                    case 406: {
-                        const redirectTo = util.getHeader(response.headers, 'Redirect-To');
-                        if (redirectTo) {
-                            // 重定向一定是GET请求
-                            config.headers = config.headers || {};
-                            config.headers['Original-Request'] = options.method + ' ' + config.referer;
-                            config.method = 'GET';
-                            _this.axiosRequest(redirectTo, config, options);
                             return;
                         }
                         break;
@@ -225,7 +218,7 @@ tnxcore.app.rpc = {
      * @param originalMethod 原始请求方法
      * @returns {boolean} 是否已经正常打开登录表单
      */
-    toLoginForm: function(loginFormUrl, originalUrl, originalMethod) {
+    toLogin: function(loginFormUrl, originalUrl, originalMethod) {
         return false;
     },
     getErrorMessage: function(errors) {
