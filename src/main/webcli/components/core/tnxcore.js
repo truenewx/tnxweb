@@ -168,23 +168,23 @@ tnxcore.app.rpc = {
         }).catch(function(error) {
             const response = error.response;
             if (response) {
+                const util = _this.owner.owner.util;
                 switch (response.status) {
                     case 401: {
-                        const util = _this.owner.owner.util;
-                        const redirectTo = util.getHeader(response.headers, "Redirect-To");
-                        if (redirectTo) {
-                            config.params = config.params || {};
-                            config.params[_this.loginSuccessRedirectParameter] = config.referer;
-                            _this.axiosRequest(redirectTo, config, options);
+                        let loginFormUrl = util.getHeader(response.headers, 'Login-Form-Url');
+                        if (loginFormUrl) { // 默认登录后跳转回当前页面
+                            loginFormUrl += "&" + _this.loginSuccessRedirectParameter + "=" + window.location.href;
+                        }
+                        let originalMethod;
+                        let originalUrl;
+                        const originalRequest = util.getHeader(response.headers, 'Original-Request');
+                        if (originalRequest) {
+                            const array = originalRequest.split(' ');
+                            originalMethod = array[0];
+                            originalUrl = array[1];
+                        }
+                        if (_this.toLoginForm(loginFormUrl, originalUrl, originalMethod)) {
                             return;
-                        } else {
-                            let loginFormUrl = util.getHeader(response.headers, "Login-Form-Url");
-                            if (loginFormUrl) { // 默认登录后跳转回当前页面
-                                loginFormUrl += "&" + _this.loginSuccessRedirectParameter + "=" + window.location.href;
-                            }
-                            if (_this.toLoginForm(loginFormUrl)) {
-                                return;
-                            }
                         }
                         break;
                     }
@@ -200,6 +200,18 @@ tnxcore.app.rpc = {
                         }
                         break;
                     }
+                    case 406: {
+                        const redirectTo = util.getHeader(response.headers, 'Redirect-To');
+                        if (redirectTo) {
+                            // 重定向一定是GET请求
+                            config.headers = config.headers || {};
+                            config.headers['Original-Request'] = options.method + ' ' + config.referer;
+                            config.method = 'GET';
+                            _this.axiosRequest(redirectTo, config, options);
+                            return;
+                        }
+                        break;
+                    }
                 }
             }
             console.error(error.stack);
@@ -209,9 +221,11 @@ tnxcore.app.rpc = {
      * 打开登录表单的函数，由业务应用覆盖提供，以决定用何种方式打开登录表单页面。
      * 默认不做任何处理，直接返回false
      * @param loginFormUrl 登录表单URL
+     * @param originalUrl 原始请求地址
+     * @param originalMethod 原始请求方法
      * @returns {boolean} 是否已经正常打开登录表单
      */
-    toLoginForm: function(loginFormUrl) {
+    toLoginForm: function(loginFormUrl, originalUrl, originalMethod) {
         return false;
     },
     getErrorMessage: function(errors) {

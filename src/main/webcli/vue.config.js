@@ -1,6 +1,8 @@
 // vue.config.js
 module.exports = {
-    publicPath: "/tnxweb",
+    publicPath: './',
+    outputDir: '../webapp/sample',
+    assetsDir: 'assets',
     devServer: {
         port: 8080
     },
