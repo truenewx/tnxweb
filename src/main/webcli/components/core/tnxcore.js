@@ -76,7 +76,13 @@ tnxcore.app.rpc = {
      * @param callback 配置初始化后的回调函数
      */
     loadConfig: function(baseUrl, callback) {
-        this.axios.defaults.baseURL = baseUrl;
+        if (typeof baseUrl === 'function') {
+            callback = baseUrl;
+            baseUrl = undefined;
+        }
+        if (baseUrl) {
+            this.axios.defaults.baseURL = baseUrl;
+        }
         const _this = this;
         this.get("/api/meta/context", function(context) {
             _this.setConfig(context);
