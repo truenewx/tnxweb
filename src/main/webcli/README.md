@@ -1,3 +1,2 @@
 # tnxweb
-
-## [《WEB前端开发规约》](./doc/dev-std.md)
+互联网技术解决方案：Web扩展支持

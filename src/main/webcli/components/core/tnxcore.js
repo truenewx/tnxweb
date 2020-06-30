@@ -6,7 +6,7 @@
 const tnxcore = {
     base: { // 标记是基于原生JavaScript的扩展
         name: 'core',
-        type: {}
+        ref: {}
     },
     alert: function(title, message, callback) {
         if (message === undefined && callback === undefined) {
@@ -59,7 +59,6 @@ tnxcore.util = {
 
 tnxcore.app = {
     owner: tnxcore,
-    name: 'tnx.app',
 };
 
 import axios from 'axios';
@@ -68,6 +67,9 @@ tnxcore.app.rpc = {
     owner: tnxcore.app,
     axios: axios,
     loginSuccessRedirectParameter: "_next",
+    getBaseUrl: function() {
+        return this.axios.defaults.baseURL;
+    },
     /**
      * 从后端服务器加载配置
      * @param baseUrl 获取配置的后端服务器基础路径
@@ -157,39 +159,41 @@ tnxcore.app.rpc = {
                 options.onUploadProgress.call(event, ratio);
             }
         }
-        this.axiosRequest(url, config, options);
+        this._callRequest(url, config, options);
     },
-    axiosRequest: function(url, config, options) {
+    _callRequest: function(url, config, options) {
+        const util = this.owner.owner.util;
         const _this = this;
         this.axios(url, config).then(function(response) {
-            if (typeof options.success == "function") {
+            let redirectUrl = util.getHeader(response.headers, 'Redirect-To');
+            if (redirectUrl) { // 指定了重定向地址，则执行重定向操作
+                config.headers = config.headers || {};
+                config.headers['Original-Request'] = options.method + ' ' + config.referer;
+                config.method = 'GET'; // 重定向一定是GET请求
+                _this._callRequest(redirectUrl, config, options);
+            } else if (typeof options.success == "function") {
                 options.success(response.data);
             }
         }).catch(function(error) {
             const response = error.response;
             if (response) {
-                const util = _this.owner.owner.util;
                 switch (response.status) {
                     case 401: {
                         let loginUrl = util.getHeader(response.headers, 'Login-Url');
-                        if (loginUrl) { // 如果指定了登录页面地址，则需进行特殊处理
+                        if (loginUrl) {
+                            // 默认登录后跳转回当前页面
+                            loginUrl += "&" + _this.loginSuccessRedirectParameter + "=" + window.location.href;
                             const originalRequest = util.getHeader(response.headers, 'Original-Request');
-                            if (!originalRequest) { // 没有指定原始请求，说明前一个请求即为原始请求，带上原始请求信息重定向至登录页面
-                                config.headers = config.headers || {};
-                                config.headers['Original-Request'] = options.method + ' ' + config.referer;
-                                config.method = 'GET'; // 重定向一定是GET请求
-                                _this.axiosRequest(loginUrl, config, options);
-                            } else { // 指定了原始请求，说明已是多次跳转，交给toLogin()方法决定下一步处理
-                                // 默认登录后跳转回当前页面
-                                loginUrl += "&" + _this.loginSuccessRedirectParameter + "=" + window.location.href;
+                            let originalMethod;
+                            let originalUrl;
+                            if (originalRequest) {
                                 const array = originalRequest.split(' ');
-                                const originalMethod = array[0];
-                                const originalUrl = array[1];
-                                if (_this.toLogin(loginUrl, originalUrl, originalMethod)) {
-                                    return;
-                                }
+                                originalMethod = array[0];
+                                originalUrl = array[1];
                             }
-                            return;
+                            if (_this.toLogin(loginUrl, originalUrl, originalMethod)) {
+                                return;
+                            }
                         }
                         break;
                     }

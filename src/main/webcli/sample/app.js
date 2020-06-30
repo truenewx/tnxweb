@@ -1,7 +1,6 @@
 // app.js
 import tnxjq from '../components/jquery/tnxjq';
 
-export const $ = tnxjq.base.type;
 export const tnx = tnxjq;
 export const util = tnx.util;
 export const app = tnx.app;
