@@ -24,8 +24,5 @@ export default function(title, content, buttons, options) {
     if (buttons instanceof Array) {
         dialog.buttons = buttons;
     }
-    dialog.onClosed = () => {
-        $('.el-dialog__wrapper:last').remove();
-    }
     dialog.options = Object.assign(dialog.options, options);
 }

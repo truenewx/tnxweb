@@ -19,10 +19,27 @@
         },
         methods: {
             showTextDialog () {
-                tnx.dialog('', 'Text: Hello World', [], {});
+                tnx.dialog('', 'Text: Hello World', [{
+                    caption: '确定',
+                    type: 'primary',
+                    click () {
+                        console.info('ok');
+                    }
+                }], {});
             },
             showComponentDialog () {
-                tnx.dialog('组件', info, [], {});
+                tnx.dialog('组件', info, [{
+                    text: '取消',
+                    click () {
+                        console.info('cancel');
+                    }
+                }, {
+                    text: '确定',
+                    type: 'primary',
+                    click () {
+                        console.info('ok');
+                    }
+                }], {});
             }
         }
     }
