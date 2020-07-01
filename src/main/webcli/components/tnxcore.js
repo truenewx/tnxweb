@@ -4,7 +4,7 @@
  */
 
 const tnxcore = {
-    base: { // 标记是基于原生JavaScript的扩展
+    base: {
         name: 'core',
         ref: {}
     },

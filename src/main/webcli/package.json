@@ -1,6 +1,6 @@
 {
   "name": "@truenewx/tnxweb",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "互联网技术解决方案：Web扩展支持",
   "private": false,
   "publishConfig": {
@@ -23,7 +23,8 @@
     "core-js": "^3.6.5",
     "jquery": "^3.5.1",
     "md5": "^2.2.1",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "element-ui": "^2.13.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",
