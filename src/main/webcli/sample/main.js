@@ -1,5 +1,9 @@
 import Vue from 'vue';
+import ElementUI from 'element-ui';
+Vue.use(ElementUI);
 import '../components/jquery/bootstrap/base-4.5.0.css';
+import 'element-ui/lib/theme-chalk/index.css';
+import '../components/vue/element/tnxel.css';
 import App from './App.vue';
 
 Vue.config.productionTip = false;

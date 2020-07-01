@@ -2,15 +2,19 @@
 /**
  * 基于Element的扩展支持
  */
+import ElementUI from 'element-ui';
 
 import tnxvue from '../tnxvue.js';
-import ElementUI from 'element-ui';
+import dialog from './dialog';
 
 const tnxel = Object.assign({}, tnxvue, {
     base: {
         name: 'element-ui',
         ref: ElementUI
     },
+    dialog () {
+        dialog.apply(tnxel, arguments);
+    }
 });
 
 export default tnxel;

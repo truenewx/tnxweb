@@ -1,11 +1,10 @@
 <template>
-    <div id="app" v-if="logined">
+    <div id="app">
         <page-index/>
     </div>
 </template>
 
 <script>
-    import app from './app.js';
     import index from './pages/index.vue';
 
     export default {
@@ -14,15 +13,7 @@
             'page-index': index,
         },
         data () {
-            return {
-                logined: false,
-            }
-        },
-        created () {
-            const vm = this;
-            app.rpc.get('/validate-login', () => {
-                vm.logined = true;
-            });
+            return {}
         }
     }
 </script>

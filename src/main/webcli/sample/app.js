@@ -1,7 +1,7 @@
 // app.js
-import tnxjq from '../components/jquery/tnxjq';
+import tnxel from '../components/vue/element/tnxel';
 
-export const tnx = tnxjq;
+export const tnx = tnxel;
 export const util = tnx.util;
 export const app = tnx.app;
 
