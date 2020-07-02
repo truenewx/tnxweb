@@ -12,14 +12,14 @@ const tnxcore = {
         if (message === undefined && callback === undefined) {
             message = title;
             title = undefined;
-        } else if (typeof message == "function") {
+        } else if (typeof message === "function") {
             callback = message;
             message = title;
             title = undefined;
         }
         const content = title ? (title + ":\n" + message) : message;
         alert(content);
-        if (typeof callback == "function") {
+        if (typeof callback === "function") {
             callback();
         }
     },
@@ -30,13 +30,13 @@ const tnxcore = {
         if (message === undefined && callback === undefined) {
             message = title;
             title = undefined;
-        } else if (typeof message == "function") {
+        } else if (typeof message === "function") {
             callback = message;
             message = title;
             title = undefined;
         }
         const yes = confirm(title + ":\n" + message);
-        if (typeof callback == "function") {
+        if (typeof callback === "function") {
             callback(yes);
         }
     }
@@ -108,12 +108,12 @@ tnxcore.app.rpc = {
         this.context = config.context || {}; // 其它站点的上下文根路径
     },
     get: function(url, params, callback, options) {
-        if (typeof params == "function" || typeof callback == "object") {
+        if (typeof params === "function" || typeof callback === "object") {
             options = callback;
             callback = params;
             params = undefined;
         }
-        if (typeof options == "function") {
+        if (typeof options === "function") {
             options = {
                 error: options
             };
@@ -125,12 +125,12 @@ tnxcore.app.rpc = {
         }));
     },
     post: function(url, body, callback, options) {
-        if (typeof body == "function" || typeof callback == "object") {
+        if (typeof body === "function" || typeof callback === "object") {
             options = callback;
             callback = body;
             body = undefined;
         }
-        if (typeof options == "function") {
+        if (typeof options === "function") {
             options = {
                 error: options
             };
@@ -159,7 +159,7 @@ tnxcore.app.rpc = {
                 return Object.stringify(params);
             };
         }
-        if (typeof options.onUploadProgress == "function") {
+        if (typeof options.onUploadProgress === "function") {
             config.onUploadProgress = function(event) {
                 const ratio = (event.loaded / event.total) || 0;
                 options.onUploadProgress.call(event, ratio);
@@ -177,7 +177,7 @@ tnxcore.app.rpc = {
                 config.headers['Original-Request'] = options.method + ' ' + config.referer;
                 config.method = 'GET'; // 重定向一定是GET请求
                 _this._callRequest(redirectUrl, config, options);
-            } else if (typeof options.success == "function") {
+            } else if (typeof options.success === "function") {
                 options.success(response.data);
             }
         }).catch(function(error) {
@@ -206,7 +206,7 @@ tnxcore.app.rpc = {
                     case 403: {
                         const errors = response.data.errors;
                         if (errors) {
-                            if (typeof options.error == "function") {
+                            if (typeof options.error === "function") {
                                 options.error(errors);
                             } else {
                                 _this.error(errors);

@@ -4,6 +4,7 @@
         <p>首页</p>
         <el-button @click="showTextDialog">文本弹框</el-button>
         <el-button @click="showComponentDialog">组件弹框</el-button>
+        <el-button @click="showAlert">Alert</el-button>
     </div>
 </template>
 
@@ -28,18 +29,13 @@
                 }], {});
             },
             showComponentDialog () {
-                tnx.dialog('组件', info, [{
-                    text: '取消',
-                    click () {
-                        console.info('cancel');
-                    }
-                }, {
-                    text: '确定',
-                    type: 'primary',
-                    click () {
-                        console.info('ok');
-                    }
-                }], {});
+                tnx.open(info, {
+                    param: '- from params'
+                });
+            },
+            showAlert () {
+                tnx.alert('Hello World', function() {
+                });
             }
         }
     }
