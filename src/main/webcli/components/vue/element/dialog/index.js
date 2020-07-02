@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 Vue.use(ElementUI);
 
-export default function(title, content, buttons, options) {
+export default function(title, content, buttons, options, contentParams) {
     let componentOption = {};
     if (this.util.isComponent(content)) {
         componentOption.components = {
@@ -21,6 +21,7 @@ export default function(title, content, buttons, options) {
     const dialog = new Dialog().$mount('#' + dialogId);
     dialog.title = title;
     dialog.content = content;
+    dialog.contentParams = contentParams;
     if (buttons instanceof Array) {
         dialog.buttons = buttons;
     }

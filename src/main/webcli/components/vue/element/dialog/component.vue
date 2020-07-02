@@ -14,7 +14,7 @@
         <div slot="title" class="dialog-title" :class="{'border-bottom': title}"
             v-html="title"></div>
         <div v-if="content" v-html="content"></div>
-        <tnxel-dialog-content v-else></tnxel-dialog-content>
+        <tnxel-dialog-content v-bind="contentParams" v-else></tnxel-dialog-content>
         <div slot="footer" class="dialog-footer" :class="{'border-top': buttons.length}">
             <el-button v-for="(button, index) in buttons" :type="button.type" :key="index"
                 @click="btnClick(index)">{{button.caption || button.text}}
@@ -34,6 +34,7 @@
                 top: null,
                 title: null,
                 content: null,
+                contentParams: null,
                 buttons: [],
                 options: { // 以下配置项均来自于element的Dialog组件
                     modal: true, // 是否需要遮罩层

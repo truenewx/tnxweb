@@ -41,7 +41,7 @@ const tnxvue = Object.assign({}, tnxcore, {
         name: 'vue',
         ref: Vue
     },
-    dialog (title, content, buttons, options) {
+    dialog (title, content, params, buttons, options) {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');
     },
@@ -74,21 +74,15 @@ const tnxvue = Object.assign({}, tnxcore, {
     open (component, params, options) {
         if (component.methods.dialog) {
             options = Object.assign({}, component.methods.dialog(), options);
+        } else {
+            options = options || {};
         }
         const title = component.title || options.title;
         const buttons = getDefaultDialogButtons(options.type, options.click);
         delete options.title;
         delete options.type;
         delete options.click;
-        if (params) {
-            Object.keys(params).forEach(key => {
-                const prop = component.props[key];
-                if (prop) {
-                    prop.default = params[key];
-                }
-            });
-        }
-        this.dialog(title, component, buttons, options);
+        this.dialog(title, component, buttons, options, params);
     }
 });
 
