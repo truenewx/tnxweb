@@ -9,14 +9,21 @@
 </template>
 
 <script>
-    import {tnx} from '../app.js';
+    import {app, tnx} from '../app.js';
     import info from './info.vue';
 
     export default {
         data () {
             return {
                 title: process.env.VUE_APP_TITLE,
+                rules: {},
             };
+        },
+        created () {
+            const vm = this;
+            app.rpc.getMeta('/manager/self/info', function(meta) {
+                vm.rules = meta.rules;
+            });
         },
         methods: {
             showTextDialog () {
@@ -26,7 +33,7 @@
                     click () {
                         console.info('ok');
                     }
-                }], {});
+                }]);
             },
             showComponentDialog () {
                 tnx.open(info, {

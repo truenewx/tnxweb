@@ -4,6 +4,7 @@
  */
 import Vue from 'vue';
 import tnxcore from '../tnxcore.js';
+import ruleConvert from './validation-rule-converter';
 
 function getDefaultDialogButtons (type, callback, source) {
     if (type) {
@@ -99,6 +100,18 @@ Object.assign(tnxcore.util, {
         return (typeof obj === 'object') && (typeof obj.data === 'function')
             && (typeof obj.render === 'function');
     }
+});
+
+// 元数据到async-validator组件规则的转换处理
+tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
+    getMeta.call(tnxvue.app.rpc, url, function(meta) {
+        if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
+            meta.rules = ruleConvert(meta);
+        }
+        if (typeof callback === 'function') {
+            callback.call(this, meta);
+        }
+    });
 });
 
 export default tnxvue;

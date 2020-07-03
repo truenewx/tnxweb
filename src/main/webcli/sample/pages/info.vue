@@ -9,7 +9,7 @@
         props: ['param'],
         data () {
             return {
-                abc: 'abc'
+                abc: 'abc',
             };
         },
         methods: {
