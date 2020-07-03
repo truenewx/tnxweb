@@ -14,7 +14,7 @@
         <div slot="title" class="dialog-title" :class="{'border-bottom': title}"
             v-html="title"></div>
         <div v-if="content" v-html="content"></div>
-        <tnxel-dialog-content v-bind="contentParams" v-else></tnxel-dialog-content>
+        <tnxel-dialog-content ref="content" v-bind="contentParams" v-else></tnxel-dialog-content>
         <div slot="footer" class="dialog-footer" :class="{'border-top': buttons.length}">
             <el-button v-for="(button, index) in buttons" :type="button.type" :key="index"
                 @click="btnClick(index)">{{button.caption || button.text}}
@@ -68,16 +68,19 @@
             btnClick (index) {
                 const button = this.buttons[index];
                 if (button && typeof button.click === 'function') {
-                    if (button.click() === false) {
+                    if (button.click.call(this.$refs.content, this.close) === false) {
                         return;
                     }
                 }
+                this.close();
+            },
+            close () {
                 this.visible = false;
             },
             onClosed () {
                 $('.el-dialog__wrapper:last').remove();
                 if (typeof this.options.onClosed === 'function') {
-                    this.options.onClosed();
+                    this.options.onClosed.call(this.$refs.content);
                 }
             }
         }

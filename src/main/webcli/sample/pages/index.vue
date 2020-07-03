@@ -31,7 +31,7 @@
             showComponentDialog () {
                 tnx.open(info, {
                     param: '- from params'
-                });
+                }, undefined, this);
             },
             showAlert () {
                 tnx.alert('Hello World', function() {

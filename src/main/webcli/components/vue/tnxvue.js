@@ -2,26 +2,25 @@
 /**
  * 基于Vue的扩展支持
  */
-
 import Vue from 'vue';
 import tnxcore from '../tnxcore.js';
 
-function getDefaultDialogButtons (type, callback) {
+function getDefaultDialogButtons (type, callback, source) {
     if (type) {
         if (type === 'confirm') {
             return [{
                 text: '取消',
-                click () {
-                    if (typeof callback === "function") {
-                        return callback(false);
+                click (close) {
+                    if (typeof callback === 'function') {
+                        return callback.call(this, false, close, source);
                     }
                 }
             }, {
                 text: '确定',
                 type: 'primary',
-                click () {
-                    if (typeof callback === "function") {
-                        return callback(true);
+                click (close) {
+                    if (typeof callback === 'function') {
+                        return callback.call(this, true, close, source);
                     }
                 }
             }];
@@ -29,7 +28,11 @@ function getDefaultDialogButtons (type, callback) {
             return [{
                 text: '确定',
                 type: 'primary',
-                click: callback
+                click (close) {
+                    if (typeof callback === 'function') {
+                        return callback.call(this, close, source);
+                    }
+                }
             }];
         }
     }
@@ -71,14 +74,14 @@ const tnxvue = Object.assign({}, tnxcore, {
         const buttons = getDefaultDialogButtons('confirm', callback);
         this.dialog(title, content, buttons, options);
     },
-    open (component, params, options) {
+    open (component, params, options, source) {
         if (component.methods.dialog) {
             options = Object.assign({}, component.methods.dialog(), options);
         } else {
             options = options || {};
         }
         const title = component.title || options.title;
-        const buttons = getDefaultDialogButtons(options.type, options.click);
+        const buttons = getDefaultDialogButtons(options.type, options.click, source);
         delete options.title;
         delete options.type;
         delete options.click;

@@ -8,7 +8,9 @@
     export default {
         props: ['param'],
         data () {
-            return {};
+            return {
+                abc: 'abc'
+            };
         },
         methods: {
             dialog () {
@@ -18,8 +20,8 @@
                     click: this.toSubmit
                 }
             },
-            toSubmit (yes) {
-                console.info(yes);
+            toSubmit (yes, close, source) {
+                console.info(this.abc + ':' + yes);
             }
         }
     }

@@ -10,3 +10,18 @@ body {
     font-weight: unset;
     font-size: unset;
 }
+
+.el-form-item {
+    margin-bottom: 1rem;
+}
+
+.el-form-item:last-child {
+    margin-bottom: 0;
+}
+
+.el-form-item__label,
+.el-form-item__content,
+.el-input__inner {
+    padding-left: 10px;
+    padding-right: 10px;
+}
