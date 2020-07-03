@@ -18,12 +18,16 @@ export default function(title, content, buttons, options, contentParams) {
 
     const dialogId = 'dialog-' + (new Date().getTime());
     $('body').append('<div id="' + dialogId + '"></div>');
-    const dialog = new Dialog().$mount('#' + dialogId);
-    dialog.title = title;
-    dialog.content = content;
-    dialog.contentParams = contentParams;
-    if (buttons instanceof Array) {
-        dialog.buttons = buttons;
+    if (!(buttons instanceof Array)) {
+        buttons = [];
     }
+    const dialog = new Dialog({
+        propsData: {
+            title: title,
+            content: content,
+            contentParams: contentParams,
+            buttons: buttons,
+        }
+    }).$mount('#' + dialogId);
     dialog.options = Object.assign(dialog.options, options);
 }

@@ -15,7 +15,7 @@
             v-html="title"></div>
         <div v-if="content" v-html="content"></div>
         <tnxel-dialog-content ref="content" v-bind="contentParams" v-else></tnxel-dialog-content>
-        <div slot="footer" class="dialog-footer" :class="{'border-top': buttons.length}">
+        <div slot="footer" class="dialog-footer" :class="{'border-top': buttons && buttons.length}">
             <el-button v-for="(button, index) in buttons" :type="button.type" :key="index"
                 @click="btnClick(index)">{{button.caption || button.text}}
             </el-button>
@@ -28,14 +28,11 @@
 
     export default {
         name: 'Dialog',
+        props: ['title', 'content', 'contentParams', 'buttons'],
         data () {
             return {
                 visible: true,
-                top: null,
-                title: null,
-                content: null,
-                contentParams: null,
-                buttons: [],
+                height: 0,
                 options: { // 以下配置项均来自于element的Dialog组件
                     modal: true, // 是否需要遮罩层
                     'close-on-click-modal': false, // 是否可以通过点击 modal 关闭 Dialog
@@ -53,13 +50,24 @@
                 } else {
                     return this.options.width;
                 }
+            },
+            top () {
+                const docHeight = $(document).height();
+                if (this.height >= docHeight) { // 如果对话框高度大于文档高度，则top偏移为0
+                    return '0px';
+                }
+                // 对话框高度占文档高度的比例
+                const heightRatio = this.height / docHeight;
+                // 为了获得更好的视觉舒适度，根据高度比确定对话框中线位置：从33vh->50vh
+                const baseline = 33 + (50 - 33) * heightRatio;
+                return 'calc(' + baseline + 'vh - ' + this.height / 2 + 'px)';
             }
         },
         mounted () {
-            const docHeight = $(document).height();
-            const dialogHeight = $('.el-dialog:last').height();
-            // 除以3而不是2，以使得对话框略微靠上，让视觉感受更舒服
-            this.top = (docHeight - dialogHeight) / 3 + 'px';
+            this.$nextTick(function() {
+                // 根据对话框高度计算top而不是直接在此计算top，直接计算的话，对话框在被关闭后会出现莫名的闪现情况
+                this.height = $('.el-dialog:last').height();
+            });
         },
         components: {
             'tnxel-dialog-content': null,
