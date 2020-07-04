@@ -4,7 +4,7 @@
  */
 import Vue from 'vue';
 import tnxcore from '../tnxcore.js';
-import ruleConvert from './validation-rule-converter';
+import validator from './tnxvue-validator';
 
 function getDefaultDialogButtons (type, callback, source) {
     if (type) {
@@ -106,7 +106,7 @@ Object.assign(tnxcore.util, {
 tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
     getMeta.call(tnxvue.app.rpc, url, function(meta) {
         if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
-            meta.rules = ruleConvert(meta);
+            meta.rules = validator.getRules(meta);
         }
         if (typeof callback === 'function') {
             callback.call(this, meta);

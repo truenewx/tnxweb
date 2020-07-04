@@ -37,6 +37,32 @@ Function.around = function(target, around) {
     }
 };
 
+// 不要在Object.prototype中添加函数，否则vue会报错
+Object.assign(String.prototype, {
+    firstToLowerCase: function() {
+        return this.substring(0, 1).toLowerCase() + this.substring(1);
+    },
+    firstToUpperCase: function() {
+        return this.substring(0, 1).toUpperCase() + this.substring(1);
+    },
+    replaceAll: function(findText, replaceText) {
+        const regex = new RegExp(findText, 'g');
+        return this.replace(regex, replaceText);
+    }
+});
+
+Object.assign(Number.prototype, {
+    /**
+     * 获取当前数值四舍五入到指定精度后的结果
+     * @param scale 精度，即小数点后的位数
+     * @returns {number} 四舍五入后的结果数值
+     */
+    toFixed: function(scale) {
+        const p = Math.pow(10, scale);
+        return Math.round(this * p) / p;
+    }
+});
+
 const tnxcore = {
     base: {
         name: 'core',
