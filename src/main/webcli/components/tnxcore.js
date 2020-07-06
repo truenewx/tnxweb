@@ -102,7 +102,12 @@ const tnxcore = {
     }
 };
 
-tnxcore.util = {
+import md5 from 'md5';
+import axios from 'axios';
+
+const util = tnxcore.util = {
+    owner: tnxcore,
+    md5: md5,
     /**
      * 从指定头信息集中获取指定头信息值
      * @param headers 头信息集
@@ -114,16 +119,241 @@ tnxcore.util = {
             return headers[name] || headers[name.toLowerCase()];
         }
         return undefined;
-    }
+    },
+    getMetaContent: function(name) {
+        const meta = document.querySelector('meta[name="' + name + '"]');
+        if (meta) {
+            return meta.getAttribute('content');
+        }
+        return undefined;
+    },
+    bindResourceLoad: function(element, url, onLoad) {
+        if (typeof onLoad === 'function') {
+            if (element.readyState) {
+                element.onreadystatechange = function() {
+                    if (element.readyState === 'loaded' || element.readyState === 'complete') {
+                        element.onreadystatechange = null;
+                        onLoad(url);
+                    }
+                }
+            } else {
+                element.onload = function() {
+                    onLoad(url);
+                }
+            }
+        }
+    },
+    loadLink: function(url, container, callback) {
+        const link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+        this.bindResourceLoad(link, url, callback);
+        link.href = url;
+
+        const node = container.getFirstChildWithoutTagName('link');
+        if (node) {
+            container.insertBefore(link, node);
+        } else {
+            container.appendChild(link);
+        }
+    },
+    loadScript: function(url, container, callback) {
+        const _this = this;
+        if (typeof require === 'function') {
+            require([url], function(page) {
+                callback(url);
+                _this.initPage(page, container);
+            });
+        } else {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            this.bindResourceLoad(script, url, callback);
+            script.src = url;
+            container.appendChild(script);
+        }
+    },
+    initPage: function(page, container) {
+        if (typeof page === 'function') {
+            page(container);
+        } else { // 如果页面js组件不是初始化方法，则必须包含onLoad()方法，没有则报错
+            page.onLoad(container);
+        }
+    },
 }
 
-tnxcore.app = {
+const app = tnxcore.app = {
     owner: tnxcore,
+    context: '',
+    version: undefined,
+    init: function(container, callback) {
+        // 初始化app环境
+        const context = util.getMetaContent('app.context');
+        if (context) {
+            app.context = context;
+        }
+        app.version = util.getMetaContent('app.version');
+
+        if (typeof container === 'function') {
+            callback = container;
+            container = undefined;
+        }
+        const _this = this;
+        this.loadLinks(container, function() {
+            _this.loadScripts(container, function() {
+                if (typeof callback === 'function') {
+                    callback.call();
+                }
+            });
+        });
+    },
+    getAction: function(url) {
+        let href = url || window.location.href;
+        // 去掉参数
+        let index = href.indexOf('?');
+        if (index >= 0) {
+            href = href.substr(0, index);
+        }
+        // 去掉锚点
+        index = href.indexOf('#');
+        if (index >= 0) {
+            href = href.substr(0, index);
+        }
+        // 去掉协议
+        if (href.startsWith('//')) {
+            href = href.substr(2);
+        } else {
+            index = href.indexOf('://');
+            if (index >= 0) {
+                href = href.substr(index + 3);
+            }
+        }
+        // 去掉域名和端口
+        index = href.indexOf('/');
+        if (index >= 0) {
+            href = href.substr(index);
+        }
+        // 去掉contextPath
+        if (this.context !== '' && this.context !== '/' && href.startsWith(this.context)) {
+            href = href.substr(this.context.length);
+        }
+        // 去掉后缀
+        index = href.lastIndexOf('.');
+        if (index >= 0) {
+            href = href.substr(0, index);
+        }
+        if (href.endsWith('/')) {
+            href = href.substr(0, href.length - 1);
+        }
+        return href;
+    },
+    loadedResources: {}, // 保存加载中和加载完成的资源
+    loadResources: function(resourceType, container, loadOneFunction, callback, recursive) {
+        if (typeof container === 'function') {
+            recursive = callback;
+            callback = loadOneFunction;
+            loadOneFunction = container;
+            container = undefined;
+        }
+        container = container || document.body;
+
+        const _this = this;
+        if (recursive !== false) {
+            const children = container.querySelectorAll('[' + resourceType + ']');
+            children.forEach(function(child) {
+                _this.loadResources(resourceType, child, loadOneFunction, null, false);
+            });
+        }
+
+        let empty = true;
+        let resources = container.getAttribute(resourceType);
+        if (resources) {
+            resources = resources.split(',');
+            resources.forEach(function(resource, i) {
+                resource = resource.trim();
+                const url = container.getAttribute('url');
+                let action = _this.getAction(url);
+                if (resource === 'true' || resource === 'default') {
+                    resource = _this.context + _this.page.context + action + '.' + resourceType;
+                }
+                if (resource.toLowerCase().endsWith('.' + resourceType)) {
+                    // 不包含协议的为相对路径，才需要做路径转换
+                    if (resource.indexOf('://') < 0) {
+                        if (resource.startsWith('/')) { //以斜杠开头的为相对于站点根路径的相对路径
+                            resources[i] = _this.context + resource;
+                        } else { // 否则为相对于当前目录的相对路径
+                            const index = action.lastIndexOf('/');
+                            if (index >= 0) {
+                                action = action.substr(0, index);
+                            }
+                            resources[i] = _this.context + _this.page.context + action + '/' + resource;
+                        }
+                    }
+                    if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
+                        resources[i] += '?v=' + _this.version;
+                    }
+                    _this.loadedResources[resource] = false;
+                } else { // 无效的脚本文件置空
+                    resources[i] = undefined;
+                }
+            });
+
+            resources.forEach(function(resource) {
+                if (resource) {
+                    empty = false;
+                    loadOneFunction.call(util, resource, container, function(url) {
+                        _this.loadedResources[url] = true;
+                        if (typeof callback === 'function' && _this.isAllLoaded(resources)) {
+                            callback.call(_this);
+                        }
+                    });
+                }
+            });
+        }
+        if (empty && typeof callback === 'function') {
+            callback.call(this);
+        }
+    },
+    isAllLoaded: function(resources) {
+        const _this = this;
+        for (let i = 0; i < resources.length; i++) {
+            const resource = resources[i];
+            if (_this.loadedResources[resource] !== true) {
+                return false;
+            }
+        }
+        return true;
+    },
+    loadLinks: function(container, callback) {
+        if (typeof container === 'function') {
+            callback = container;
+            container = undefined;
+        }
+        this.loadResources('css', container, util.loadLink, callback);
+    },
+    loadScripts: function(container, callback) {
+        if (typeof container === 'function') {
+            callback = container;
+            container = undefined;
+        }
+        this.loadResources('js', container, util.loadScript, callback);
+    },
+    buildCsrfField: function(form) {
+        const meta = document.querySelector('meta[name="csrf"]');
+        if (meta) {
+            const name = meta.getAttribute('parameter');
+            const value = meta.getAttribute('content');
+            if (name && value) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            }
+        }
+    },
 };
 
-import axios from 'axios';
-
-tnxcore.app.rpc = {
+app.rpc = {
     owner: tnxcore.app,
     axios: axios,
     loginSuccessRedirectParameter: '_next',
@@ -228,7 +458,6 @@ tnxcore.app.rpc = {
         this._callRequest(url, config, options);
     },
     _callRequest: function(url, config, options) {
-        const util = this.owner.owner.util;
         const _this = this;
         this.axios(url, config).then(function(response) {
             let redirectUrl = util.getHeader(response.headers, 'Redirect-To');
@@ -341,5 +570,10 @@ tnxcore.app.rpc = {
         }
     },
 }
+
+app.page = {
+    owner: app,
+    context: "/pages",
+};
 
 export default tnxcore;
