@@ -12,4 +12,6 @@ const tnxjq = $.extend({}, tnxcore, {
     },
 });
 
+tnxjq.app.owner = tnxjq;
+
 export default tnxjq;

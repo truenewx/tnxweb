@@ -8,6 +8,8 @@ function getRuleType (metaType) {
     switch (metaType) {
         case 'text':
             return 'string';
+        case 'decimal':
+            return 'float';
     }
     return metaType;
 }
@@ -35,7 +37,24 @@ function getRule (validationName, validationValue, fieldMeta) {
                         if (fieldLength > validationValue) {
                             const message = validator.getErrorMessage(validationName,
                                 fieldMeta.caption, validationValue, fieldLength - validationValue);
-                            return new Error(message);
+                            return callback(new Error(message));
+                        }
+                    }
+                }
+            }
+            break;
+        case 'notContainsHtmlChars':
+            rule = {
+                validator (r, fieldValue, callback, source, options) {
+                    if (typeof validationValue && fieldValue) {
+                        const limitedValues = ['<', '>', '\'', '"', '/', '\\'];
+                        for (let i = 0; i < limitedValues.length; i++) {
+                            if (fieldValue.indexOf(limitedValues[i]) >= 0) {
+                                const s = limitedValues.join(' ');
+                                const message = validator.getErrorMessage('notContains',
+                                    fieldMeta.caption, s);
+                                return callback(new Error(message));
+                            }
                         }
                     }
                 }
@@ -48,7 +67,7 @@ function getRule (validationName, validationValue, fieldMeta) {
             metaType = fieldMeta.type.toLowerCase();
         }
         rule.type = getRuleType(metaType);
-        rule.trigger = metaType === 'select' ? 'change' : 'blur';
+        rule.trigger = metaType === 'option' ? 'change' : 'blur';
     }
     return rule;
 }

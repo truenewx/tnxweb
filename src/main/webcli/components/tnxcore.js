@@ -263,14 +263,21 @@ tnxcore.app.rpc = {
                         }
                         break;
                     }
-                    case 403: {
-                        const errors = response.data.errors;
-                        if (errors) {
-                            if (typeof options.error === 'function') {
-                                options.error(errors);
-                            } else {
-                                _this.error(errors);
+                    case 400: {
+                        let errors = response.data.errors;
+                        if (errors) { // 字段格式异常
+                            errors.forEach(error => {
+                                error.message = error.field + error.defaultMessage;
+                            });
+                            // 转换错误消息之后，与403错误做相同处理
+                            if (_this._handleErrors(errors, options)) {
+                                return;
                             }
+                        }
+                        break;
+                    }
+                    case 403: {
+                        if (_this._handleErrors(response.data.errors, options)) {
                             return;
                         }
                         break;
@@ -291,6 +298,21 @@ tnxcore.app.rpc = {
     toLogin: function(loginFormUrl, originalUrl, originalMethod) {
         return false;
     },
+    _handleErrors: function(errors, options) {
+        if (errors) {
+            if (options && typeof options.error === 'function') {
+                options.error(errors);
+            } else {
+                this.error(errors);
+            }
+            return true;
+        }
+        return false;
+    },
+    error: function(errors) {
+        const message = this.getErrorMessage(errors);
+        this.owner.owner.alert('错误', message);
+    },
     getErrorMessage: function(errors) {
         let message = '';
         if (errors instanceof Array) {
@@ -300,15 +322,11 @@ tnxcore.app.rpc = {
         }
         return message.trim();
     },
-    error: function(errors) {
-        let message = this.getErrorMessage(errors);
-        this.owner.owner.alert('错误', message);
-    },
     metas: {},
     getMeta: function(url, callback) {
         const metas = this.metas;
         if (metas[url]) {
-            if (typeof callback == 'function') {
+            if (typeof callback === 'function') {
                 callback(metas[url]);
             }
         } else {
@@ -316,7 +334,7 @@ tnxcore.app.rpc = {
                 url: url
             }, function(meta) {
                 metas[url] = meta;
-                if (typeof callback == 'function') {
+                if (typeof callback === 'function') {
                     callback(meta);
                 }
             });

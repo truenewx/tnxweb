@@ -5,6 +5,7 @@
 
 const messages = {
     required: "{0}不能为空",
+    notEmpty: "{0}不能为空",
     notBlank: "{0}不能为空或纯空格",
     maxLength: "{0}长度最多可以有{1}位，已超出{2}位",
     minLength: "{0}长度最少必须有{1}位，还缺少{2}位",
@@ -19,8 +20,6 @@ const messages = {
     url: "{0}应为格式正确的网址链接",
     regex: "{0}格式错误{1}",
     notContains: "{0}不能包含：{1}",
-    notContainsAngleBracket: "{0}不能包含：< >",
-    notContainsHtmlChars: "{0}不能包含：< > \" '",
     rejectTags: "{0}不能包含任何标签",
     allowedTags: "{0}只能包含标签：{1}",
     forbiddenTags: "{0}不能包含标签：{1}"
@@ -32,7 +31,7 @@ export function getErrorMessage (validationName, fieldCaption) {
         fieldCaption = fieldCaption || '';
         message = message.replaceAll('\\{0\\}', fieldCaption);
         for (let i = 2; i < arguments.length; i++) {
-            message = message.replaceAll("\\{" + i + "\\}", arguments[i]);
+            message = message.replaceAll("\\{" + (i - 1) + "\\}", arguments[i]);
         }
     }
     return message;

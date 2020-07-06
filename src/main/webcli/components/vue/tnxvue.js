@@ -91,6 +91,7 @@ const tnxvue = Object.assign({}, tnxcore, {
 });
 
 Object.assign(tnxcore.util, {
+    owner: tnxvue,
     /**
      * 判断指定对象是否组件实例
      * @param obj 对象
@@ -101,6 +102,8 @@ Object.assign(tnxcore.util, {
             && (typeof obj.render === 'function');
     }
 });
+
+tnxvue.app.owner = tnxvue;
 
 // 元数据到async-validator组件规则的转换处理
 tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
