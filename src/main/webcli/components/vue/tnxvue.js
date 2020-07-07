@@ -2,7 +2,7 @@
 /**
  * 基于Vue的扩展支持
  */
-import Vue from 'vue/dist/vue';
+import Vue from 'vue/dist/vue.min'; // 默认的引入方式不能直接用于浏览器
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 
