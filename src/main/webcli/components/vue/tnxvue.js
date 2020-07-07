@@ -2,9 +2,17 @@
 /**
  * 基于Vue的扩展支持
  */
-import Vue from 'vue';
+import Vue from 'vue/dist/vue';
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
+
+Vue.component('tv-div', {
+    template: '<div><slot></slot></div>'
+});
+
+Vue.component('tv-span', {
+    template: '<span><slot></slot></span>'
+});
 
 function getDefaultDialogButtons (type, callback, source) {
     if (type) {
@@ -41,10 +49,7 @@ function getDefaultDialogButtons (type, callback, source) {
 }
 
 const tnxvue = Object.assign({}, tnxcore, {
-    base: {
-        name: 'vue',
-        ref: Vue
-    },
+    depends: Object.assign({}, tnxcore.depends, {Vue}),
     dialog (title, content, params, buttons, options) {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');
@@ -90,7 +95,7 @@ const tnxvue = Object.assign({}, tnxcore, {
     }
 });
 
-Object.assign(tnxcore.util, {
+Object.assign(tnxvue.util, {
     owner: tnxvue,
     /**
      * 判断指定对象是否组件实例
@@ -101,6 +106,19 @@ Object.assign(tnxcore.util, {
         return (typeof obj === 'object') && (typeof obj.data === 'function')
             && (typeof obj.render === 'function');
     }
+});
+
+tnxvue.util.initPage = Function.around(tnxvue.util.initPage, function(initPage, page, container) {
+    if (container.tagName === 'BODY') { // vue不支持以body为容器，故从body下获取第一个div作为容器
+        for (let i = 0; i < container.children.length; i++) {
+            const child = container.children[i];
+            if (child.tagName === 'DIV') {
+                container = child;
+                break;
+            }
+        }
+    }
+    initPage.call(this, page, container);
 });
 
 tnxvue.app.owner = tnxvue;

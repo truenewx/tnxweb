@@ -102,10 +102,7 @@ Object.assign(Array.prototype, {
 });
 
 const tnxcore = {
-    base: {
-        name: 'core',
-        ref: {}
-    },
+    depends: {},
     alert: function(title, message, callback) {
         if (message === undefined && callback === undefined) {
             message = title;
