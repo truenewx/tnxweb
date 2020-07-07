@@ -63,6 +63,44 @@ Object.assign(Number.prototype, {
     }
 });
 
+Object.assign(Element.prototype, {
+    /**
+     * 获取不是指定标签的第一个子节点
+     * @param tagName 标签名
+     * @return ChildNode 不是指定标签的第一个子节点，没有则返回undefined
+     */
+    getFirstChildWithoutTagName: function(tagName) {
+        const children = this.childNodes;
+        for (let i = 0; i < children.length; i++) {
+            if (children[i].tagName && children[i].tagName !== tagName.toUpperCase()) {
+                return children[i];
+            }
+        }
+        return undefined;
+    }
+});
+
+Object.assign(Array.prototype, {
+    contains: function(element) {
+        for (let e of this) {
+            if (e === element) {
+                return true;
+            }
+        }
+        return false;
+    },
+    containsIgnoreCase: function(element) {
+        if (typeof element == 'string') {
+            for (let e of this) {
+                if (typeof e == 'string' && e.toLocaleLowerCase() === element.toLocaleLowerCase()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+});
+
 const tnxcore = {
     base: {
         name: 'core',
@@ -159,8 +197,8 @@ const util = tnxcore.util = {
     },
     loadScript: function(url, container, callback) {
         const _this = this;
-        if (typeof require === 'function') {
-            require([url], function(page) {
+        if (typeof requirejs === 'function') {
+            requirejs([url], function(page) {
                 callback(url);
                 _this.initPage(page, container);
             });
@@ -257,60 +295,64 @@ const app = tnxcore.app = {
         container = container || document.body;
 
         const _this = this;
-        if (recursive !== false) {
-            const children = container.querySelectorAll('[' + resourceType + ']');
-            children.forEach(function(child) {
-                _this.loadResources(resourceType, child, loadOneFunction, null, false);
-            });
-        }
-
-        let empty = true;
         let resources = container.getAttribute(resourceType);
-        if (resources) {
-            resources = resources.split(',');
-            resources.forEach(function(resource, i) {
-                resource = resource.trim();
-                const url = container.getAttribute('url');
-                let action = _this.getAction(url);
-                if (resource === 'true' || resource === 'default') {
-                    resource = _this.context + _this.page.context + action + '.' + resourceType;
-                }
-                if (resource.toLowerCase().endsWith('.' + resourceType)) {
-                    // 不包含协议的为相对路径，才需要做路径转换
-                    if (resource.indexOf('://') < 0) {
-                        if (resource.startsWith('/')) { //以斜杠开头的为相对于站点根路径的相对路径
-                            resources[i] = _this.context + resource;
-                        } else { // 否则为相对于当前目录的相对路径
-                            const index = action.lastIndexOf('/');
-                            if (index >= 0) {
-                                action = action.substr(0, index);
+        const children = container.querySelectorAll('[' + resourceType + ']');
+        // 如果存在子容器需要加载，则当前容器不再加载
+        if (children.length && recursive !== false) {
+            children.forEach(function(child) {
+                _this.loadResources(resourceType, child, loadOneFunction, callback, false);
+            });
+            if (resources) {
+                console.warn(resources + ' is ignored.');
+            }
+        } else {
+            let empty = true;
+            if (resources) {
+                resources = resources.split(',');
+                resources.forEach(function(resource, i) {
+                    resource = resource.trim();
+                    const url = container.getAttribute('url');
+                    let action = _this.getAction(url);
+                    if (resource === 'true' || resource === 'default') {
+                        resource = _this.context + _this.page.context + action + '.' + resourceType;
+                    }
+                    if (resource.toLowerCase().endsWith('.' + resourceType)) {
+                        // 不包含协议的为相对路径，才需要做路径转换
+                        if (resource.indexOf('://') < 0) {
+                            if (resource.startsWith('/')) { //以斜杠开头的为相对于站点根路径的相对路径
+                                resources[i] = _this.context + resource;
+                            } else { // 否则为相对于当前目录的相对路径
+                                const index = action.lastIndexOf('/');
+                                if (index >= 0) {
+                                    action = action.substr(0, index);
+                                }
+                                resources[i] = _this.context + _this.page.context + action + '/' + resource;
                             }
-                            resources[i] = _this.context + _this.page.context + action + '/' + resource;
                         }
+                        if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
+                            resources[i] += '?v=' + _this.version;
+                        }
+                        _this.loadedResources[resource] = false;
+                    } else { // 无效的脚本文件置空
+                        resources[i] = undefined;
                     }
-                    if (_this.version) { // 脚本路径附加应用版本信息，以更新客户端缓存
-                        resources[i] += '?v=' + _this.version;
-                    }
-                    _this.loadedResources[resource] = false;
-                } else { // 无效的脚本文件置空
-                    resources[i] = undefined;
-                }
-            });
+                });
 
-            resources.forEach(function(resource) {
-                if (resource) {
-                    empty = false;
-                    loadOneFunction.call(util, resource, container, function(url) {
-                        _this.loadedResources[url] = true;
-                        if (typeof callback === 'function' && _this.isAllLoaded(resources)) {
-                            callback.call(_this);
-                        }
-                    });
-                }
-            });
-        }
-        if (empty && typeof callback === 'function') {
-            callback.call(this);
+                resources.forEach(function(resource) {
+                    if (resource) {
+                        empty = false;
+                        loadOneFunction.call(util, resource, container, function(url) {
+                            _this.loadedResources[url] = true;
+                            if (typeof callback === 'function' && _this.isAllLoaded(resources)) {
+                                callback.call(_this);
+                            }
+                        });
+                    }
+                });
+            }
+            if (empty && typeof callback === 'function') {
+                callback.call(this);
+            }
         }
     },
     isAllLoaded: function(resources) {
