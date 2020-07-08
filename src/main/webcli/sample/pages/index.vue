@@ -27,7 +27,7 @@
         },
         methods: {
             showTextDialog () {
-                tnx.dialog('', 'Text: Hello World', [{
+                tnx.dialog('Text: Hello World', '', [{
                     caption: '确定',
                     type: 'primary',
                     click () {
@@ -37,8 +37,9 @@
             },
             showComponentDialog () {
                 tnx.open(info, {
-                    param: '- from params'
-                }, undefined, this);
+                    param: '- from params',
+                    opener: this,
+                });
             },
             showAlert () {
                 tnx.alert('Hello World', function() {

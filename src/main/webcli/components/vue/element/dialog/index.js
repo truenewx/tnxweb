@@ -1,12 +1,12 @@
 // /components/vue/element/dialog/index.js
-import Vue from 'vue';
-import ElementUI from 'element-ui';
+import tnxjq from '../../../jquery/tnxjq';
+import tnxvue from '../../tnxvue.js';
 import component from './component.vue';
-import $ from 'jquery';
 
-Vue.use(ElementUI);
+const $ = tnxjq.libs.$;
+const Vue = tnxvue.libs.Vue;
 
-export default function(title, content, buttons, options, contentParams) {
+export default function(content, title, buttons, options, contentParams) {
     let componentOption = {};
     if (this.util.isComponent(content)) {
         componentOption.components = {
@@ -23,8 +23,8 @@ export default function(title, content, buttons, options, contentParams) {
     }
     const dialog = new Dialog({
         propsData: {
-            title: title,
             content: content,
+            title: title,
             contentParams: contentParams,
             buttons: buttons,
         }

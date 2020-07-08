@@ -90,9 +90,9 @@ Object.assign(Array.prototype, {
         return false;
     },
     containsIgnoreCase: function(element) {
-        if (typeof element == 'string') {
+        if (typeof element === 'string') {
             for (let e of this) {
-                if (typeof e == 'string' && e.toLocaleLowerCase() === element.toLocaleLowerCase()) {
+                if (typeof e === 'string' && e.toLocaleLowerCase() === element.toLocaleLowerCase()) {
                     return true;
                 }
             }

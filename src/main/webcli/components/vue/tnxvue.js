@@ -14,14 +14,14 @@ Vue.component('tv-span', {
     template: '<span><slot></slot></span>'
 });
 
-function getDefaultDialogButtons (type, callback, source) {
+function getDefaultDialogButtons (type, callback) {
     if (type) {
         if (type === 'confirm') {
             return [{
                 text: '取消',
                 click (close) {
                     if (typeof callback === 'function') {
-                        return callback.call(this, false, close, source);
+                        return callback.call(this, false, close);
                     }
                 }
             }, {
@@ -29,7 +29,7 @@ function getDefaultDialogButtons (type, callback, source) {
                 type: 'primary',
                 click (close) {
                     if (typeof callback === 'function') {
-                        return callback.call(this, true, close, source);
+                        return callback.call(this, true, close);
                     }
                 }
             }];
@@ -39,7 +39,7 @@ function getDefaultDialogButtons (type, callback, source) {
                 type: 'primary',
                 click (close) {
                     if (typeof callback === 'function') {
-                        return callback.call(this, close, source);
+                        return callback.call(this, close);
                     }
                 }
             }];
@@ -50,48 +50,43 @@ function getDefaultDialogButtons (type, callback, source) {
 
 const tnxvue = Object.assign({}, tnxcore, {
     libs: Object.assign({}, tnxcore.libs, {Vue}),
-    dialog (title, content, params, buttons, options) {
+    dialog (content, title, buttons, options, contentParams) {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');
     },
-    alert (title, content, callback, options) {
-        if (typeof content === "function") {
+    alert (content, title, callback, options) {
+        if (typeof title === "function") {
             options = callback;
-            callback = content;
-            content = undefined;
-        }
-        if (content === undefined) {
-            content = title;
+            callback = title;
             title = '提示';
         }
         const buttons = getDefaultDialogButtons('alert', callback);
-        this.dialog(title, content, buttons, options);
+        this.dialog(content, title, buttons, options);
     },
     error (content, callback, options) {
-        this.alert('错误', content, callback, options);
+        this.alert(content, '错误', callback, options);
     },
-    confirm (title, content, callback, options) {
-        if (typeof content === 'function') {
+    confirm (content, title, callback, options) {
+        if (typeof title === 'function') {
             options = callback;
-            callback = content;
-            content = title;
+            callback = title;
             title = '确定';
         }
         const buttons = getDefaultDialogButtons('confirm', callback);
-        this.dialog(title, content, buttons, options);
+        this.dialog(content, title, buttons, options);
     },
-    open (component, params, options, source) {
+    open (component, params, options) {
         if (component.methods.dialog) {
             options = Object.assign({}, component.methods.dialog(), options);
         } else {
             options = options || {};
         }
         const title = component.title || options.title;
-        const buttons = getDefaultDialogButtons(options.type, options.click, source);
+        const buttons = getDefaultDialogButtons(options.type, options.click);
         delete options.title;
         delete options.type;
         delete options.click;
-        this.dialog(title, component, buttons, options, params);
+        this.dialog(component, title, buttons, options, params);
     }
 });
 
