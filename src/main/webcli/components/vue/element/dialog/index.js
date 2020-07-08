@@ -8,7 +8,7 @@ import component from './component.vue';
 const $ = tnxjq.libs.$;
 const Vue = tnxvue.libs.Vue;
 
-export default function(content, title, buttons, options, contentParams) {
+export default function(content, title, buttons, options, contentProps) {
     let componentOption = {};
     if (this.util.isComponent(content)) {
         componentOption.components = {
@@ -27,7 +27,7 @@ export default function(content, title, buttons, options, contentParams) {
         propsData: {
             content: content,
             title: title,
-            contentParams: contentParams,
+            contentProps: contentProps,
             buttons: buttons,
         }
     }).$mount('#' + dialogId);

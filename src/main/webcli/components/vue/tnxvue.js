@@ -50,7 +50,7 @@ function getDefaultDialogButtons (type, callback) {
 
 const tnxvue = Object.assign({}, tnxcore, {
     libs: Object.assign({}, tnxcore.libs, {Vue}),
-    dialog (content, title, buttons, options, contentParams) {
+    dialog (content, title, buttons, options, contentProps) {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');
     },
@@ -75,7 +75,7 @@ const tnxvue = Object.assign({}, tnxcore, {
         const buttons = getDefaultDialogButtons('confirm', callback);
         this.dialog(content, title, buttons, options);
     },
-    open (component, params, options) {
+    open (component, props, options) {
         if (component.methods.dialog) {
             options = Object.assign({}, component.methods.dialog(), options);
         } else {
@@ -86,7 +86,7 @@ const tnxvue = Object.assign({}, tnxcore, {
         delete options.title;
         delete options.type;
         delete options.click;
-        this.dialog(component, title, buttons, options, params);
+        this.dialog(component, title, buttons, options, props);
     }
 });
 

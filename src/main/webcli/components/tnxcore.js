@@ -392,7 +392,8 @@ const app = tnxcore.app = {
     },
 };
 
-app.rpc = {
+// 定义rpc常量便于在IDE结构/大纲中定位
+const rpc = app.rpc = {
     owner: tnxcore.app,
     axios: axios,
     loginSuccessRedirectParameter: '_next',
@@ -437,7 +438,7 @@ app.rpc = {
         this.context = config.context || {}; // 其它站点的上下文根路径
     },
     get: function(url, params, callback, options) {
-        if (typeof params === 'function' || typeof callback === 'object') {
+        if (typeof params === 'function' || (callback && typeof callback === 'object')) {
             options = callback;
             callback = params;
             params = undefined;
@@ -454,7 +455,7 @@ app.rpc = {
         }));
     },
     post: function(url, body, callback, options) {
-        if (typeof body === 'function' || typeof callback === 'object') {
+        if (typeof body === 'function' || (callback && typeof callback === 'object')) {
             options = callback;
             callback = body;
             body = undefined;
@@ -464,11 +465,12 @@ app.rpc = {
                 error: options
             };
         }
-        this.request(url, Object.assign({}, options, {
+        options = Object.assign({}, options, {
             method: 'post',
             body: body,
             success: callback,
-        }));
+        });
+        this.request(url, options);
     },
     request: function(url, options) {
         if (options.base) {
@@ -501,6 +503,9 @@ app.rpc = {
         this.axios(url, config).then(function(response) {
             let redirectUrl = util.getHeader(response.headers, 'Redirect-To');
             if (redirectUrl) { // 指定了重定向地址，则执行重定向操作
+                if (_this._isIgnored(options, 'Redirect-To')) {
+                    return;
+                }
                 config.headers = config.headers || {};
                 config.headers['Original-Request'] = options.method + ' ' + config.referer;
                 config.method = 'GET'; // 重定向一定是GET请求
@@ -511,6 +516,9 @@ app.rpc = {
         }).catch(function(error) {
             const response = error.response;
             if (response) {
+                if (_this._isIgnored(options, response.status)) {
+                    return;
+                }
                 switch (response.status) {
                     case 401: {
                         let loginUrl = util.getHeader(response.headers, 'Login-Url');
@@ -554,6 +562,16 @@ app.rpc = {
             }
             console.error(error.stack);
         });
+    },
+    _isIgnored: function(options, type) {
+        if (options && options.ignored) {
+            if (options.ignored instanceof Array) {
+                return options.ignored.contains(type);
+            } else {
+                return options.ignored === type;
+            }
+        }
+        return false;
     },
     /**
      * 打开登录表单的函数，由业务应用覆盖提供，以决定用何种方式打开登录表单页面。
