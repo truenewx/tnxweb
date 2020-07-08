@@ -1,4 +1,6 @@
-// /components/vue/element/dialog/index.js
+/**
+ * 基于ElementUI的对话框组件
+ */
 import tnxjq from '../../../jquery/tnxjq';
 import tnxvue from '../../tnxvue.js';
 import component from './component.vue';
