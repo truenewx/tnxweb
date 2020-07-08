@@ -27,6 +27,10 @@ body {
     padding-right: 10px;
 }
 
+el-button {
+    visibility: hidden;
+}
+
 .el-alert {
     width: unset;
     margin: 1rem 10px;

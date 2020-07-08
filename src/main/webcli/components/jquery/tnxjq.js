@@ -6,7 +6,7 @@ import $ from 'jquery';
 import tnxcore from '../tnxcore.js';
 
 const tnxjq = $.extend({}, tnxcore, {
-    depends: $.extend({}, tnxcore.depends, {$})
+    libs: $.extend({}, tnxcore.libs, {$})
 });
 
 tnxjq.app.owner = tnxjq;

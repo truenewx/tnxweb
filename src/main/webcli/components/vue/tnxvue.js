@@ -49,7 +49,7 @@ function getDefaultDialogButtons (type, callback, source) {
 }
 
 const tnxvue = Object.assign({}, tnxcore, {
-    depends: Object.assign({}, tnxcore.depends, {Vue}),
+    libs: Object.assign({}, tnxcore.libs, {Vue}),
     dialog (title, content, params, buttons, options) {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');

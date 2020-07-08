@@ -1,6 +1,6 @@
 {
   "name": "@truenewx/tnxweb",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "互联网技术解决方案：Web扩展支持",
   "private": false,
   "publishConfig": {

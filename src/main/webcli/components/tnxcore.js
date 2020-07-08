@@ -102,7 +102,7 @@ Object.assign(Array.prototype, {
 });
 
 const tnxcore = {
-    depends: {},
+    libs: {},
     alert: function(title, message, callback) {
         if (message === undefined && callback === undefined) {
             message = title;
