@@ -41,7 +41,7 @@
                 });
             },
             showToast () {
-                tnx.toast('操作成功', 200000, function() {
+                tnx.toast('操作成功', 2000, function() {
                     console.info('Toast closed.');
                 });
             },

@@ -49,6 +49,7 @@
     },
     "rules": {
       "no-unused-vars": "off",
+      "no-undef": "warn",
       "eqeqeq": "warn"
     }
   },

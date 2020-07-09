@@ -1,7 +1,6 @@
 // vue.config.js
 module.exports = {
     publicPath: './',
-    outputDir: '../webapp/sample',
     assetsDir: 'assets',
     devServer: {
         port: 8080
