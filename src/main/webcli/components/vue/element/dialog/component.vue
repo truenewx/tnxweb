@@ -33,13 +33,15 @@
             return {
                 visible: true,
                 height: 0,
-                options: { // 以下配置项均来自于element的Dialog组件
+                options: {
                     modal: true, // 是否需要遮罩层
-                    'close-on-click-modal': false, // 是否可以通过点击 modal 关闭 Dialog
-                    'close-on-press-escape': true, // 是否可以通过按下 ESC 关闭 Dialog
+                    'close-on-click-modal': false, // 是否可以通过点击遮罩层关闭对话框
+                    'close-on-press-escape': true, // 是否可以通过按下 ESC 关闭对话框
                     'show-close': true, // 是否显示关闭按钮
                     center: false, // 是否对头部和底部采用居中布局
-                    width: '500px', // Dialog 的宽度
+                    width: '422px', // 对话框宽度，默认与MessageBox的宽度一致
+                    // 以上均为element的Dialog组件配置项
+                    onShown: undefined, // 对话框展示后的事件回调
                 },
             };
         },
@@ -67,6 +69,9 @@
             this.$nextTick(function() {
                 // 根据对话框高度计算top而不是直接在此计算top，直接计算的话，对话框在被关闭后会出现莫名的闪现情况
                 this.height = $('.el-dialog:last').height();
+                if (typeof this.options.onShown === 'function') {
+                    this.options.onShown.call(this);
+                }
             });
         },
         components: {

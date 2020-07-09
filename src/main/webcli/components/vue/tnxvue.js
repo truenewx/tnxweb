@@ -2,7 +2,7 @@
 /**
  * 基于Vue的扩展支持
  */
-import Vue from 'vue/dist/vue.min'; // 默认的引入方式不能直接用于浏览器
+import Vue from 'vue/dist/vue'; // 默认的引入方式不能直接用于浏览器
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 
@@ -54,27 +54,6 @@ const tnxvue = Object.assign({}, tnxcore, {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');
     },
-    alert (content, title, callback, options) {
-        if (typeof title === "function") {
-            options = callback;
-            callback = title;
-            title = '提示';
-        }
-        const buttons = getDefaultDialogButtons('alert', callback);
-        this.dialog(content, title, buttons, options);
-    },
-    error (content, callback, options) {
-        this.alert(content, '错误', callback, options);
-    },
-    confirm (content, title, callback, options) {
-        if (typeof title === 'function') {
-            options = callback;
-            callback = title;
-            title = '确定';
-        }
-        const buttons = getDefaultDialogButtons('confirm', callback);
-        this.dialog(content, title, buttons, options);
-    },
     open (component, props, options) {
         if (component.methods.dialog) {
             options = Object.assign({}, component.methods.dialog(), options);
@@ -82,12 +61,12 @@ const tnxvue = Object.assign({}, tnxcore, {
             options = options || {};
         }
         const title = component.title || options.title;
-        const buttons = getDefaultDialogButtons(options.type, options.click);
+        const buttons = options.buttons || getDefaultDialogButtons(options.type, options.click);
         delete options.title;
         delete options.type;
         delete options.click;
         this.dialog(component, title, buttons, options, props);
-    }
+    },
 });
 
 Object.assign(tnxvue.util, {

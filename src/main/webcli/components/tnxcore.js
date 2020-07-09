@@ -214,6 +214,9 @@ const util = tnxcore.util = {
             page.onLoad(container);
         }
     },
+    getDocHeight: function() {
+        return document.documentElement.clientHeight;
+    }
 }
 
 const app = tnxcore.app = {

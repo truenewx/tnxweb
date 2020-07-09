@@ -1,6 +1,6 @@
 {
   "name": "@truenewx/tnxweb",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "互联网技术解决方案：Web扩展支持",
   "private": false,
   "publishConfig": {
@@ -24,7 +24,6 @@
     "element-ui": "^2.13.2",
     "jquery": "^3.5.1",
     "md5": "^2.2.1",
-    "requirejs": "^2.3.6",
     "vue": "^2.6.11"
   },
   "devDependencies": {

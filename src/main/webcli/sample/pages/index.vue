@@ -2,14 +2,19 @@
     <div class="text-center m-3">
         <h1 class="text-center">{{title}}</h1>
         <p>首页</p>
-        <el-button @click="showTextDialog">文本弹框</el-button>
-        <el-button @click="showComponentDialog">组件弹框</el-button>
-        <el-button @click="showAlert">Alert</el-button>
+        <p>
+            <el-button @click="showAlert">Alert</el-button>
+            <el-button @click="showError">Error</el-button>
+            <el-button @click="showConfirm">Confirm</el-button>
+            <el-button @click="showToast">Toast</el-button>
+            <el-button @click="showLoading">Loading</el-button>
+            <el-button @click="showOpen">Open</el-button>
+        </p>
     </div>
 </template>
 
 <script>
-    import {app, tnx} from '../app.js';
+    import {tnx} from '../app.js';
     import info from './info.vue';
 
     export default {
@@ -19,32 +24,39 @@
                 rules: {},
             };
         },
-        created () {
-            const vm = this;
-            app.rpc.getMeta('/manager/self/info', function(meta) {
-                vm.rules = meta.rules;
-            });
-        },
         methods: {
-            showTextDialog () {
-                tnx.dialog('Text: Hello World', '', [{
-                    caption: '确定',
-                    type: 'primary',
-                    click () {
-                        console.info('ok');
-                    }
-                }]);
+            showAlert () {
+                tnx.alert('Hello World', function() {
+                    console.info('Alerted');
+                });
             },
-            showComponentDialog () {
+            showError () {
+                tnx.error('Hello World', function() {
+                    console.info('Errored');
+                });
+            },
+            showConfirm () {
+                tnx.confirm('Hello World', function(yes) {
+                    console.info(yes);
+                });
+            },
+            showToast () {
+                tnx.toast('操作成功', 200000, function() {
+                    console.info('Toast closed.');
+                });
+            },
+            showLoading () {
+                tnx.showLoading('加载中');
+                setTimeout(function() {
+                    tnx.closeLoading();
+                }, 2000);
+            },
+            showOpen () {
                 tnx.open(info, {
                     param: '- from params',
                     opener: this,
                 });
             },
-            showAlert () {
-                tnx.alert('Hello World', function() {
-                });
-            }
         }
     }
 </script>

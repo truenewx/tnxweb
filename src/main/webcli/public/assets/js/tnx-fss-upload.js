@@ -2,8 +2,8 @@
 /**
  * 文件存储服务的文件上传组件
  */
-define(["tnxbs"], function(tnx) {
-    var FssUpload = function FssUpload(container, options) {
+define(["src/main/webcli/public/assets/js/tnxbs"], function(tnx) {
+    var FssUpload = function FssUpload (container, options) {
         if (!container.is("div")) {
             throw new Error("FssUpload must be based on DIV element");
         }

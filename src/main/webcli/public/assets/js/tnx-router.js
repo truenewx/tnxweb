@@ -1,9 +1,9 @@
 /**
  * 页面路由组件
  */
-define(["tnxjq"], function(tnx) {
+define(["src/main/webcli/public/assets/js/tnxjq"], function(tnx) {
 
-    var TnxRouter = function TnxRouter(viewContainer) {
+    var TnxRouter = function TnxRouter (viewContainer) {
         this.viewContainer = $(viewContainer);
         this.to(this.getCurrentPath());
         var _this = this;

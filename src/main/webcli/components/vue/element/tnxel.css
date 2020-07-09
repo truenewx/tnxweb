@@ -36,3 +36,36 @@ el-button {
     margin: 1rem 10px;
     padding: 10px 12px;
 }
+
+.el-message-box {
+    vertical-align: unset;
+}
+
+.el-message {
+    min-width: unset;
+    top: unset;
+    padding: 12px 1rem;
+    flex-direction: column;
+}
+
+.el-message .el-message__icon {
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+}
+
+.el-message .el-message__content {
+    line-height: 120%;
+    max-width: 17.5rem; /* 刚好容纳20个汉字的宽度，以尽可能让一行文本的左右空白宽度一致。rem=14n/16 */
+}
+
+.el-loading-spinner {
+    top: calc(40vh + 25px);
+}
+
+.el-dialog {
+    border-radius: 4px;
+}
+
+.el-dialog--center .el-dialog__body {
+    text-align: center;
+}
