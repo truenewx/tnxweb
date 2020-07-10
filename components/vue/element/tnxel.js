@@ -6,14 +6,34 @@ import ElementUI from 'element-ui/lib/index'; // 默认的引入方式不能直�
 import tnxvue from '../tnxvue.js';
 import dialog from './dialog';
 import {Loading, Message, MessageBox} from 'element-ui';
+import $ from 'jquery';
 
 tnxvue.libs.Vue.use(ElementUI);
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI}),
     dialog () {
-        this.closeToast();
+        this._closeMessage();
         dialog.apply(tnxel, arguments);
+    },
+    _closeMessage: function() {
+        Message.closeAll();
+        this.closeLoading();
+    },
+    _handleZIndex: function(selector) {
+        const util = this.util;
+        setTimeout(function() {
+            const topZIndex = util.minTopZIndex(2);
+            const element = $(selector);
+            const zIndex = Number(element.css('zIndex'));
+            if (isNaN(zIndex) || topZIndex > zIndex) {
+                element.css('zIndex', topZIndex);
+                const modal = element.next();
+                if (modal.is('.v-modal')) {
+                    modal.css('zIndex', topZIndex - 1);
+                }
+            }
+        });
     },
     alert (message, title, callback, options) {
         if (typeof title === 'function') {
@@ -24,15 +44,17 @@ const tnxel = Object.assign({}, tnxvue, {
         options = Object.assign({}, options, {
             type: 'warning',
         });
-        this.closeToast();
+        this._closeMessage();
         MessageBox.alert(message, title, options).then(callback);
+        this._handleZIndex('.el-message-box__wrapper:last');
     },
     error (message, callback, options) {
         options = Object.assign({}, options, {
             type: 'error',
         });
-        this.closeToast();
+        this._closeMessage();
         MessageBox.alert(message, '错误', options).then(callback);
+        this._handleZIndex('.el-message-box__wrapper:last');
     },
     confirm (message, title, callback, options) {
         if (typeof title === 'function') {
@@ -40,7 +62,7 @@ const tnxel = Object.assign({}, tnxvue, {
             callback = title;
             title = '确定';
         }
-        this.closeToast();
+        this._closeMessage();
         const promise = MessageBox.confirm(message, title, options);
         if (typeof callback === 'function') {
             promise.then(function() {
@@ -49,13 +71,7 @@ const tnxel = Object.assign({}, tnxvue, {
                 callback(false);
             });
         }
-    },
-    toastInstance: undefined,
-    closeToast: function() {
-        if (this.toastInstance) {
-            this.toastInstance.close();
-            this.toastInstance = undefined;
-        }
+        this._handleZIndex('.el-message-box__wrapper:last');
     },
     toast: function(message, timeout, callback, options) {
         if (typeof timeout === 'function') {
@@ -70,11 +86,12 @@ const tnxel = Object.assign({}, tnxvue, {
             center: true, // 因为是竖向排列，所以必须居中
             showClose: false,
             message: message,
-            duration: timeout,
-            callback: callback,
+            duration: timeout || 1500,
+            onClose: callback,
         });
-        this.closeToast();
-        this.toastInstance = Message(options);
+        this._closeMessage();
+        Message(options);
+        this._handleZIndex('.el-message:last');
     },
     loadingInstance: undefined,
     closeLoading: function() {
@@ -91,12 +108,13 @@ const tnxel = Object.assign({}, tnxvue, {
         options = Object.assign({}, options, {
             text: message
         });
-        this.closeToast();
-        this.closeLoading();
+        this._closeMessage();
         this.loadingInstance = Loading.service(options);
+        this._handleZIndex('.el-loading-mask');
     }
 });
 
+tnxel.util.owner = tnxel;
 tnxel.app.owner = tnxel;
 
 export default tnxel;

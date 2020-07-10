@@ -3,6 +3,9 @@
  * 基于原生JavaScript的扩展支持
  */
 
+import md5 from 'md5';
+import axios from 'axios';
+
 /**
  * 将指定对象中的所有字段拼凑成形如a=a1&b=b1的字符串
  * @param object 对象
@@ -137,9 +140,6 @@ const tnxcore = {
     }
 };
 
-import md5 from 'md5';
-import axios from 'axios';
-
 const util = tnxcore.util = {
     owner: tnxcore,
     md5: md5,
@@ -216,6 +216,48 @@ const util = tnxcore.util = {
     },
     getDocHeight: function() {
         return document.documentElement.clientHeight;
+    },
+    maxZIndex: function(elements) {
+        let result = -1;
+        elements.forEach(function(element) {
+            const zIndex = Number(element.style.zIndex);
+            if (result < zIndex) {
+                result = zIndex;
+            }
+        });
+        return result;
+    },
+    /**
+     * 获取最小的可位于界面顶层的ZIndex
+     */
+    minTopZIndex: function(step) {
+        step = step || 1;
+        const maxValue = 2147483584; // 允许的最大值，取各浏览器支持的最大值中的最小一个（Opera）
+        const elements = document.body.querySelectorAll('*');
+        const maxZIndex = this.maxZIndex(elements); // 可见DOM元素中的最高层级
+        if (maxZIndex > maxValue - step) {
+            return maxValue;
+        } else {
+            return maxZIndex + step;
+        }
+    },
+    /**
+     * 最少超时回调
+     * @param beginTime 开始时间
+     * @param callback 回调函数
+     * @param minTimeout 最少超时时间，单位：毫秒
+     */
+    setMinTimeout: function(beginTime, callback, minTimeout) {
+        if (beginTime instanceof Date) {
+            beginTime = beginTime.getTime();
+        }
+        minTimeout = minTimeout || 1500;
+        const dTime = new Date().getTime() - beginTime;
+        if (dTime > minTimeout) {
+            callback();
+        } else {
+            setTimeout(callback, minTimeout - dTime);
+        }
     }
 }
 

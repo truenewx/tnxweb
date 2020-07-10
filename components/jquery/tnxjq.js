@@ -9,6 +9,7 @@ const tnxjq = $.extend({}, tnxcore, {
     libs: $.extend({}, tnxcore.libs, {$})
 });
 
+tnxjq.util.owner = tnxjq;
 tnxjq.app.owner = tnxjq;
 
 export default tnxjq;
