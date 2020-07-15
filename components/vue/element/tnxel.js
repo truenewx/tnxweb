@@ -12,7 +12,6 @@ import upload from './upload/component.vue';
 
 const Vue = tnxvue.libs.Vue;
 Vue.use(ElementUI);
-Vue.component('tnxel-upload', upload);
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI}),
@@ -120,5 +119,7 @@ const tnxel = Object.assign({}, tnxvue, {
 
 tnxel.util.owner = tnxel;
 tnxel.app.owner = tnxel;
+
+Vue.component('tnxel-upload', upload);
 
 export default tnxel;

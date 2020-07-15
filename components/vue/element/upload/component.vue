@@ -9,6 +9,7 @@
         list-type="picture-card"
         name="files"
         :data="params"
+        :headers="headers"
         :file-list="fileList">
         <i class="el-icon-plus"></i>
         <div slot="tip" class="el-upload__tip" v-if="tip" v-text="tip"></div>
@@ -41,6 +42,9 @@
                 params: {
                     fileIds: []
                 },
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             };
         },
         watch: {
@@ -93,7 +97,15 @@
                 }
             },
             onError: function(error, file, fileList) {
-
+                if (error.status === 401) {
+                    const index = error.message.lastIndexOf(' ');
+                    if (index >= 0) {
+                        const redirectUrl = error.message.substr(index + 1);
+                        if (this.tnx.util.isUrl(redirectUrl)) {
+                            console.error(redirectUrl);
+                        }
+                    }
+                }
             },
             getFileUrls: function() {
 

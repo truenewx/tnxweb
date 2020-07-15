@@ -258,6 +258,19 @@ const util = tnxcore.util = {
         } else {
             setTimeout(callback, minTimeout - dTime);
         }
+    },
+    isUrl: function(s) {
+        const regex = '^((https|http|ftp)?://)'
+            + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?' //ftp的user@
+            + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
+            + '|' // 允许IP和DOMAIN（域名）
+            + '([0-9a-z_!~*\'()-]+.)*' // 二级域名：www
+            + '([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].' // 一级域名
+            + '[a-z]{2,6})' // 域名后缀：.com
+            + '(:[0-9]{1,4})?' // 端口：80
+            + '((/?)|'
+            + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
+        return new RegExp(regex).test(s);
     }
 }
 
@@ -547,22 +560,19 @@ const rpc = app.rpc = {
     _callRequest: function(url, config, options) {
         const _this = this;
         this.axios(url, config).then(function(response) {
-            let redirectUrl = util.getHeader(response.headers, 'Redirect-To');
-            if (redirectUrl) { // 指定了重定向地址，则执行重定向操作
-                if (_this._isIgnored(options, 'Redirect-To')) {
-                    return;
-                }
-                config.headers = config.headers || {};
-                config.headers['Original-Request'] = options.method + ' ' + config.referer;
-                config.method = 'GET'; // 重定向一定是GET请求
-                _this._callRequest(redirectUrl, config, options);
-            } else if (typeof options.success === 'function') {
+            if (_this._redirectRequest(response, config, options)) { // 执行了重定向跳转，则不作后续处理
+                return;
+            }
+            if (typeof options.success === 'function') {
                 options.success(response.data);
             }
         }).catch(function(error) {
             const response = error.response;
             if (response) {
                 if (_this._isIgnored(options, response.status)) {
+                    return;
+                }
+                if (_this._redirectRequest(response, config, options)) { // 执行了重定向跳转，则不作后续处理
                     return;
                 }
                 switch (response.status) {
@@ -608,6 +618,20 @@ const rpc = app.rpc = {
             }
             console.error(error.stack);
         });
+    },
+    _redirectRequest: function(response, config, options) {
+        let redirectUrl = util.getHeader(response.headers, 'Redirect-To');
+        if (redirectUrl) { // 指定了重定向地址，则执行重定向操作
+            if (this._isIgnored(options, 'Redirect-To')) {
+                return true;
+            }
+            config.headers = config.headers || {};
+            config.headers['Original-Request'] = options.method + ' ' + config.referer;
+            config.method = 'GET'; // 重定向一定是GET请求
+            this._callRequest(redirectUrl, config, options);
+            return true;
+        }
+        return false;
     },
     _isIgnored: function(options, type) {
         if (options && options.ignored) {
