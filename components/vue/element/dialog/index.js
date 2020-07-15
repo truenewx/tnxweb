@@ -1,11 +1,10 @@
 /**
  * 基于ElementUI的对话框组件
  */
-import tnxjq from '../../../jquery/tnxjq';
+import $ from 'jquery';
 import tnxvue from '../../tnxvue.js';
 import component from './component.vue';
 
-const $ = tnxjq.libs.$;
 const Vue = tnxvue.libs.Vue;
 
 export default function(content, title, buttons, options, contentProps) {

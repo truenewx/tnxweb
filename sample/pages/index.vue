@@ -1,6 +1,6 @@
 <template>
     <div class="text-center m-3">
-        <h1 class="text-center">{{title}}</h1>
+        <h1>{{title}}</h1>
         <p>首页</p>
         <p>
             <el-button @click="showAlert">Alert</el-button>
@@ -10,19 +10,31 @@
             <el-button @click="showLoading">Loading</el-button>
             <el-button @click="showOpen">Open</el-button>
         </p>
+        <p>
+            <tnxel-upload ref="headImageUpload" v-if="uploadBaseUrl" :base-url="uploadBaseUrl"
+                type="ManagerHeadImage" size="64"/>
+        </p>
     </div>
 </template>
 
 <script>
-    import {tnx} from '../app.js';
+    import {app, tnx} from '../app.js';
     import info from './info.vue';
 
     export default {
         data () {
             return {
                 title: process.env.VUE_APP_TITLE,
-                rules: {},
+                uploadBaseUrl: app.rpc.context.fss,
             };
+        },
+        created () {
+            if (!this.uploadBaseUrl) {
+                const vm = this;
+                app.rpc.loadConfig(function(context) {
+                    vm.uploadBaseUrl = context.context.fss;
+                });
+            }
         },
         methods: {
             showAlert () {

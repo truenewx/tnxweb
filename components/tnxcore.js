@@ -442,6 +442,7 @@ const rpc = app.rpc = {
     owner: tnxcore.app,
     axios: axios,
     loginSuccessRedirectParameter: '_next',
+    context: {},
     getBaseUrl: function() {
         return this.axios.defaults.baseURL;
     },
@@ -462,7 +463,7 @@ const rpc = app.rpc = {
         this.get('/api/meta/context', function(context) {
             _this.setConfig(context);
             if (typeof callback === 'function') {
-                callback();
+                callback(context);
             }
         });
     },
@@ -480,7 +481,7 @@ const rpc = app.rpc = {
         Object.assign(this.axios.defaults.headers.common, config.headers, {
             'X-Requested-With': 'XMLHttpRequest'
         });
-        this.context = config.context || {}; // 其它站点的上下文根路径
+        this.context = config.context || this.context; // 其它站点的上下文根路径
     },
     get: function(url, params, callback, options) {
         if (typeof params === 'function' || (callback && typeof callback === 'object')) {

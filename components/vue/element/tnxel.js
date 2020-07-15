@@ -8,7 +8,11 @@ import dialog from './dialog';
 import {Loading, Message, MessageBox} from 'element-ui';
 import $ from 'jquery';
 
-tnxvue.libs.Vue.use(ElementUI);
+import upload from './upload/component.vue';
+
+const Vue = tnxvue.libs.Vue;
+Vue.use(ElementUI);
+Vue.component('tnxel-upload', upload);
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI}),

@@ -1,9 +1,9 @@
 /* tnxvue.css */
-tv-div, tv-span {
+tnxvue-div, tnxvue-span {
     display: none;
 }
 
-tv-div[mode='v'], tv-span[mode='v'] {
+tnxvue-div[mode='v'], tnxvue-span[mode='v'] {
     visibility: hidden;
 }
 

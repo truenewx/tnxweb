@@ -1,37 +1,34 @@
 <template>
-    <div>
-        <el-dialog
-            :visible.sync="visible"
-            :destroy-on-close="true"
-            :append-to-body="true"
-            :modal="options.modal"
-            :close-on-click-modal="options['close-on-click-modal']"
-            :close-on-press-escape="options['close-on-press-escape']"
-            :show-close="options['show-close']"
-            :center="options.center"
-            :width="width"
-            :top="top"
-            @closed="onClosed">
-            <div slot="title" class="dialog-title" :class="{'border-bottom': title}"
-                v-html="title"></div>
-            <div v-if="content" v-html="content"></div>
-            <tnxel-dialog-content ref="content" v-bind="contentProps" v-else></tnxel-dialog-content>
-            <div slot="footer" class="dialog-footer"
-                :class="{'border-top': buttons && buttons.length}">
-                <el-button v-for="(button, index) in buttons" :type="button.type" :key="index"
-                    @click="btnClick(index)">{{button.caption || button.text}}
-                </el-button>
-            </div>
-        </el-dialog>
-    </div>
-
+    <el-dialog
+        :visible.sync="visible"
+        :destroy-on-close="true"
+        :append-to-body="true"
+        :modal="options.modal"
+        :close-on-click-modal="options['close-on-click-modal']"
+        :close-on-press-escape="options['close-on-press-escape']"
+        :show-close="options['show-close']"
+        :center="options.center"
+        :width="width"
+        :top="top"
+        @closed="onClosed">
+        <div slot="title" class="dialog-title" :class="{'border-bottom': title}"
+            v-html="title"></div>
+        <div v-if="content" v-html="content"></div>
+        <tnxel-dialog-content ref="content" v-bind="contentProps" v-else></tnxel-dialog-content>
+        <div slot="footer" class="dialog-footer"
+            :class="{'border-top': buttons && buttons.length}">
+            <el-button v-for="(button, index) in buttons" :type="button.type" :key="index"
+                @click="btnClick(index)">{{button.caption || button.text}}
+            </el-button>
+        </div>
+    </el-dialog>
 </template>
 
 <script>
     import $ from 'jquery';
 
     export default {
-        name: 'Dialog',
+        name: 'TnxelDialog',
         props: ['title', 'content', 'contentProps', 'buttons'],
         data () {
             return {

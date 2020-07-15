@@ -6,11 +6,11 @@ import Vue from 'vue/dist/vue'; // 默认的引入方式不能直接用于浏览
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 
-Vue.component('tv-div', {
+Vue.component('tnxvue-div', {
     template: '<div><slot></slot></div>'
 });
 
-Vue.component('tv-span', {
+Vue.component('tnxvue-span', {
     template: '<span><slot></slot></span>'
 });
 
