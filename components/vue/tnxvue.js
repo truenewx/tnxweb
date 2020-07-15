@@ -67,10 +67,6 @@ const tnxvue = Object.assign({}, tnxcore, {
         delete options.click;
         this.dialog(component, title, buttons, options, props);
     },
-    component: function(id, definition) {
-        definition.tnx = this;
-        Vue.component(id, definition);
-    }
 });
 
 Object.assign(tnxvue.util, {
