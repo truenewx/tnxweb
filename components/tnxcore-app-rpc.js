@@ -133,22 +133,23 @@ export default {
                         if (loginUrl) {
                             // 默认登录后跳转回当前页面
                             loginUrl += '&' + _this.loginSuccessRedirectParameter + '=' + window.location.href;
-                            const originalRequest = util.getHeader(response.headers, 'Original-Request');
-                            let originalMethod;
-                            let originalUrl;
-                            if (originalRequest) {
-                                const array = originalRequest.split(' ');
-                                originalMethod = array[0];
-                                originalUrl = array[1];
-                            }
-                            // 原始地址是登录验证地址或登出地址，视为框架特有请求，无需应用做个性化处理
-                            if (originalUrl === _this._ensureLoginedUrl || originalUrl.endsWith('/logout')) {
-                                originalUrl = undefined;
-                                originalMethod = undefined;
-                            }
-                            if (_this.toLogin(loginUrl, originalUrl, originalMethod)) {
-                                return;
-                            }
+                        }
+                        const originalRequest = util.getHeader(response.headers, 'Original-Request');
+                        let originalMethod;
+                        let originalUrl;
+                        if (originalRequest) {
+                            const array = originalRequest.split(' ');
+                            originalMethod = array[0];
+                            originalUrl = array[1];
+                        }
+                        // 原始地址是登录验证地址或登出地址，视为框架特有请求，无需应用做个性化处理
+                        if (originalUrl === _this._ensureLoginedUrl || originalUrl.endsWith('/logout')) {
+                            originalUrl = undefined;
+                            originalMethod = undefined;
+                        }
+                        const toLogin = options.toLogin || _this.toLogin;
+                        if (toLogin(loginUrl, originalUrl, originalMethod)) {
+                            return;
                         }
                         break;
                     }
@@ -173,7 +174,7 @@ export default {
                     }
                 }
             }
-            console.error(error.stack);
+            console.error(url + ':\n' + error.stack);
         });
     },
     _redirectRequest: function(response, config, options) {
@@ -240,8 +241,8 @@ export default {
         return message.trim();
     },
     _ensureLoginedUrl: '/authentication/validate',
-    ensureLogined: function(callback) {
-        this.get(this._ensureLoginedUrl, callback);
+    ensureLogined: function(callback, options) {
+        this.get(this._ensureLoginedUrl, callback, options);
     },
     _metas: {},
     getMeta: function(url, callback) {
