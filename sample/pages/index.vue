@@ -11,8 +11,8 @@
             <el-button @click="showOpen">Open</el-button>
         </p>
         <p>
-            <tnxel-upload ref="headImageUpload" v-if="uploadBaseUrl" :base-url="uploadBaseUrl"
-                type="ManagerHeadImage" size="64" :on-unauthorized="toLogin"/>
+            <tnxel-upload ref="headImageUpload" v-if="uploadBaseUrl" type="ManagerHeadImage"
+                size="64"/>
         </p>
     </div>
 </template>
@@ -26,7 +26,6 @@
             return {
                 title: process.env.VUE_APP_TITLE,
                 uploadBaseUrl: app.rpc.context.fss,
-                tnx: tnx,
             };
         },
         created () {
@@ -70,11 +69,6 @@
                     opener: this,
                 });
             },
-            toLogin: function(loginUrl, callback) {
-                app.rpc.get('/validate-login', function() {
-                    app.rpc.get(loginUrl, callback);
-                });
-            }
         }
     }
 </script>

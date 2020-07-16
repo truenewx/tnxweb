@@ -22,29 +22,19 @@
     export default {
         name: 'TnxelUpload',
         props: {
-            tnx: {
-                type: Object,
-                required: true,
-            },
             type: {
                 type: String,
                 required: true,
             },
-            onUnauthorized: {
-                type: Function,
-                required: true,
-            },
             files: [Object, Array],
             size: [String, Number],
-            validateLoginUrl: {
-                type: String,
-                default: '/validate-login',
-            },
         },
         data () {
+            const tnx = window.tnx;
             return {
+                tnx: tnx,
                 id: 'upload-' + new Date().getTime(),
-                action: this.tnx.app.rpc.context.fss + '/upload/' + this.type,
+                action: tnx.app.rpc.context.fss + '/upload/' + this.type,
                 tip: null,
                 fileList: [],
                 params: {
@@ -97,7 +87,7 @@
         },
         methods: {
             beforeUpload: function(file) {
-
+                // 校验限制条件
             },
             onSuccess: function(result, file, fileList) {
                 if (result instanceof Array) {
@@ -106,7 +96,7 @@
             },
             onError: function(error, file, fileList) {
                 if (error.status === 401) {
-
+                    console.error(error.message);
                 }
             },
             getFileUrls: function() {

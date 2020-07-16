@@ -82,19 +82,6 @@ Object.assign(tnxvue.util, {
     }
 });
 
-tnxvue.util.initPage = Function.around(tnxvue.util.initPage, function(initPage, page, container) {
-    if (container.tagName === 'BODY') { // vue不支持以body为容器，故从body下获取第一个div作为容器
-        for (let i = 0; i < container.children.length; i++) {
-            const child = container.children[i];
-            if (child.tagName === 'DIV') {
-                container = child;
-                break;
-            }
-        }
-    }
-    initPage.call(this, page, container);
-});
-
 tnxvue.app.owner = tnxvue;
 
 // 元数据到async-validator组件规则的转换处理
@@ -108,5 +95,20 @@ tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMet
         }
     });
 });
+
+tnxvue.app.page.init = Function.around(tnxvue.app.page.init, function(init, page, container) {
+    if (container.tagName === 'BODY') { // vue不推荐以body为挂载目标，故从body下获取第一个div作为容器
+        for (let i = 0; i < container.children.length; i++) {
+            const child = container.children[i];
+            if (child.tagName === 'DIV') {
+                container = child;
+                break;
+            }
+        }
+    }
+    init.call(this, page, container);
+});
+
+window.tnx = tnxvue;
 
 export default tnxvue;

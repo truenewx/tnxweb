@@ -121,4 +121,6 @@ const tnxel = Object.assign({}, tnxvue, {
 tnxel.util.owner = tnxel;
 tnxel.app.owner = tnxel;
 
+window.tnx = tnxel;
+
 export default tnxel;
