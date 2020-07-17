@@ -163,6 +163,9 @@ const util = {
         }
         return undefined;
     },
+    getDocWidth: function() {
+        return document.documentElement.clientWidth;
+    },
     getDocHeight: function() {
         return document.documentElement.clientHeight;
     },

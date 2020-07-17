@@ -7,7 +7,6 @@
             :on-progress="onProgress"
             :on-success="onSuccess"
             :on-error="onError"
-            :on-preview="onPreview"
             :with-credentials="true"
             list-type="picture-card"
             name="files"
@@ -34,6 +33,10 @@
             </div>
             <div slot="tip" class="el-upload__tip" v-if="tip" v-text="tip"></div>
         </el-upload>
+        <el-dialog class="text-center" :top="preview.top" :width="preview.width"
+            :visible.sync="preview.visible">
+            <img :src="preview.url" style="max-width: 100%;">
+        </el-dialog>
     </div>
 </template>
 
@@ -71,8 +74,12 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 fileList: this.toFileList(this.files), // 本地预览文件集
-                previewVisible: false,
-                previewImageUrl: '',
+                preview: {
+                    visible: false,
+                    url: '',
+                    top: undefined,
+                    width: undefined,
+                },
             };
         },
         computed: {
@@ -253,6 +260,9 @@
                 const $image = $('.el-upload-list__item-thumbnail', $listItem);
                 let imageWidth = $image.width();
                 let imageHeight = $image.height();
+                // 缓存图片高度，预览时需用到
+                file.width = imageWidth;
+                file.height = imageHeight;
                 if (imageWidth > imageHeight) {
                     imageHeight = (imageHeight / imageWidth).toPercent(4);
                     imageWidth = '100%';
@@ -279,12 +289,6 @@
                     console.error(error.message);
                 }
             },
-            onPreview: function(file) {
-                console.info('on preview: ' + file.name);
-            },
-            previewFile: function(file) {
-
-            },
             removeFile: function(file) {
                 this.uploadFiles.remove(function(f) {
                     return file.uid === f.uid;
@@ -292,6 +296,19 @@
                 if (this.uploadFiles.length < this.uploadLimit.number) {
                     // 显示添加按钮
                     $('#' + this.id + ' .el-upload').fadeIn('slow');
+                }
+            },
+            previewFile: function(file) {
+                const dialogPadding = 16;
+                let top = (util.getDocHeight() - file.height) / 2 - dialogPadding;
+                top = Math.max(top, 5); // 最高底部留5px空隙
+                let width = file.width + dialogPadding * 6; // 为关闭按钮留出位置
+                width = Math.min(width, util.getDocWidth() - 10); // 最宽两边各留px空隙
+                this.preview = {
+                    visible: true,
+                    url: file.url,
+                    top: top + 'px',
+                    width: width + 'px',
                 }
             },
             getFileStorageUrls: function() {
