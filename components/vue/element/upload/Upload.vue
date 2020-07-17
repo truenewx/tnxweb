@@ -84,7 +84,7 @@
                         tip += separator + this.tipMessages.number.format(this.uploadLimit.number);
                     }
                     if (this.uploadLimit.capacity > 0) {
-                        const capacity = util.getCapacityCaption(this.uploadLimit.capacity);
+                        const capacity = util.getCapacityCaption(this.uploadLimit.capacity, 2);
                         tip += separator + this.tipMessages.capacity.format(capacity);
                     }
                     if (this.uploadLimit.extensions && this.uploadLimit.extensions.length) {
@@ -168,11 +168,39 @@
                 return file.id;
             },
             validate: function(file) {
-                if (this.uploadFiles.length > this.uploadLimit.number) {
+                // 校验数量
+                if (this.uploadLimit.number > 0 && this.uploadFiles.length > this.uploadLimit.number) {
                     let message = this.tipMessages.number.format(this.uploadLimit.number);
                     message += '，多余的文件未加入上传队列';
                     tnx.error(message);
                     return false;
+                }
+                // 校验容量大小
+                if (this.uploadLimit.capacity > 0 && file.size > this.uploadLimit.capacity) {
+                    const capacity = util.getCapacityCaption(this.uploadLimit.capacity);
+                    let message = this.tipMessages.capacity.format(capacity, 2);
+                    message += '，文件"' + file.name + '"大小为' + util.getCapacityCaption(file.size, 2) + '，不符合要求';
+                    tnx.error(message);
+                    return false;
+                }
+                // 校验扩展名
+                if (this.uploadLimit.extensions && this.uploadLimit.extensions.length) {
+                    const extension = file.name.substr(file.name.lastIndexOf('.') + 1);
+                    if (this.uploadLimit.extensionsRejected) { // 扩展名黑名单模式
+                        if (this.uploadLimit.extensions.containsIgnoreCase(extension)) {
+                            const extensions = this.uploadLimit.extensions.join('、');
+                            tnx.error(this.tipMessages.excludedExtensions.format(extensions));
+                            return false;
+                        }
+                    } else { // 扩展名白名单模式
+                        if (!this.uploadLimit.extensions.containsIgnoreCase(extension)) {
+                            const extensions = this.uploadLimit.extensions.join('、');
+                            let message = this.tipMessages.extensions.format(extensions);
+                            message += '，文件"' + file.name + '"不符合要求';
+                            tnx.error(message);
+                            return false;
+                        }
+                    }
                 }
                 return true;
             },

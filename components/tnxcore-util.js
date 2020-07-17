@@ -213,13 +213,14 @@ const util = {
             + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
         return new RegExp(regex).test(s);
     },
-    getCapacityCaption: function(capacity) {
+    getCapacityCaption: function(capacity, scale) {
         if (typeof capacity === 'number') {
+            scale = scale || 0;
             const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
             let series = 0;
             for (series = 0; series < units.length; series++) {
                 if (capacity >= 1024) {
-                    capacity = (capacity / 1024).halfUp(0);
+                    capacity = (capacity / 1024).halfUp(scale);
                 } else {
                     break;
                 }
