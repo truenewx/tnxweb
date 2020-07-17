@@ -12,9 +12,8 @@
             <el-button @click="showOpen">Open</el-button>
         </p>
         <p>
-            <el-col :offset="11">
-                <tnxel-upload ref="headImageUpload" class="text-left" type="ManagerHeadImage"
-                    size="64" v-if="uploadBaseUrl"/>
+            <el-col class="text-left" :offset="11">
+                <tnxel-upload ref="headImageUpload" type="ManagerHeadImage" v-if="uploadBaseUrl"/>
             </el-col>
         </p>
     </div>

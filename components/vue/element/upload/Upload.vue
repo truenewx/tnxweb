@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-upload ref="upload"
+        <el-upload ref="upload" class="d-none"
             :id="id"
             :action="action"
             :before-upload="beforeUpload"
@@ -54,7 +54,6 @@
                 required: true,
             },
             files: [Object, Array],
-            size: [String, Number],
         },
         data () {
             return {
@@ -119,37 +118,35 @@
                 return this.$refs.upload ? this.$refs.upload.uploadFiles : [];
             },
         },
-        created () {
-            const vm = this;
-            rpc.get('/upload-limit/' + this.type, function(uploadLimit) {
-                uploadLimit.number++; // TODO
-                vm.uploadLimit = uploadLimit;
-            }, {
-                base: 'fss'
-            });
-        },
         mounted () {
             const vm = this;
             this.$nextTick(function() {
-                let size = Number(vm.size);
-                if (isNaN(size)) {
-                    size = vm.size;
-                } else {
-                    size = size + 'px';
-                }
-                if (size) {
-                    const $upload = $('#' + vm.id + ' .el-upload');
-                    $upload.css({
-                        width: size,
-                        height: size,
-                    });
+                rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
+                    uploadLimit.number++; // TODO
+                    vm.uploadLimit = uploadLimit;
+                    // 初始化显示尺寸
+                    let uploadSize = undefined;
+                    if (uploadLimit.sizes && uploadLimit.sizes.length) {
+                        uploadSize = uploadLimit.sizes[0];
+                    }
+                    const $container = $('#' + vm.id);
+                    if (uploadSize) {
+                        const $upload = $('.el-upload', $container);
+                        $upload.css({
+                            width: uploadSize.width + 'px',
+                            height: uploadSize.height + 'px',
+                        });
 
-                    let plusSize = $upload.height() / 4;
-                    plusSize = Math.max(16, Math.min(plusSize, 32));
-                    $('.el-icon-plus', $upload).css({
-                        fontSize: plusSize + 'px'
-                    });
-                }
+                        let plusSize = Math.min(uploadSize.width, uploadSize.height) / 4;
+                        plusSize = Math.max(16, Math.min(plusSize, 32));
+                        $('.el-icon-plus', $upload).css({
+                            fontSize: plusSize + 'px'
+                        });
+                    }
+                    $container.removeClass('d-none');
+                }, {
+                    base: 'fss'
+                });
             });
         },
         methods: {
