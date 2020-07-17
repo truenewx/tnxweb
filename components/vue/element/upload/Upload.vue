@@ -168,6 +168,13 @@
                 return file.id;
             },
             validate: function(file) {
+                // 校验文件重复
+                const vm = this;
+                if (this.uploadFiles.contains(function(f) {
+                    return file.uid !== f.raw.uid && vm.getFileId(file) === vm.getFileId(f.raw);
+                })) {
+                    return false;
+                }
                 // 校验数量
                 if (this.uploadLimit.number > 0 && this.uploadFiles.length > this.uploadLimit.number) {
                     let message = this.tipMessages.number.format(this.uploadLimit.number);
@@ -287,7 +294,7 @@
                     $('#' + this.id + ' .el-upload').fadeIn('slow');
                 }
             },
-            getFileUrls: function() {
+            getFileStorageUrls: function() {
 
             }
         }

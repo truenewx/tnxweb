@@ -93,9 +93,17 @@ Object.assign(Element.prototype, {
 
 Object.assign(Array.prototype, {
     contains: function(element) {
-        for (let e of this) {
-            if (e === element) {
-                return true;
+        if (typeof element === 'function') {
+            for (let e of this) {
+                if (element(e)) {
+                    return true;
+                }
+            }
+        } else {
+            for (let e of this) {
+                if (e === element) {
+                    return true;
+                }
             }
         }
         return false;
