@@ -8,11 +8,11 @@ import dialog from './dialog';
 import {Loading, Message, MessageBox} from 'element-ui';
 import $ from 'jquery';
 
-import upload from './upload/component.vue';
+import Upload from './upload/Upload.vue';
 
 const Vue = tnxvue.libs.Vue;
 Vue.use(ElementUI);
-Vue.component('tnxel-upload', upload);
+Vue.component('tnxel-upload', Upload);
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI}),
@@ -52,6 +52,14 @@ const tnxel = Object.assign({}, tnxvue, {
         MessageBox.alert(message, title, options).then(callback);
         this._handleZIndex('.el-message-box__wrapper:last');
     },
+    success (message, callback, options) {
+        options = Object.assign({}, options, {
+            type: 'success',
+        });
+        this._closeMessage();
+        MessageBox.alert(message, '成功', options).then(callback);
+        this._handleZIndex('.el-message-box__wrapper:last');
+    },
     error (message, callback, options) {
         options = Object.assign({}, options, {
             type: 'error',
@@ -64,8 +72,12 @@ const tnxel = Object.assign({}, tnxvue, {
         if (typeof title === 'function') {
             options = callback;
             callback = title;
-            title = '确定';
+            title = '确认';
         }
+        options = Object.assign({}, options, {
+            type: 'info',
+            iconClass: 'el-icon-question',
+        });
         this._closeMessage();
         const promise = MessageBox.confirm(message, title, options);
         if (typeof callback === 'function') {

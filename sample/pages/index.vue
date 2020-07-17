@@ -4,6 +4,7 @@
         <p>首页</p>
         <p>
             <el-button @click="showAlert">Alert</el-button>
+            <el-button @click="showSuccess">Success</el-button>
             <el-button @click="showError">Error</el-button>
             <el-button @click="showConfirm">Confirm</el-button>
             <el-button @click="showToast">Toast</el-button>
@@ -11,8 +12,10 @@
             <el-button @click="showOpen">Open</el-button>
         </p>
         <p>
-            <tnxel-upload ref="headImageUpload" v-if="uploadBaseUrl" type="ManagerHeadImage"
-                size="64"/>
+            <el-col :offset="11">
+                <tnxel-upload ref="headImageUpload" class="text-left" type="ManagerHeadImage"
+                    size="64" v-if="uploadBaseUrl"/>
+            </el-col>
         </p>
     </div>
 </template>
@@ -40,6 +43,11 @@
             showAlert () {
                 tnx.alert('Hello World', function() {
                     console.info('Alerted');
+                });
+            },
+            showSuccess () {
+                tnx.success('Hello World', function() {
+                    console.info('Successed');
                 });
             },
             showError () {

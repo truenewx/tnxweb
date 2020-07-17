@@ -3,19 +3,19 @@
  */
 import $ from 'jquery';
 import tnxvue from '../../tnxvue.js';
-import component from './component.vue';
+import componentDefinition from './Dialog.vue';
 
 const Vue = tnxvue.libs.Vue;
 
 export default function(content, title, buttons, options, contentProps) {
-    let componentOption = {};
+    let componentOptions = {};
     if (this.util.isComponent(content)) {
-        componentOption.components = {
+        componentOptions.components = {
             'tnxel-dialog-content': content
         };
         content = null;
     }
-    let Dialog = Vue.extend(Object.assign({}, component, componentOption));
+    let Dialog = Vue.extend(Object.assign({}, componentDefinition, componentOptions));
 
     const dialogId = 'dialog-' + (new Date().getTime());
     $('body').append('<div id="' + dialogId + '"></div>');

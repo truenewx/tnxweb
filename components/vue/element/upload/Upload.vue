@@ -1,6 +1,7 @@
 <template>
     <div>
-        <el-upload :id="id"
+        <el-upload ref="upload"
+            :id="id"
             :action="action"
             :before-upload="beforeUpload"
             :on-progress="onProgress"
@@ -12,7 +13,9 @@
             name="files"
             :file-list="fileList"
             :data="uploadParams"
-            :headers="uploadHeaders">
+            :headers="uploadHeaders"
+            :multiple="uploadLimit.number > 1"
+            :accept="uploadAccept">
             <i slot="default" class="el-icon-plus"></i>
             <div slot="file" slot-scope="{file}" class="el-upload-list__panel"
                 :data-file-id="getFileId(file)">
@@ -54,7 +57,13 @@
             return {
                 id: 'upload-container-' + new Date().getTime(),
                 action: rpc.context.fss + '/upload/' + this.type,
-                tip: null,
+                uploadLimit: {},
+                tipMessages: {
+                    number: '最多只能上传{0}个文件',
+                    capacity: '单个文件不能超过{0}',
+                    extensions: '只能上传{0}文件',
+                    excludedExtensions: '不能上传{0}文件',
+                },
                 uploadParams: {
                     fileIds: []
                 },
@@ -65,6 +74,52 @@
                 previewVisible: false,
                 previewImageUrl: '',
             };
+        },
+        computed: {
+            tip () {
+                if (this.uploadLimit) {
+                    let tip = '';
+                    const separator = '，';
+                    if (this.uploadLimit.number > 1) {
+                        tip += separator + this.tipMessages.number.format(this.uploadLimit.number);
+                    }
+                    if (this.uploadLimit.capacity > 0) {
+                        const capacity = util.getCapacityCaption(this.uploadLimit.capacity);
+                        tip += separator + this.tipMessages.capacity.format(capacity);
+                    }
+                    if (this.uploadLimit.extensions && this.uploadLimit.extensions.length) {
+                        const extensions = this.uploadLimit.extensions.join('、');
+                        if (this.uploadLimit.extensionsRejected) {
+                            tip += separator + this.tipMessages.excludedExtensions.format(extensions);
+                        } else {
+                            tip += separator + this.tipMessages.extensions.format(extensions);
+                        }
+                    }
+                    if (tip.length > 0) {
+                        tip = tip.substr(separator.length);
+                    }
+                    return tip;
+                }
+                return undefined;
+            },
+            uploadAccept () {
+                if (this.uploadLimit && this.uploadLimit.mimeTypes) {
+                    return this.uploadLimit.mimeTypes.join(',');
+                }
+                return undefined;
+            },
+            uploadFiles () {
+                return this.$refs.upload ? this.$refs.upload.uploadFiles : [];
+            },
+        },
+        created () {
+            const vm = this;
+            rpc.get('/upload-limit/' + this.type, function(uploadLimit) {
+                uploadLimit.number++; // TODO
+                vm.uploadLimit = uploadLimit;
+            }, {
+                base: 'fss'
+            });
         },
         mounted () {
             const vm = this;
@@ -106,34 +161,51 @@
                 return [];
             },
             getFileId: function(file) {
-                if (!file.id) { // 文件类型+文件名+文件大小+最后修改时间，几乎可以唯一区分一个文件，重复的概率极低
+                if (!file.id) {
+                    // 文件类型+文件名+文件大小+最后修改时间，几乎可以唯一区分一个文件，重复的概率极低，即使重复也不破坏业务一致性和完整性
                     file.id = util.md5(file.type + '-' + file.name + '-' + file.size + '-' + file.lastModified);
                 }
                 return file.id;
             },
+            validate: function(file) {
+                if (this.uploadFiles.length > this.uploadLimit.number) {
+                    let message = this.tipMessages.number.format(this.uploadLimit.number);
+                    message += '，多余的文件未加入上传队列';
+                    tnx.error(message);
+                    return false;
+                }
+                return true;
+            },
             beforeUpload: function(file) {
-                // 校验限制条件
-                const vm = this;
-                return new Promise(function(resolve, reject) {
-                    rpc.ensureLogined(function() {
-                        resolve(file);
-                    }, {
-                        base: 'fss',
-                        toLogin: function(loginFormUrl, originalUrl, originalMethod) {
-                            // 此时已可知在CAS服务器上未登录，即未登录任一服务
-                            reject(file);
-                            // 从fss服务一定无法取得登录表单地址，改为从当前服务获取
-                            rpc.get('/authentication/login-url', function(loginUrl) {
-                                // 默认登录后跳转回当前页面
-                                loginUrl += '&' + rpc.loginSuccessRedirectParameter + '=' + window.location.href;
-                                rpc.toLogin(loginUrl, vm.action, 'POST');
-                            });
-                            return true;
-                        }
+                if (this.validate(file)) {
+                    const vm = this;
+                    return new Promise(function(resolve, reject) {
+                        // 确保在fss服务中已登录
+                        rpc.ensureLogined(function() {
+                            resolve(file);
+                        }, {
+                            base: 'fss',
+                            toLogin: function(loginFormUrl, originalUrl, originalMethod) {
+                                // 此时已可知在CAS服务器上未登录，即未登录任一服务
+                                reject(file);
+                                // 从fss服务一定无法取得登录表单地址，改为从当前服务获取
+                                rpc.get('/authentication/login-url', function(loginUrl) {
+                                    // 默认登录后跳转回当前页面
+                                    loginUrl += '&' + rpc.loginSuccessRedirectParameter + '=' + window.location.href;
+                                    rpc.toLogin(loginUrl, vm.action, 'POST');
+                                });
+                                return true;
+                            }
+                        });
                     });
-                });
+                }
+                return false;
             },
             onProgress: function(event, file, fileList) {
+                if (fileList.length >= this.uploadLimit.number) {
+                    // 隐藏添加按钮
+                    $('#' + this.id + ' .el-upload').fadeOut('slow');
+                }
                 const $container = $('#' + this.id);
                 const $upload = $('.el-upload', $container);
                 const fileId = this.getFileId(file);
@@ -160,11 +232,11 @@
                     width: imageWidth,
                     height: imageHeight,
                 });
-                this.fileList = fileList;
             },
             onSuccess: function(uploadedFiles, file, fileList) {
                 if (uploadedFiles instanceof Array) {
                     const uploadedFile = uploadedFiles[0]; // 该组件为单文件上传模式
+                    file.storageUrl = uploadedFile.storageUrl;
                 }
             },
             onError: function(error, file, fileList) {
@@ -179,9 +251,13 @@
 
             },
             removeFile: function(file) {
-                this.fileList.remove(function(f) {
+                this.uploadFiles.remove(function(f) {
                     return file.uid === f.uid;
                 });
+                if (this.uploadFiles.length < this.uploadLimit.number) {
+                    // 显示添加按钮
+                    $('#' + this.id + ' .el-upload').fadeIn('slow');
+                }
             },
             getFileUrls: function() {
 
@@ -196,6 +272,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        margin-bottom: 8px;
     }
 
     .el-upload-list--picture-card {

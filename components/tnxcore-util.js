@@ -46,7 +46,17 @@ Object.assign(String.prototype, {
     replaceAll: function(findText, replaceText) {
         const regex = new RegExp(findText, 'g');
         return this.replace(regex, replaceText);
-    }
+    },
+    format: function(args) {
+        if (!(args instanceof Array)) {
+            args = arguments;
+        }
+        let s = this;
+        for (let i = 0; i < args.length; i++) {
+            s = s.replaceAll('\\{' + i + '\\}', args[i]);
+        }
+        return s;
+    },
 });
 
 Object.assign(Number.prototype, {
@@ -55,12 +65,12 @@ Object.assign(Number.prototype, {
      * @param scale 精度，即小数点后的位数
      * @returns {number} 四舍五入后的结果数值
      */
-    toFixed: function(scale) {
+    halfUp: function(scale) {
         const p = Math.pow(10, scale);
         return Math.round(this * p) / p;
     },
     toPercent: function(scale) {
-        return (this * 100).toFixed(scale) + "%";
+        return (this * 100).halfUp(scale) + "%";
     }
 });
 
@@ -202,6 +212,21 @@ const util = {
             + '((/?)|'
             + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
         return new RegExp(regex).test(s);
+    },
+    getCapacityCaption: function(capacity) {
+        if (typeof capacity === 'number') {
+            const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            let series = 0;
+            for (series = 0; series < units.length; series++) {
+                if (capacity >= 1024) {
+                    capacity = (capacity / 1024).halfUp(0);
+                } else {
+                    break;
+                }
+            }
+            return capacity + units[series];
+        }
+        return undefined;
     },
 };
 
