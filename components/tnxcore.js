@@ -25,8 +25,11 @@ const tnxcore = {
             callback();
         }
     },
+    success: function(message, callback) {
+        this.alert(message, '成功', callback);
+    },
     error: function(message, callback) {
-        this.alert('错误', message, callback);
+        this.alert(message, '错误', callback);
     },
     confirm: function(message, title, callback) {
         if (typeof title === 'function') {

@@ -18,7 +18,7 @@ const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI}),
     dialog () {
         this._closeMessage();
-        dialog.apply(tnxel, arguments);
+        dialog.apply(this, arguments);
     },
     _closeMessage: function() {
         Message.closeAll();
