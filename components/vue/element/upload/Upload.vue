@@ -72,7 +72,7 @@
                 uploadHeaders: {
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                fileList: this.toFileList(this.files), // 本地预览文件集
+                fileList: this.getFileList(),
                 preview: {
                     visible: false,
                     url: '',
@@ -149,16 +149,22 @@
             });
         },
         methods: {
-            toFileList: function(uploadedFiles) {
-                if (uploadedFiles) {
-                    if (typeof uploadedFiles === 'object') {
-                        uploadedFiles = [uploadedFiles];
+            getFileList: function() {
+                let initialFiles = this.files;
+                if (initialFiles) {
+                    if (typeof initialFiles === 'object') {
+                        initialFiles = [initialFiles];
                     }
-                    if (uploadedFiles instanceof Array) {
-                        uploadedFiles.forEach(file => {
-                            file.url = file.thumbnailReadUrl || file.readUrl;
+                    if (initialFiles instanceof Array) {
+                        const fileList = [];
+                        initialFiles.forEach(file => {
+                            fileList.push({
+                                name: file.name,
+                                url: 'http:' + (file.thumbnailReadUrl || file.readUrl),
+                                storageUrl: file.storageUrl,
+                            });
                         });
-                        return uploadedFiles;
+                        return fileList;
                     }
                 }
                 return [];
@@ -365,6 +371,10 @@
 
     .el-upload-list--picture-card .el-upload-list__item-actions {
         font-size: 1rem;
+    }
+
+    .el-form-item__content .el-upload__tip {
+        line-height: 1;
     }
 
 </style>
