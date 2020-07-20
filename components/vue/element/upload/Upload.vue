@@ -143,6 +143,12 @@
                         });
                     }
                     $container.removeClass('d-none');
+
+                    if (vm.fileList && vm.fileList.length) {
+                        vm.fileList.forEach(function(file) {
+                            vm._resizeImage(file, vm.fileList);
+                        });
+                    }
                 }, {
                     base: 'fss'
                 });
@@ -171,8 +177,12 @@
             },
             getFileId: function(file) {
                 if (!file.id) {
-                    // 文件类型+文件名+文件大小+最后修改时间，几乎可以唯一区分一个文件，重复的概率极低，即使重复也不破坏业务一致性和完整性
-                    file.id = util.md5(file.type + '-' + file.name + '-' + file.size + '-' + file.lastModified);
+                    if (file.url) { // 有URL的文件通过URL即可唯一确定
+                        file.id = util.md5(file.url);
+                    } else {
+                        // 没有URL的文件，通过文件类型+文件名+文件大小+最后修改时间，几乎可以唯一区分一个文件，重复的概率极低，即使重复也不破坏业务一致性和完整性
+                        file.id = util.md5(file.type + '-' + file.name + '-' + file.size + '-' + file.lastModified);
+                    }
                 }
                 return file.id;
             },
@@ -180,7 +190,8 @@
                 // 校验文件重复
                 const vm = this;
                 if (this.uploadFiles.contains(function(f) {
-                    return file.uid !== f.raw.uid && vm.getFileId(file) === vm.getFileId(f.raw);
+                    const raw = f.raw ? f.raw : f;
+                    return file.uid !== raw.uid && vm.getFileId(file) === vm.getFileId(raw);
                 })) {
                     return false;
                 }
@@ -246,9 +257,12 @@
                 return false;
             },
             onProgress: function(event, file, fileList) {
+                this._resizeImage(file, fileList);
+            },
+            _resizeImage: function(file, fileList) {
                 if (fileList.length >= this.uploadLimit.number) {
                     // 隐藏添加按钮
-                    $('#' + this.id + ' .el-upload').fadeOut('slow');
+                    $('#' + this.id + ' .el-upload').fadeOut(1000);
                 }
                 const $container = $('#' + this.id);
                 const $upload = $('.el-upload', $container);
@@ -297,7 +311,7 @@
                 });
                 if (this.uploadFiles.length < this.uploadLimit.number) {
                     // 显示添加按钮
-                    $('#' + this.id + ' .el-upload').fadeIn('slow');
+                    $('#' + this.id + ' .el-upload').fadeIn(1000);
                 }
             },
             previewFile: function(file) {
