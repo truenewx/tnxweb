@@ -122,7 +122,6 @@
             const vm = this;
             this.$nextTick(function() {
                 rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
-                    uploadLimit.number++; // TODO
                     vm.uploadLimit = uploadLimit;
                     // 初始化显示尺寸
                     let uploadSize = undefined;
@@ -248,8 +247,7 @@
                 const $container = $('#' + this.id);
                 const $upload = $('.el-upload', $container);
                 const fileId = this.getFileId(file);
-                const $panel = $('.el-upload-list__panel[data-file-id="' + fileId + '"]', $container);
-                const $listItem = $panel.parent();
+                const $listItem = $('.el-upload-list__panel[data-file-id="' + fileId + '"]', $container).parent();
                 $listItem.css({
                     width: $upload.css('width'),
                     height: $upload.css('height'),
@@ -257,18 +255,19 @@
                 const $image = $('.el-upload-list__item-thumbnail', $listItem);
                 let imageWidth = $image.width();
                 let imageHeight = $image.height();
-                // 缓存图片高度，预览时需用到
+                // 缓存图片尺寸，预览时需用到
                 file.width = imageWidth;
                 file.height = imageHeight;
-                if (imageWidth > imageHeight) {
-                    imageHeight = (imageHeight / imageWidth).toPercent(4);
-                    imageWidth = '100%';
-                } else if (imageWidth < imageHeight) {
-                    imageWidth = (imageWidth / imageHeight).toPercent(4);
-                    imageHeight = '100%';
+                const imageRatio = imageWidth / imageHeight; // 图片宽高比
+                const boxRatio = $upload.outerWidth() / $upload.outerHeight(); // 缩略框宽高比
+                if (boxRatio > imageRatio) {
+                    // 缩略框的宽高比大于图片宽高比，说明等比缩放后，缩略框比图片更宽或更矮，此时应保持两者高度一致
+                    imageHeight = $upload.height();
+                    imageWidth = imageHeight * imageRatio;
                 } else {
-                    imageWidth = '100%';
-                    imageHeight = '100%';
+                    // 否则，说明等比缩放后，缩略框比图片更窄或更高，此时应保持两者宽度一致。宽高比相等是满足此种情况的特例
+                    imageWidth = $upload.width();
+                    imageHeight = imageWidth / imageRatio;
                 }
                 $image.css({
                     width: imageWidth,
