@@ -40,7 +40,7 @@
                     'close-on-press-escape': true, // 是否可以通过按下 ESC 关闭对话框
                     'show-close': true, // 是否显示关闭按钮
                     center: false, // 是否对头部和底部采用居中布局
-                    width: '422px', // 对话框宽度，默认与MessageBox的宽度一致
+                    width: '512px',
                     // 以上均为element的Dialog组件配置项
                     onShown: undefined, // 对话框展示后的事件回调
                 },
@@ -131,5 +131,13 @@
 
     .dialog-footer {
         padding: 1rem;
+    }
+
+    .el-message-box {
+        width: unset;
+        min-width: 256px;
+        max-width: 512px;
+        word-wrap: break-word;
+        word-break: normal;
     }
 </style>

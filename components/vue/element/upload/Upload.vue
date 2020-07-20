@@ -297,9 +297,9 @@
             previewFile: function(file) {
                 const dialogPadding = 16;
                 let top = (util.getDocHeight() - file.height) / 2 - dialogPadding;
-                top = Math.max(top, 5); // 最高底部留5px空隙
+                top = Math.max(top, 5); // 最高顶部留5px空隙
                 let width = file.width + dialogPadding * 6; // 为关闭按钮留出位置
-                width = Math.min(width, util.getDocWidth() - 10); // 最宽两边各留px空隙
+                width = Math.min(width, util.getDocWidth() - 10); // 最宽两边各留10px空隙
                 this.preview = {
                     visible: true,
                     url: file.url,
@@ -307,8 +307,24 @@
                     width: width + 'px',
                 }
             },
-            getFileStorageUrls: function() {
-
+            /**
+             * 获取已上传文件的存储地址集合
+             * @return {Promise<已全部上传完毕的回调, 未全部上传完毕的回调>}
+             */
+            getStorageUrls: function() {
+                const vm = this;
+                return new Promise(function(resolve, reject) {
+                    const storageUrls = [];
+                    for (let file of vm.uploadFiles) {
+                        if (file.storageUrl) {
+                            storageUrls.push(file.storageUrl);
+                        } else {
+                            reject(file);
+                            return;
+                        }
+                    }
+                    resolve(storageUrls);
+                });
             }
         }
     }

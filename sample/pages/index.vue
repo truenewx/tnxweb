@@ -13,7 +13,9 @@
         </p>
         <p>
             <el-col class="text-left" :offset="11">
-                <tnxel-upload ref="headImageUpload" type="ManagerHeadImage" v-if="uploadBaseUrl"/>
+                <tnxel-upload class="mb-2" ref="headImageUpload" type="ManagerHeadImage"
+                    v-if="uploadBaseUrl"/>
+                <el-button type="primary" @click="uploadOk">确定</el-button>
             </el-col>
         </p>
     </div>
@@ -76,6 +78,15 @@
                     opener: this,
                 });
             },
+            uploadOk () {
+                this.$refs.headImageUpload.getStorageUrls().then(function(storageUrls) {
+                    if (storageUrls.length) {
+                        tnx.success(storageUrls.join('\n'));
+                    }
+                }).catch(function(file) {
+                    tnx.alert('文件"' + file.name + '"还未上传完毕，请稍候');
+                });
+            }
         }
     }
 </script>
