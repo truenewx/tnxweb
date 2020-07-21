@@ -10,6 +10,7 @@
         :center="options.center"
         :width="width"
         :top="top"
+        :before-close="beforeClose"
         @closed="onClosed">
         <div slot="title" class="dialog-title" :class="{'border-bottom': title}"
             v-html="title"></div>
@@ -33,7 +34,7 @@
         data () {
             return {
                 visible: true,
-                height: 0,
+                top: '40vh',
                 options: {
                     modal: true, // 是否需要遮罩层
                     'close-on-click-modal': false, // 是否可以通过点击遮罩层关闭对话框
@@ -54,22 +55,20 @@
                     return this.options.width;
                 }
             },
-            top () {
-                const docHeight = $(document).height();
-                if (this.height >= docHeight) { // 如果对话框高度大于文档高度，则top偏移为0
-                    return '0px';
-                }
-                // 对话框高度占文档高度的比例
-                const heightRatio = this.height / docHeight;
-                // 为了获得更好的视觉舒适度，根据高度比确定对话框中线位置：从33vh->50vh
-                const baseline = 33 + (50 - 33) * heightRatio;
-                return 'calc(' + baseline + 'vh - ' + this.height / 2 + 'px)';
-            }
         },
         mounted () {
             this.$nextTick(function() {
-                // 根据对话框高度计算top而不是直接在此计算top，直接计算的话，对话框在被关闭后会出现莫名的闪现情况
-                this.height = $('.el-dialog:last').height();
+                const height = $('.el-dialog:last').height();
+                const docHeight = window.tnx.util.getDocHeight();
+                // 对话框高度占文档高度的比例
+                const heightRatio = height / docHeight;
+                // 为了获得更好的视觉舒适度，根据高度比确定对话框中线位置：从33vh->50vh
+                const baseline = 33 + (50 - 33) * heightRatio;
+                const baseTop = docHeight * baseline / 100;
+                let top = (baseTop - height / 2);
+                top = Math.max(top, 5); // 至少顶部留5px空隙
+                this.top = top + 'px';
+
                 if (typeof this.options.onShown === 'function') {
                     this.options.onShown.call(this);
                 }
@@ -89,11 +88,21 @@
                 this.close();
             },
             close () {
-                if (!this.content) { // 避免组件内容在关闭时被再次加载
-                    const height = $('.el-dialog__wrapper:last .el-dialog__body').height();
-                    this.content = '<div style="height: ' + height + 'px"></div>';
+                const vm = this;
+                this.beforeClose(function() {
+                    vm.visible = false;
+                });
+            },
+            beforeClose (done) {
+                if (typeof this.options.beforeClose === 'function') {
+                    if (!this.options.beforeClose()) {
+                        return;
+                    }
                 }
-                this.visible = false;
+                // 避免组件内容在关闭时被再次加载，并出现闪现现象
+                const height = $('.el-dialog__wrapper:last .el-dialog__body').height();
+                this.content = '<div style="height: ' + height + 'px"></div>';
+                done();
             },
             onClosed () {
                 $('.el-dialog__wrapper:last').remove();
