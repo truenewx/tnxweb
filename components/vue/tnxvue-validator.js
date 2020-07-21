@@ -40,6 +40,7 @@ function getRule (validationName, validationValue, fieldMeta) {
                             return callback(new Error(message));
                         }
                     }
+                    return callback();
                 }
             }
             break;
@@ -57,6 +58,7 @@ function getRule (validationName, validationValue, fieldMeta) {
                             }
                         }
                     }
+                    return callback();
                 }
             }
             break;
