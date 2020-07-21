@@ -57,7 +57,7 @@ function applyGrantedItemToItems (authority, item, items) {
 }
 
 function findItem (path, items, callback) {
-    if (path && items && items.length) {
+    if (path && items && items.length && typeof callback === 'function') {
         for (let item of items) {
             if (item.path && item.path.startsWith(path)) {
                 return callback(item);
@@ -111,6 +111,13 @@ Menu.prototype.getBreadcrumbItems = function(path) {
         }
     });
     return breadcrumbItems || [];
+};
+
+Menu.prototype.isGranted = function(path) {
+    const _this = this;
+    return findItem(path, this.items, (item, operation, sub) => {
+        return isGranted(_this.authority, sub || operation || item);
+    });
 };
 
 Menu.prototype.loadGrantedItems = function(callback) {
