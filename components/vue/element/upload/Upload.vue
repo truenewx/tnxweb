@@ -33,10 +33,6 @@
             </div>
             <div slot="tip" class="el-upload__tip" v-if="tip" v-text="tip"></div>
         </el-upload>
-        <el-dialog class="text-center" :top="preview.top" :width="preview.width"
-            :visible.sync="preview.visible">
-            <img :src="preview.url" style="max-width: 100%;">
-        </el-dialog>
     </div>
 </template>
 
@@ -262,7 +258,7 @@
             _resizeImage: function(file, fileList) {
                 if (fileList.length >= this.uploadLimit.number) {
                     // 隐藏添加按钮
-                    $('#' + this.id + ' .el-upload').fadeOut(1000);
+                    $('#' + this.id + ' .el-upload').hide();
                 }
                 const $container = $('#' + this.id);
                 const $upload = $('.el-upload', $container);
@@ -272,6 +268,7 @@
                     width: $upload.css('width'),
                     height: $upload.css('height'),
                 });
+                $listItem.parent().css({'min-height': $upload.outerHeight(true)});
                 const $image = $('.el-upload-list__item-thumbnail', $listItem);
                 let imageWidth = $image.width();
                 let imageHeight = $image.height();
@@ -311,14 +308,17 @@
                 });
                 if (this.uploadFiles.length < this.uploadLimit.number) {
                     // 显示添加按钮
-                    $('#' + this.id + ' .el-upload').fadeIn(1000);
+                    const $upload = $('#' + this.id + ' .el-upload');
+                    setTimeout(function() {
+                        $upload.show();
+                    }, 500);
                 }
             },
             previewFile: function(file) {
                 const dialogPadding = 16;
                 let top = (util.getDocHeight() - file.height) / 2 - dialogPadding;
                 top = Math.max(top, 5); // 最高顶部留5px空隙
-                let width = file.width + dialogPadding * 6; // 为关闭按钮留出位置
+                let width = file.width;
                 width = Math.min(width, util.getDocWidth() - 10); // 最宽两边各留10px空隙
                 this.preview = {
                     visible: true,
@@ -326,6 +326,10 @@
                     top: top + 'px',
                     width: width + 'px',
                 }
+                const content = '<img src="' + file.url + '" style="max-width: 100%;">';
+                tnx.dialog(content, '', [], {
+                    width: width + 'px'
+                });
             },
             /**
              * 获取已上传文件的存储地址集合
