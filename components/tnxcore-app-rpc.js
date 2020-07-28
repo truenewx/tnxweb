@@ -36,8 +36,8 @@ export default {
         if (config.loginSuccessRedirectParameter) {
             this.loginSuccessRedirectParameter = config.loginSuccessRedirectParameter;
         }
-        if (config.context) { // 其它站点的上下文根路径
-            this.context = config.context;
+        if (config.apps) { // 其它站点的上下文根路径
+            this.apps = config.apps;
         }
         // 不以斜杠开头说明基本路径为跨域访问路径
         if (!axios.defaults.baseURL.startsWith('/')) {
@@ -85,7 +85,7 @@ export default {
     },
     request: function(url, options) {
         if (options.base) {
-            const baseUrl = this.context[options.base];
+            const baseUrl = this.apps[options.base];
             if (baseUrl) {
                 url = baseUrl + url;
             }

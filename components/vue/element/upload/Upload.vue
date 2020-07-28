@@ -54,7 +54,7 @@
         data () {
             return {
                 id: 'upload-container-' + new Date().getTime(),
-                action: rpc.context.fss + '/upload/' + this.type,
+                action: rpc.apps.fss + '/upload/' + this.type,
                 uploadLimit: {},
                 tipMessages: {
                     number: '最多只能上传{0}个文件',

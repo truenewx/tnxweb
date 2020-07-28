@@ -29,14 +29,14 @@
         data () {
             return {
                 title: process.env.VUE_APP_TITLE,
-                uploadBaseUrl: app.rpc.context.fss,
+                uploadBaseUrl: app.rpc.apps.fss,
             };
         },
         created () {
             if (!this.uploadBaseUrl) {
                 const vm = this;
                 app.rpc.loadConfig(function(context) {
-                    vm.uploadBaseUrl = context.context.fss;
+                    vm.uploadBaseUrl = context.apps.fss;
                 });
             }
         },
