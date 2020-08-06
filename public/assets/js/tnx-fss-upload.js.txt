@@ -47,7 +47,7 @@ define(["src/main/webcli/public/assets/js/tnxbs"], function(tnx) {
             throw new Error("FssUpload缺少type配置项");
         }
         var _this = this;
-        if (!tnx.app.rpc.context.fss) { // fss上下文根路径没设置则等待后再重试
+        if (!tnx.app.rpc.apps.fss) { // fss上下文根路径没设置则等待后再重试
             if (++this.baseRetry > 10) {
                 throw new Error("FssUpload无法获取fss上下文根路径配置项");
             }

@@ -4,7 +4,7 @@ import axios from "axios";
 
 export default {
     loginSuccessRedirectParameter: '_next',
-    context: {},
+    apps: {},
     getBaseUrl: function() {
         return axios.defaults.baseURL;
     },
