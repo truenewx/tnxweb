@@ -2,7 +2,8 @@
 /**
  * 基于Vue的扩展支持
  */
-import Vue from 'vue/dist/vue'; // 默认的引入方式不能直接用于浏览器
+import Vue from 'vue';
+import Vue_UMD from 'vue/dist/vue';
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 
@@ -14,12 +15,12 @@ Vue.component('tnxvue-span', {
     template: '<span><slot></slot></span>'
 });
 
-function getDefaultDialogButtons (type, callback) {
+function getDefaultDialogButtons(type, callback) {
     if (type) {
         if (type === 'confirm') {
             return [{
                 text: '取消',
-                click (close) {
+                click(close) {
                     if (typeof callback === 'function') {
                         return callback.call(this, false, close);
                     }
@@ -27,7 +28,7 @@ function getDefaultDialogButtons (type, callback) {
             }, {
                 text: '确定',
                 type: 'primary',
-                click (close) {
+                click(close) {
                     if (typeof callback === 'function') {
                         return callback.call(this, true, close);
                     }
@@ -37,7 +38,7 @@ function getDefaultDialogButtons (type, callback) {
             return [{
                 text: '确定',
                 type: 'primary',
-                click (close) {
+                click(close) {
                     if (typeof callback === 'function') {
                         return callback.call(this, close);
                     }
@@ -49,12 +50,12 @@ function getDefaultDialogButtons (type, callback) {
 }
 
 const tnxvue = Object.assign({}, tnxcore, {
-    libs: Object.assign({}, tnxcore.libs, {Vue}),
-    dialog (content, title, buttons, options, contentProps) {
+    libs: Object.assign({}, tnxcore.libs, {Vue, Vue_UMD}),
+    dialog(content, title, buttons, options, contentProps) {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');
     },
-    open (component, props, options) {
+    open(component, props, options) {
         if (component.methods.dialog) {
             options = Object.assign({}, component.methods.dialog(), options);
         } else {
@@ -85,8 +86,8 @@ Object.assign(tnxvue.util, {
 tnxvue.app.owner = tnxvue;
 
 // 元数据到async-validator组件规则的转换处理
-tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
-    getMeta.call(tnxvue.app.rpc, url, function(meta) {
+tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function (getMeta, url, callback) {
+    getMeta.call(tnxvue.app.rpc, url, function (meta) {
         if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
             meta.rules = validator.getRules(meta);
         }
@@ -96,7 +97,7 @@ tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMet
     });
 });
 
-tnxvue.app.page.init = Function.around(tnxvue.app.page.init, function(init, page, container) {
+tnxvue.app.page.init = Function.around(tnxvue.app.page.init, function (init, page, container) {
     if (container.tagName === 'BODY') { // vue不推荐以body为挂载目标，故从body下获取第一个div作为容器
         for (let i = 0; i < container.children.length; i++) {
             const child = container.children[i];
