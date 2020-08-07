@@ -1,6 +1,6 @@
 {
   "name": "@truenewx/tnxweb",
-  "version": "0.6.7",
+  "version": "2.2.0",
   "description": "互联网技术解决方案：Web扩展支持",
   "private": false,
   "publishConfig": {
@@ -13,7 +13,7 @@
     "tnx"
   ],
   "author": "truenewx",
-  "license": "Apache License 2.0",
+  "license": "Apache-2.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --modern"
