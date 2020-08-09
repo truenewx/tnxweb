@@ -75,3 +75,12 @@ el-button {
 .el-dialog--center .el-dialog__body {
     text-align: center;
 }
+
+.el-table td.tnxel-table_tags {
+    padding: 7px 0;
+}
+
+.el-table td.tnxel-table_tags .el-tag:not(:last-child),
+.el-table td.tnxel-table_tags .tnxel-table_tag:not(:last-child) {
+    margin: 3px 6px 3px 0;
+}

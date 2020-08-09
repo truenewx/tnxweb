@@ -59,14 +59,29 @@ function applyGrantedItemToItems (authority, item, items) {
 function findItem (path, items, callback) {
     if (path && items && items.length && typeof callback === 'function') {
         for (let item of items) {
-            if (item.path && item.path.startsWith(path)) {
+            // 去掉可能的请求参数部分
+            const index = path.indexOf('?');
+            if (index >= 0) {
+                path = path.substr(index);
+            }
+            // 检查直接路径是否匹配
+            if (item.path && item.path === path) {
                 return callback(item);
             }
             // 直接路径不匹配，则尝试在包含的操作中查找
             if (item.operations && item.operations.length) {
                 for (let operation of item.operations) {
-                    if (operation.path && operation.path.startsWith(path)) {
-                        return callback(item, operation);
+                    if (operation.path) {
+                        let pattern = operation.path.replace(/\/:[a-zA-Z0-9_]+/g, '/[a-zA-Z0-9_\\*]+');
+                        if (pattern === operation.path) { // 无路径参数
+                            if (operation.path === path) {
+                                return callback(item, operation);
+                            }
+                        } else { // 有路径参数
+                            if (new RegExp(pattern, 'g').test(path)) {
+                                return callback(item, operation);
+                            }
+                        }
                     }
                 }
             }
