@@ -2,7 +2,7 @@
  * 菜单组件
  * 菜单配置中的权限配置不是服务端权限判断的依据，仅用于生成具有权限的客户端菜单，以及分配权限时展示可分配的权限范围
  */
-function isGranted (authority, item) {
+function isGranted(authority, item) {
     if (item.rank || item.permission) {
         if (item.rank) {
             if (authority.rank !== item.rank) {
@@ -20,7 +20,7 @@ function isGranted (authority, item) {
     return true;
 }
 
-function applyGrantedItemToItems (authority, item, items) {
+function applyGrantedItemToItems(authority, item, items) {
     const granted = isGranted(authority, item);
     if (granted === true) { // 授权匹配
         items.push(Object.assign({}, item));
@@ -56,7 +56,7 @@ function applyGrantedItemToItems (authority, item, items) {
     }
 }
 
-function findItem (path, items, callback) {
+function findItem(path, items, callback) {
     if (path && items && items.length && typeof callback === 'function') {
         for (let item of items) {
             // 去掉可能的请求参数部分
@@ -97,7 +97,7 @@ function findItem (path, items, callback) {
     return undefined;
 }
 
-const Menu = function Menu (config) {
+const Menu = function Menu(config) {
     this.items = config.items;
     this._url = config.url;
     this._grantedItems = null;
@@ -108,13 +108,43 @@ const Menu = function Menu (config) {
     };
 }
 
-Menu.prototype.getItem = function(path) {
+Menu.prototype.getItem = function (path) {
     return findItem(path, this.items, (item, operation, sub) => {
         return sub ? sub : item;
     });
 };
 
-Menu.prototype.getBreadcrumbItems = function(path) {
+function findAssignableItems(items) {
+    const assignableItems = [];
+    items.forEach(item => {
+        let assignableItem = {
+            subs: [],
+            operations: [],
+        };
+        if (item.permission) {
+            Object.assign(assignableItem, item, {
+                subs: [],
+                operations: [],
+            });
+        }
+        if (item.subs && item.subs.length) {
+            assignableItem.subs = findAssignableItems(item.subs);
+        }
+        if (item.operations && item.operations.length) {
+            assignableItem.operations = findAssignableItems(item.operations);
+        }
+        if (assignableItem.caption || assignableItem.subs.length || assignableItem.operations.length) {
+            assignableItems.push(assignableItem);
+        }
+    });
+    return assignableItems;
+}
+
+Menu.prototype.getAssignableItems = function () {
+    return findAssignableItems(this.items);
+}
+
+Menu.prototype.getBreadcrumbItems = function (path) {
     let breadcrumbItems = findItem(path, this.items, (item, operation, breadcrumbItems) => {
         if (breadcrumbItems && breadcrumbItems.length) {
             breadcrumbItems.unshift(item);
@@ -128,19 +158,19 @@ Menu.prototype.getBreadcrumbItems = function(path) {
     return breadcrumbItems || [];
 };
 
-Menu.prototype.isGranted = function(path) {
+Menu.prototype.isGranted = function (path) {
     const _this = this;
     return findItem(path, this.items, (item, operation, sub) => {
         return isGranted(_this.authority, sub || operation || item);
     });
 };
 
-Menu.prototype.loadGrantedItems = function(callback) {
+Menu.prototype.loadGrantedItems = function (callback) {
     if (this._grantedItems) {
         callback(this._grantedItems);
     } else {
         const _this = this;
-        window.tnx.app.rpc.get(this._url, function(authorities) {
+        window.tnx.app.rpc.get(this._url, function (authorities) {
             authorities.forEach(auth => {
                 switch (auth.kind) {
                     case 'TYPE':
