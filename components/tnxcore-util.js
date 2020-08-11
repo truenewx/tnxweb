@@ -37,17 +37,17 @@ Function.around = function(target, around) {
 
 // 不要在Object.prototype中添加函数，否则vue会报错
 Object.assign(String.prototype, {
-    firstToLowerCase: function() {
+    firstToLowerCase() {
         return this.substring(0, 1).toLowerCase() + this.substring(1);
     },
-    firstToUpperCase: function() {
+    firstToUpperCase() {
         return this.substring(0, 1).toUpperCase() + this.substring(1);
     },
-    replaceAll: function(findText, replaceText) {
+    replaceAll(findText, replaceText) {
         const regex = new RegExp(findText, 'g');
         return this.replace(regex, replaceText);
     },
-    format: function(args) {
+    format(args) {
         if (!(args instanceof Array)) {
             args = arguments;
         }
@@ -65,11 +65,11 @@ Object.assign(Number.prototype, {
      * @param scale 精度，即小数点后的位数
      * @returns {number} 四舍五入后的结果数值
      */
-    halfUp: function(scale) {
+    halfUp(scale) {
         const p = Math.pow(10, scale);
         return Math.round(this * p) / p;
     },
-    toPercent: function(scale) {
+    toPercent(scale) {
         return (this * 100).halfUp(scale) + "%";
     }
 });
@@ -80,7 +80,7 @@ Object.assign(Element.prototype, {
      * @param tagName 标签名
      * @return ChildNode 不是指定标签的第一个子节点，没有则返回undefined
      */
-    getFirstChildWithoutTagName: function(tagName) {
+    getFirstChildWithoutTagName(tagName) {
         const children = this.childNodes;
         for (let i = 0; i < children.length; i++) {
             if (children[i].tagName && children[i].tagName !== tagName.toUpperCase()) {
@@ -92,7 +92,7 @@ Object.assign(Element.prototype, {
 });
 
 Object.assign(Array.prototype, {
-    contains: function(element) {
+    contains(element) {
         if (typeof element === 'function') {
             for (let e of this) {
                 if (element(e)) {
@@ -108,7 +108,7 @@ Object.assign(Array.prototype, {
         }
         return false;
     },
-    containsIgnoreCase: function(element) {
+    containsIgnoreCase(element) {
         if (typeof element === 'string') {
             for (let e of this) {
                 if (typeof e === 'string' && e.toLocaleLowerCase() === element.toLocaleLowerCase()) {
@@ -118,7 +118,7 @@ Object.assign(Array.prototype, {
         }
         return false;
     },
-    remove: function(element) {
+    remove(element) {
         let index = -1;
         if (typeof element === 'function') {
             for (let i = 0; i < this.length; i++) {
@@ -150,26 +150,26 @@ const util = {
      * @param name 头信息名称
      * @returns {undefined|*} 头信息值
      */
-    getHeader: function(headers, name) {
+    getHeader(headers, name) {
         if (headers && name) {
             return headers[name] || headers[name.toLowerCase()];
         }
         return undefined;
     },
-    getMetaContent: function(name) {
+    getMetaContent(name) {
         const meta = document.querySelector('meta[name="' + name + '"]');
         if (meta) {
             return meta.getAttribute('content');
         }
         return undefined;
     },
-    getDocWidth: function() {
+    getDocWidth() {
         return document.documentElement.clientWidth;
     },
-    getDocHeight: function() {
+    getDocHeight() {
         return document.documentElement.clientHeight;
     },
-    maxZIndex: function(elements) {
+    maxZIndex(elements) {
         let result = -1;
         elements.forEach(function(element) {
             const zIndex = Number(element.style.zIndex);
@@ -182,7 +182,7 @@ const util = {
     /**
      * 获取最小的可位于界面顶层的ZIndex
      */
-    minTopZIndex: function(step) {
+    minTopZIndex(step) {
         step = step || 1;
         const maxValue = 2147483584; // 允许的最大值，取各浏览器支持的最大值中的最小一个（Opera）
         const elements = document.body.querySelectorAll('*');
@@ -199,7 +199,7 @@ const util = {
      * @param callback 回调函数
      * @param minTimeout 最少超时时间，单位：毫秒
      */
-    setMinTimeout: function(beginTime, callback, minTimeout) {
+    setMinTimeout(beginTime, callback, minTimeout) {
         if (beginTime instanceof Date) {
             beginTime = beginTime.getTime();
         }
@@ -211,7 +211,7 @@ const util = {
             setTimeout(callback, minTimeout - dTime);
         }
     },
-    isUrl: function(s) {
+    isUrl(s) {
         const regex = '^((https|http|ftp)?://)'
             + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?' //ftp的user@
             + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
@@ -224,7 +224,7 @@ const util = {
             + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
         return new RegExp(regex).test(s);
     },
-    getCapacityCaption: function(capacity, scale) {
+    getCapacityCaption(capacity, scale) {
         if (typeof capacity === 'number') {
             scale = scale || 0;
             const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];

@@ -71,7 +71,6 @@ const tnxvue = Object.assign({}, tnxcore, {
 });
 
 Object.assign(tnxvue.util, {
-    owner: tnxvue,
     /**
      * 判断指定对象是否组件实例
      * @param obj 对象
@@ -83,11 +82,9 @@ Object.assign(tnxvue.util, {
     }
 });
 
-tnxvue.app.owner = tnxvue;
-
 // 元数据到async-validator组件规则的转换处理
-tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function (getMeta, url, callback) {
-    getMeta.call(tnxvue.app.rpc, url, function (meta) {
+tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
+    getMeta.call(tnxvue.app.rpc, url, function(meta) {
         if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
             meta.rules = validator.getRules(meta);
         }
@@ -97,7 +94,7 @@ tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function (getMe
     });
 });
 
-tnxvue.app.page.init = Function.around(tnxvue.app.page.init, function (init, page, container) {
+tnxvue.app.page.init = Function.around(tnxvue.app.page.init, function(init, page, container) {
     if (container.tagName === 'BODY') { // vue不推荐以body为挂载目标，故从body下获取第一个div作为容器
         for (let i = 0; i < container.children.length; i++) {
             const child = container.children[i];

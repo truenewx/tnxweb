@@ -11,7 +11,7 @@ import $ from 'jquery';
 import Upload from './upload/Upload.vue';
 import PermissionTree from "./permission-tree/PermissionTree";
 
-function usePlugin (Vue, plugin) {
+function usePlugin(Vue, plugin) {
     Vue.use(plugin);
     Vue.component('tnxel-upload', Upload);
     Vue.component('tnxel-permission-tree', PermissionTree);
@@ -22,15 +22,15 @@ usePlugin(tnxvue.libs.Vue_UMD, ElementUI_UMD);
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI, ElementUI_UMD}),
-    dialog () {
+    dialog() {
         this._closeMessage();
         dialog.apply(this, arguments);
     },
-    _closeMessage: function() {
+    _closeMessage() {
         Message.closeAll();
         this.closeLoading();
     },
-    _handleZIndex: function(selector) {
+    _handleZIndex(selector) {
         const util = this.util;
         setTimeout(function() {
             const topZIndex = util.minTopZIndex(2);
@@ -45,7 +45,7 @@ const tnxel = Object.assign({}, tnxvue, {
             }
         });
     },
-    alert (message, title, callback, options) {
+    alert(message, title, callback, options) {
         if (typeof title === 'function') {
             options = callback;
             callback = title;
@@ -58,7 +58,7 @@ const tnxel = Object.assign({}, tnxvue, {
         MessageBox.alert(message, title, options).then(callback);
         this._handleZIndex('.el-message-box__wrapper:last');
     },
-    success (message, callback, options) {
+    success(message, callback, options) {
         options = Object.assign({}, options, {
             type: 'success',
         });
@@ -66,7 +66,7 @@ const tnxel = Object.assign({}, tnxvue, {
         MessageBox.alert(message, '成功', options).then(callback);
         this._handleZIndex('.el-message-box__wrapper:last');
     },
-    error (message, callback, options) {
+    error(message, callback, options) {
         options = Object.assign({}, options, {
             type: 'error',
         });
@@ -74,7 +74,7 @@ const tnxel = Object.assign({}, tnxvue, {
         MessageBox.alert(message, '错误', options).then(callback);
         this._handleZIndex('.el-message-box__wrapper:last');
     },
-    confirm (message, title, callback, options) {
+    confirm(message, title, callback, options) {
         if (typeof title === 'function') {
             options = callback;
             callback = title;
@@ -95,7 +95,7 @@ const tnxel = Object.assign({}, tnxvue, {
         }
         this._handleZIndex('.el-message-box__wrapper:last');
     },
-    toast: function(message, timeout, callback, options) {
+    toast(message, timeout, callback, options) {
         if (typeof timeout === 'function') {
             options = callback;
             callback = timeout;
@@ -115,14 +115,7 @@ const tnxel = Object.assign({}, tnxvue, {
         Message(options);
         this._handleZIndex('.el-message:last');
     },
-    loadingInstance: undefined,
-    closeLoading: function() {
-        if (this.loadingInstance) {
-            this.loadingInstance.close();
-            this.loadingInstance = undefined;
-        }
-    },
-    showLoading: function(message, options) {
+    showLoading(message, options) {
         if (typeof message !== 'string') {
             options = message;
             message = undefined;
@@ -131,13 +124,16 @@ const tnxel = Object.assign({}, tnxvue, {
             text: message
         });
         this._closeMessage();
-        this.loadingInstance = Loading.service(options);
+        window.tnx.loadingInstance = Loading.service(options);
         this._handleZIndex('.el-loading-mask');
-    }
+    },
+    closeLoading() {
+        if (window.tnx.loadingInstance) { // 确保绝对的单例
+            window.tnx.loadingInstance.close();
+            window.tnx.loadingInstance = undefined;
+        }
+    },
 });
-
-tnxel.util.owner = tnxel;
-tnxel.app.owner = tnxel;
 
 window.tnx = tnxel;
 

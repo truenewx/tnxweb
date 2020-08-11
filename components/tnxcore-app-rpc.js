@@ -5,7 +5,7 @@ import axios from "axios";
 export default {
     loginSuccessRedirectParameter: '_next',
     apps: {},
-    getBaseUrl: function() {
+    getBaseUrl() {
         return axios.defaults.baseURL;
     },
     /**
@@ -13,7 +13,7 @@ export default {
      * @param baseUrl 获取配置的后端服务器基础路径
      * @param callback 配置初始化后的回调函数
      */
-    loadConfig: function(baseUrl, callback) {
+    loadConfig(baseUrl, callback) {
         if (typeof baseUrl === 'function') {
             callback = baseUrl;
             baseUrl = undefined;
@@ -29,7 +29,7 @@ export default {
             }
         });
     },
-    setConfig: function(config) {
+    setConfig(config) {
         if (config.baseUrl) {
             axios.defaults.baseURL = config.baseUrl;
         }
@@ -48,7 +48,7 @@ export default {
             'X-Requested-With': 'XMLHttpRequest'
         });
     },
-    get: function(url, params, callback, options) {
+    get(url, params, callback, options) {
         if (typeof params === 'function' || (callback && typeof callback === 'object')) {
             options = callback;
             callback = params;
@@ -65,7 +65,7 @@ export default {
             success: callback,
         }));
     },
-    post: function(url, body, callback, options) {
+    post(url, body, callback, options) {
         if (typeof body === 'function' || (callback && typeof callback === 'object')) {
             options = callback;
             callback = body;
@@ -83,7 +83,7 @@ export default {
         });
         this.request(url, options);
     },
-    request: function(url, options) {
+    request(url, options) {
         if (options.base) {
             const baseUrl = this.apps[options.base];
             if (baseUrl) {
@@ -109,7 +109,7 @@ export default {
         }
         this._request(url, config, options);
     },
-    _request: function(url, config, options) {
+    _request(url, config, options) {
         const _this = this;
         axios(url, config).then(function(response) {
             if (_this._redirectRequest(response, config, options)) { // 执行了重定向跳转，则不作后续处理
@@ -177,7 +177,7 @@ export default {
             console.error(url + ':\n' + error.stack);
         });
     },
-    _redirectRequest: function(response, config, options) {
+    _redirectRequest(response, config, options) {
         let redirectUrl = util.getHeader(response.headers, 'Redirect-To');
         if (redirectUrl) { // 指定了重定向地址，则执行重定向操作
             if (this._isIgnored(options, 'Redirect-To')) {
@@ -191,7 +191,7 @@ export default {
         }
         return false;
     },
-    _isIgnored: function(options, type) {
+    _isIgnored(options, type) {
         if (options && options.ignored) {
             if (options.ignored instanceof Array) {
                 return options.ignored.contains(type);
@@ -209,10 +209,10 @@ export default {
      * @param originalMethod 原始请求方法
      * @returns {boolean} 是否已经正常打开登录表单
      */
-    toLogin: function(loginFormUrl, originalUrl, originalMethod) {
+    toLogin(loginFormUrl, originalUrl, originalMethod) {
         return false;
     },
-    _handleErrors: function(errors, options) {
+    _handleErrors(errors, options) {
         if (errors) {
             if (options && typeof options.error === 'function') {
                 options.error(errors);
@@ -223,15 +223,11 @@ export default {
         }
         return false;
     },
-    error: function(errors) {
+    error(errors) {
         const message = this.getErrorMessage(errors);
-        if (this.owner && this.owner.owner && typeof this.owner.owner.alert === 'function') {
-            this.owner.owner.alert(message, '错误');
-        } else {
-            alert(message);
-        }
+        window.tnx.error(message);
     },
-    getErrorMessage: function(errors) {
+    getErrorMessage(errors) {
         let message = '';
         if (errors instanceof Array) {
             for (let i = 0; i < errors.length; i++) {
@@ -241,11 +237,11 @@ export default {
         return message.trim();
     },
     _ensureLoginedUrl: '/authentication/validate',
-    ensureLogined: function(callback, options) {
+    ensureLogined(callback, options) {
         this.get(this._ensureLoginedUrl, callback, options);
     },
     _metas: {},
-    getMeta: function(url, callback) {
+    getMeta(url, callback) {
         const metas = this._metas;
         if (metas[url]) {
             if (typeof callback === 'function') {

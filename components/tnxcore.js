@@ -8,13 +8,9 @@ import app from "./tnxcore-app";
 
 const tnxcore = {
     libs: {},
-    util: Object.assign({}, util, {
-        owner: this
-    }),
-    app: Object.assign({}, app, {
-        owner: this
-    }),
-    alert: function(message, title, callback) {
+    util: util,
+    app: app,
+    alert(message, title, callback) {
         if (typeof title === 'function') {
             callback = title;
             title = undefined;
@@ -25,13 +21,13 @@ const tnxcore = {
             callback();
         }
     },
-    success: function(message, callback) {
+    success(message, callback) {
         this.alert(message, '成功', callback);
     },
-    error: function(message, callback) {
+    error(message, callback) {
         this.alert(message, '错误', callback);
     },
-    confirm: function(message, title, callback) {
+    confirm(message, title, callback) {
         if (typeof title === 'function') {
             callback = title;
             title = undefined;

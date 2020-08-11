@@ -6,13 +6,10 @@ import rpc from './tnxcore-app-rpc';
 const app = {
     context: '',
     version: undefined,
-    rpc: Object.assign({}, rpc, {
-        owner: this
-    }),
+    rpc: rpc,
     page: {
-        owner: this,
         context: "/pages",
-        init: function(page, container) {
+        init(page, container) {
             if (typeof page === 'function') {
                 page(container);
             } else { // 如果页面js组件不是初始化方法，则必须包含onLoad()方法，没有则报错
@@ -20,7 +17,7 @@ const app = {
             }
         }
     },
-    _bindResourceLoad: function(element, url, onLoad) {
+    _bindResourceLoad(element, url, onLoad) {
         if (typeof onLoad === 'function') {
             if (element.readyState) {
                 element.onreadystatechange = function() {
@@ -36,7 +33,7 @@ const app = {
             }
         }
     },
-    _loadLink: function(url, container, callback) {
+    _loadLink(url, container, callback) {
         const link = document.createElement('link');
         link.type = 'text/css';
         link.rel = 'stylesheet';
@@ -50,7 +47,7 @@ const app = {
             container.appendChild(link);
         }
     },
-    _loadScript: function(url, container, callback) {
+    _loadScript(url, container, callback) {
         const _this = this;
         if (typeof requirejs === 'function') {
             requirejs([url], function(page) {
@@ -66,7 +63,7 @@ const app = {
         }
     },
     _loadedResources: {}, // 保存加载中和加载完成的资源
-    _loadResources: function(resourceType, container, loadOneFunction, callback, recursive) {
+    _loadResources(resourceType, container, loadOneFunction, callback, recursive) {
         if (typeof container === 'function') {
             recursive = callback;
             callback = loadOneFunction;
@@ -136,7 +133,7 @@ const app = {
             }
         }
     },
-    _isAllLoaded: function(resources) {
+    _isAllLoaded(resources) {
         const _this = this;
         for (let i = 0; i < resources.length; i++) {
             const resource = resources[i];
@@ -146,21 +143,21 @@ const app = {
         }
         return true;
     },
-    _loadLinks: function(container, callback) {
+    _loadLinks(container, callback) {
         if (typeof container === 'function') {
             callback = container;
             container = undefined;
         }
         this._loadResources('css', container, this._loadLink, callback);
     },
-    _loadScripts: function(container, callback) {
+    _loadScripts(container, callback) {
         if (typeof container === 'function') {
             callback = container;
             container = undefined;
         }
         this._loadResources('js', container, this._loadScript, callback);
     },
-    getAction: function(url) {
+    getAction(url) {
         let href = url || window.location.href;
         // 去掉参数
         let index = href.indexOf('?');
@@ -200,7 +197,7 @@ const app = {
         }
         return href;
     },
-    init: function(container, callback) {
+    init(container, callback) {
         // 初始化app环境
         const context = util.getMetaContent('app.context');
         if (context) {
@@ -221,7 +218,7 @@ const app = {
             });
         });
     },
-    buildCsrfField: function(form) {
+    buildCsrfField(form) {
         const meta = document.querySelector('meta[name="csrf"]');
         if (meta) {
             const name = meta.getAttribute('parameter');
