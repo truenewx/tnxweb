@@ -17,7 +17,7 @@
 </template>
 
 <script>
-function addTreeNodesTo (parentId, menuItems, treeNodes) {
+function addMenuItemToTreeNodes(parentId, menuItems, treeNodes) {
     for (let i = 0; i < menuItems.length; i++) {
         const item = menuItems[i];
         let node = {
@@ -29,32 +29,44 @@ function addTreeNodesTo (parentId, menuItems, treeNodes) {
         };
         if (item.subs && item.subs.length) {
             node.children = node.children || [];
-            addTreeNodesTo(node.id, item.subs, node.children);
+            addMenuItemToTreeNodes(node.id, item.subs, node.children);
         }
         if (item.operations && item.operations.length) {
             node.children = node.children || [];
-            addTreeNodesTo(node.id, item.operations, node.children);
+            addMenuItemToTreeNodes(node.id, item.operations, node.children);
         }
         treeNodes.push(node);
     }
 }
 
-function getTreeNodes (menu) {
+function getTreeNodes(menu) {
     let items = menu.getAssignableItems();
     const nodes = [];
-    addTreeNodesTo(undefined, items, nodes);
+    addMenuItemToTreeNodes(undefined, items, nodes);
     return nodes;
 }
 
+function addTreeNodePermissionsTo(nodes, permissions) {
+    nodes.forEach(node => {
+        if (node.permission) {
+            permissions.push(node.permission);
+        }
+        if (node.children) {
+            addTreeNodePermissionsTo(node.children, permissions);
+        }
+    });
+}
+
 export default {
+    name: 'TnxelPermissionTree',
     props: ['menu', 'permissions'],
-    data () {
+    data() {
         return {
-            nodes: this.getTreeNodes(this.menu),
+            nodes: getTreeNodes(this.menu),
         };
     },
     methods: {
-        onCheckChange (node, checked) {
+        onCheckChange(node, checked) {
             if (checked) { // 节点被选中，则上级节点必须选中
                 if (node.parentId) {
                     this.$refs.tree.setChecked(node.parentId, true);
@@ -68,17 +80,19 @@ export default {
                 }
             }
         },
-        getPermissions () {
+        getPermissions() {
+            const permissions = [];
             const nodes = this.$refs.tree.getCheckedNodes();
             if (nodes && nodes.length) {
-
+                addTreeNodePermissionsTo(nodes, permissions);
             }
+            return permissions;
         }
     }
 }
 </script>
 
-<style>
+<style scoped>
 .permission-node {
     width: 100%;
 }
