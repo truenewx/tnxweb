@@ -158,7 +158,7 @@ export default {
                         if (errors && errors.length) { // 字段格式异常
                             errors.forEach(error => {
                                 if (!error.message && error.defaultMessage) {
-                                    error.message = error.field + error.defaultMessage;
+                                    error.message = error.field + ' ' + error.defaultMessage;
                                 }
                             });
                             // 转换错误消息之后，与403错误做相同处理
