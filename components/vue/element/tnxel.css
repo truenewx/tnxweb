@@ -103,3 +103,7 @@ el-button {
 .el-table td.tnxel-table_tags.nowrap.is-center .cell {
     justify-content: center;
 }
+
+.el-alert .el-alert__content {
+    display: inline-flex;
+}
