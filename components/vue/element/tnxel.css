@@ -107,3 +107,19 @@ el-button {
 .el-alert .el-alert__content {
     display: inline-flex;
 }
+
+a,
+.link,
+.el-link.el-link--primary {
+    color: #409eff;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+a:hover,
+.link:hover,
+.el-link.el-link--primary:hover {
+    color: #0056b3;
+    cursor: pointer;
+    text-decoration: none;
+}
