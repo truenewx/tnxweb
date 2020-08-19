@@ -8,17 +8,13 @@ import tnxvue from '../tnxvue.js';
 import dialog from './dialog';
 import $ from 'jquery';
 
-import Upload from './upload/Upload.vue';
-import PermissionTree from "./permission-tree/PermissionTree";
+import Upload from './upload';
+import PermissionTree from "./permission-tree";
 
-function usePlugin(Vue, plugin) {
-    Vue.use(plugin);
-    Vue.component('tnxel-upload', Upload);
-    Vue.component('tnxel-permission-tree', PermissionTree);
-}
+ElementUI.umd = false;
+ElementUI_UMD.umd = true;
 
-usePlugin(tnxvue.libs.Vue, ElementUI);
-usePlugin(tnxvue.libs.Vue_UMD, ElementUI_UMD);
+const components = [Upload, PermissionTree];
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI, ElementUI_UMD}),
@@ -134,6 +130,21 @@ const tnxel = Object.assign({}, tnxvue, {
         }
     },
 });
+
+tnxel.install = Function.around(tnxel.install, (install, Vue) => {
+    install(Vue);
+    if (Vue.umd) {
+        Vue.use(ElementUI_UMD);
+    } else {
+        Vue.use(ElementUI);
+    }
+    components.forEach(component => {
+        Vue.component(component.name, component);
+    });
+});
+
+tnxel.libs.Vue.use(tnxel);
+tnxel.libs.Vue_UMD.use(tnxel);
 
 window.tnx = tnxel;
 

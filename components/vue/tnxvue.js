@@ -7,13 +7,8 @@ import Vue_UMD from 'vue/dist/vue';
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 
-Vue.component('tnxvue-div', {
-    template: '<div><slot></slot></div>'
-});
-
-Vue.component('tnxvue-span', {
-    template: '<span><slot></slot></span>'
-});
+Vue.umd = false;
+Vue_UMD.umd = true;
 
 function getDefaultDialogButtons(type, callback) {
     if (type) {
@@ -51,6 +46,14 @@ function getDefaultDialogButtons(type, callback) {
 
 const tnxvue = Object.assign({}, tnxcore, {
     libs: Object.assign({}, tnxcore.libs, {Vue, Vue_UMD}),
+    install(Vue) {
+        Vue.component('tnxvue-div', {
+            template: '<div><slot></slot></div>'
+        });
+        Vue.component('tnxvue-span', {
+            template: '<span><slot></slot></span>'
+        });
+    },
     dialog(content, title, buttons, options, contentProps) {
         // 默认不实现，由UI框架扩展层实现
         throw new Error('Unsupported function');
@@ -106,6 +109,9 @@ tnxvue.app.page.init = Function.around(tnxvue.app.page.init, function(init, page
     }
     init.call(this, page, container);
 });
+
+Vue.use(tnxvue);
+Vue_UMD.use(tnxvue);
 
 window.tnx = tnxvue;
 
