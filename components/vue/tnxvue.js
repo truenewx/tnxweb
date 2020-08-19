@@ -44,14 +44,24 @@ function getDefaultDialogButtons(type, callback) {
     return [];
 }
 
+const components = {
+    'Div': {
+        name: 'TnxvueDiv',
+        template: '<div><slot></slot></div>'
+    },
+    'Span': {
+        name: 'TnxvueSpan',
+        template: '<span><slot></slot></span>'
+    }
+};
+
 const tnxvue = Object.assign({}, tnxcore, {
     libs: Object.assign({}, tnxcore.libs, {Vue, Vue_UMD}),
+    components,
     install(Vue) {
-        Vue.component('tnxvue-div', {
-            template: '<div><slot></slot></div>'
-        });
-        Vue.component('tnxvue-span', {
-            template: '<span><slot></slot></span>'
+        Object.keys(components).forEach(key => {
+            const component = components[key];
+            Vue.component(component.name, component);
         });
     },
     dialog(content, title, buttons, options, contentProps) {

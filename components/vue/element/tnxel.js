@@ -14,10 +14,22 @@ import PermissionTree from "./permission-tree";
 ElementUI.umd = false;
 ElementUI_UMD.umd = true;
 
-const components = [Upload, PermissionTree];
+const components = Object.assign({}, tnxvue.components, {Upload, PermissionTree});
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI, ElementUI_UMD}),
+    components,
+    install(Vue) {
+        if (Vue.umd) {
+            Vue.use(ElementUI_UMD);
+        } else {
+            Vue.use(ElementUI);
+        }
+        Object.keys(components).forEach(key => {
+            const component = components[key];
+            Vue.component(component.name, component);
+        });
+    },
     dialog() {
         this._closeMessage();
         dialog.apply(this, arguments);
@@ -129,18 +141,6 @@ const tnxel = Object.assign({}, tnxvue, {
             window.tnx.loadingInstance = undefined;
         }
     },
-});
-
-tnxel.install = Function.around(tnxel.install, (install, Vue) => {
-    install(Vue);
-    if (Vue.umd) {
-        Vue.use(ElementUI_UMD);
-    } else {
-        Vue.use(ElementUI);
-    }
-    components.forEach(component => {
-        Vue.component(component.name, component);
-    });
 });
 
 tnxel.libs.Vue.use(tnxel);
