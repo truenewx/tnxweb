@@ -2,6 +2,10 @@
     <el-form label-position="right" label-width="auto" ref="form" :model="model"
         :rules="rules" :validate-on-rule-change="false" :disabled="disabled" status-icon>
         <slot></slot>
+        <el-form-item v-if="submit">
+            <el-button type="primary" @click="toSubmit">确定</el-button>
+            <el-button @click="$router.back()">取消</el-button>
+        </el-form-item>
     </el-form>
 </template>
 
