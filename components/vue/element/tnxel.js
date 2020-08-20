@@ -10,11 +10,16 @@ import $ from 'jquery';
 
 import Upload from './upload';
 import PermissionTree from "./permission-tree";
+import Form from "./form";
 
 ElementUI.umd = false;
 ElementUI_UMD.umd = true;
 
-const components = Object.assign({}, tnxvue.components, {Upload, PermissionTree});
+const components = Object.assign({}, tnxvue.components, {
+    Upload,
+    PermissionTree,
+    Form,
+});
 
 const tnxel = Object.assign({}, tnxvue, {
     libs: Object.assign({}, tnxvue.libs, {ElementUI, ElementUI_UMD}),
