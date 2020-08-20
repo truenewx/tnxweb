@@ -3,8 +3,8 @@
         :rules="rules" :validate-on-rule-change="false" :disabled="disabled" status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
-            <el-button type="primary" @click="toSubmit">确定</el-button>
-            <el-button @click="$router.back()">取消</el-button>
+            <el-button type="primary" @click="toSubmit">{{submitText}}</el-button>
+            <el-button @click="$router.back()">{{cancelText}}</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -22,7 +22,16 @@ export default {
             required: true,
         },
         rule: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
+        onRulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: Function,
+        submitText: {
+            type: String,
+            default: () => '确定' // TODO 国际化
+        },
+        cancelText: {
+            type: String,
+            default: () => '取消'
+        }
     },
     data() {
         return {
@@ -34,6 +43,9 @@ export default {
         if (typeof this.rule === 'string') {
             const vm = this;
             this.tnx.app.rpc.getMeta(this.rule, meta => {
+                if (vm.onRulesLoaded) {
+                    vm.onRulesLoaded(meta.rules);
+                }
                 vm.rules = meta.rules;
             });
         } else if (this.rule) {
@@ -51,9 +63,12 @@ export default {
             this.$refs.form.validateField(props, callback);
         },
         toSubmit(callback) {
+            const vm = this;
             this.validate(function(success) {
                 if (success) {
-                    callback = callback || this.submit;
+                    if (typeof callback !== 'function') {
+                        callback = vm.submit;
+                    }
                     if (typeof callback === 'function') {
                         callback();
                     }
@@ -63,7 +78,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-
-</style>

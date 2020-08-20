@@ -23,6 +23,12 @@ body {
     padding-right: 10px;
 }
 
+.el-form-item__label:before {
+    content: '*';
+    color: transparent;
+    margin-right: 4px;
+}
+
 .el-form-item__content,
 .el-form-item__error,
 .el-input__inner {
