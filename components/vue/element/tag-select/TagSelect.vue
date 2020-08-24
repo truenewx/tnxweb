@@ -17,10 +17,7 @@ export default {
     props: {
         type: String,
         size: String,
-        items: {
-            type: Array,
-            required: true,
-        },
+        items: Array,
         keyName: {
             type: String,
             default: 'key',
@@ -48,7 +45,7 @@ export default {
     },
     methods: {
         getTags() {
-            if (this.items && this.items.length) {
+            if (this.items) {
                 const vm = this;
                 const tags = [];
                 this.items.forEach(item => {
