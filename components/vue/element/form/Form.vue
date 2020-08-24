@@ -1,6 +1,7 @@
 <template>
     <el-form label-position="right" label-width="auto" ref="form" :model="model"
-        :rules="rules" :validate-on-rule-change="false" :disabled="disabled" status-icon>
+        :rules="rules" :validate-on-rule-change="false" :inline-message="true" :disabled="disabled"
+        status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
             <el-button type="primary" @click="toSubmit">{{submitText}}</el-button>
