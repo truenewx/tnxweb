@@ -1,6 +1,7 @@
 <template>
     <el-form label-position="right" label-width="auto" ref="form" :model="model"
-        :rules="rules" :validate-on-rule-change="false" :inline-message="true" :disabled="disabled"
+        :rules="validationRules" :validate-on-rule-change="false" :inline-message="true"
+        :disabled="disabled"
         status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
@@ -22,7 +23,7 @@ export default {
             type: Object,
             required: true,
         },
-        rule: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
+        rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
         onRulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: Function,
         submitText: {
@@ -36,21 +37,21 @@ export default {
     },
     data() {
         return {
-            rules: {},
+            validationRules: {},
             disabled: false,
         };
     },
     created() {
-        if (typeof this.rule === 'string') {
+        if (typeof this.rules === 'string') {
             const vm = this;
-            this.tnx.app.rpc.getMeta(this.rule, meta => {
+            this.tnx.app.rpc.getMeta(this.rules, meta => {
                 if (vm.onRulesLoaded) {
                     vm.onRulesLoaded(meta.rules);
                 }
-                vm.rules = meta.rules;
+                vm.validationRules = meta.rules;
             });
-        } else if (this.rule) {
-            this.rules = this.rule;
+        } else if (this.rules) {
+            this.validationRules = this.rules;
         }
     },
     methods: {

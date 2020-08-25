@@ -15,9 +15,15 @@
 export default {
     name: 'TnxelTagSelect',
     props: {
+        tnx: {
+            type: Object,
+            default() {
+                return window.tnx;
+            }
+        },
         type: String,
         size: String,
-        items: Array,
+        items: [Array, String],
         keyName: {
             type: String,
             default: 'key',
@@ -35,30 +41,40 @@ export default {
     },
     data() {
         return {
-            tags: this.getTags()
+            tags: null,
         }
+    },
+    created() {
+        this.loadTags();
     },
     watch: {
         items() {
-            this.tags = this.getTags();
+            this.loadTags();
         }
     },
     methods: {
-        getTags() {
-            if (this.items) {
+        loadTags() {
+            if (typeof this.items === 'string') {
                 const vm = this;
-                const tags = [];
-                this.items.forEach(item => {
-                    const key = item[vm.keyName];
-                    tags.push({
-                        key: key,
-                        text: item[vm.textName],
-                        selected: vm.keys.contains(key),
-                    });
+                this.tnx.app.rpc.get(this.items, items => {
+                    vm.toTags(items);
                 });
-                return tags;
+            } else if (this.items) {
+                this.toTags(this.items);
             }
-            return undefined;
+        },
+        toTags(items) {
+            const vm = this;
+            const tags = [];
+            items.forEach(item => {
+                const key = item[vm.keyName];
+                tags.push({
+                    key: key,
+                    text: item[vm.textName],
+                    selected: vm.keys.contains(key),
+                });
+            });
+            this.tags = tags;
         },
         select(index) {
             this.tags[index].selected = !this.tags[index].selected;
