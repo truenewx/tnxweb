@@ -1,13 +1,23 @@
 <template>
-    <div class="tnxel-tag-group" v-if="tags">
-        <el-tag v-for="(tag, index) in tags"
-            :key="tag.key" :type="type" :size="size"
-            :effect="tag.selected ? 'dark' : 'plain'" @click="select(index)">
-            {{tag.text}}
-        </el-tag>
-    </div>
-    <div v-else>
-        <i class="el-icon-loading"/>
+    <div class="tnxel-tag-select">
+        <el-input prefix-icon="el-icon-search" :placeholder="'输入' + keywordCaption + '进行筛选'"
+            v-model="keyword" v-if="paged"/>
+        <div class="tnxel-tag-group" v-if="tags">
+            <el-tag v-for="tag in tags" :key="tag.key" :type="type" :size="tagSize"
+                :effect="isSelected(tag.key) ? 'dark' : 'plain'" @click="select(tag.key)">
+                {{tag.text}}
+            </el-tag>
+            <div class="d-flex justify-content-between" v-if="paged">
+                <div class="el-pagination">
+                    <span class="el-pagination__total">已选择 {{selectedKeys.length}} 个</span>
+                </div>
+                <el-pagination layout="prev, pager, next" background @current-change="query"
+                    :total="paged.total" :page-size="paged.pageSize" :current-page="paged.pageNo"/>
+            </div>
+        </div>
+        <div v-else>
+            <i class="el-icon-loading"/>
+        </div>
     </div>
 </template>
 
@@ -22,8 +32,9 @@ export default {
             }
         },
         type: String,
-        size: String,
+        tagSize: String,
         items: [Array, String],
+        pageSize: Number,
         keyName: {
             type: String,
             default: 'key',
@@ -32,74 +43,126 @@ export default {
             type: String,
             default: 'text',
         },
+        keywordName: {
+            type: String,
+            default: 'keyword',
+        },
+        keywordCaption: {
+            type: String,
+            default: '关键字',
+        },
         keys: {
             type: Array,
             default() {
                 return [];
             }
         },
+        toTag: {
+            type: Function,
+            default(item) {
+                return {
+                    key: item[this.keyName],
+                    text: item[this.textName],
+                };
+            }
+        }
     },
     data() {
         return {
             tags: null,
+            selectedKeys: this.keys,
+            paged: null,
+            keyword: '',
         }
-    },
-    created() {
-        this.loadTags();
     },
     watch: {
         items() {
-            this.loadTags();
-        }
+            this.query();
+        },
+        keys() {
+            this.selectedKeys = this.keys;
+        },
+        keyword() {
+            this.query();
+        },
+    },
+    created() {
+        this.query();
     },
     methods: {
-        loadTags() {
+        query(pageNo) {
             if (typeof this.items === 'string') {
                 const vm = this;
-                this.tnx.app.rpc.get(this.items, items => {
-                    vm.toTags(items);
+                const params = {};
+                if (this.pageSize) {
+                    params.pageSize = this.pageSize;
+                }
+                if (typeof pageNo === 'number') {
+                    params.pageNo = pageNo;
+                }
+                if (this.paged) {
+                    params[this.keywordName] = this.keyword;
+                }
+                this.tnx.app.rpc.get(this.items, params, result => {
+                    if (result instanceof Array) {
+                        vm.toTags(result);
+                    } else if (result.records && result.paged) {
+                        vm.toTags(result.records);
+                        vm.paged = result.paged;
+                    }
                 });
             } else if (this.items) {
                 this.toTags(this.items);
             }
         },
         toTags(items) {
-            const vm = this;
             const tags = [];
+            const vm = this;
             items.forEach(item => {
-                const key = item[vm.keyName];
-                tags.push({
-                    key: key,
-                    text: item[vm.textName],
-                    selected: vm.keys.contains(key),
-                });
+                tags.push(vm.toTag(item));
             });
             this.tags = tags;
         },
-        select(index) {
-            this.tags[index].selected = !this.tags[index].selected;
+        isSelected(key) {
+            return this.selectedKeys.contains(key);
+        },
+        select(key) {
+            const selectedKeyIndex = this.selectedKeys.indexOf(key);
+            if (selectedKeyIndex >= 0) {
+                this.selectedKeys.splice(selectedKeyIndex, 1);
+            } else {
+                this.selectedKeys.push(key);
+            }
         },
         getSelectedKeys() {
-            const keys = [];
-            this.tags.forEach(tag => {
-                if (tag.selected) {
-                    keys.push(tag.key);
-                }
-            });
-            return keys;
+            return this.selectedKeys;
         }
     }
 }
 </script>
 
 <style scoped>
-.tnxel-tag-group .el-tag {
+.tnxel-tag-select .el-input {
+    margin-bottom: 5px;
+    width: 200px;
+}
+
+.tnxel-tag-select .tnxel-tag-group .el-tag {
     margin-top: 5px;
     margin-bottom: 5px;
     cursor: pointer;
 }
 
-.tnxel-tag-group .el-tag:not(:last-child) {
+.tnxel-tag-select .tnxel-tag-group .el-tag:not(:last-child) {
     margin-right: 10px;
+}
+
+.tnxel-tag-select .el-pagination {
+    margin-top: 5px;
+    line-height: 28px;
+}
+
+.tnxel-tag-select .el-pagination .el-pager {
+    line-height: 28px;
 }
 </style>
