@@ -1,7 +1,7 @@
 <template>
     <div class="tnxel-tag-select">
         <el-input prefix-icon="el-icon-search" :placeholder="'输入' + keywordCaption + '进行筛选'"
-            :clearable="true" v-model="keyword" v-if="paged && paged.pageCount > 1"/>
+            :clearable="true" v-model="keyword" v-if="paged"/>
         <div class="tnxel-tag-group" v-if="tags">
             <el-tag v-for="tag in tags" :key="tag.key" :type="type" :size="tagSize"
                 :effect="isSelected(tag.key) ? 'dark' : 'plain'" @click="select(tag.key)">
