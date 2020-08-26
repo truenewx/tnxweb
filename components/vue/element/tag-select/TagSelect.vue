@@ -1,13 +1,13 @@
 <template>
     <div class="tnxel-tag-select">
         <el-input prefix-icon="el-icon-search" :placeholder="'输入' + keywordCaption + '进行筛选'"
-            v-model="keyword" v-if="paged"/>
+            :clearable="true" v-model="keyword" v-if="paged && paged.pageCount > 1"/>
         <div class="tnxel-tag-group" v-if="tags">
             <el-tag v-for="tag in tags" :key="tag.key" :type="type" :size="tagSize"
                 :effect="isSelected(tag.key) ? 'dark' : 'plain'" @click="select(tag.key)">
                 {{tag.text}}
             </el-tag>
-            <div class="d-flex justify-content-between" v-if="paged">
+            <div class="d-flex justify-content-between" v-if="paged && paged.pageCount > 1">
                 <div class="el-pagination">
                     <span class="el-pagination__total">已选择 {{selectedKeys.length}} 个</span>
                 </div>
