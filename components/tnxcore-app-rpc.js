@@ -30,7 +30,7 @@ export default {
         });
     },
     setConfig(config) {
-        if (config.baseUrl) {
+        if (config.baseUrl !== undefined && config.baseUrl !== null) {
             axios.defaults.baseURL = config.baseUrl;
         }
         if (config.loginSuccessRedirectParameter) {
