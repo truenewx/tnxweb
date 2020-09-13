@@ -6,12 +6,12 @@ import md5 from 'md5';
  * @param object 对象
  * @returns {string} 拼凑成的字符串
  */
-Object.stringify = function(object) {
+Object.stringify = function (object) {
     let s = '';
-    Object.keys(object).forEach(function(key) {
+    Object.keys(object).forEach(function (key) {
         const value = object[key];
         if (value instanceof Array) {
-            value.forEach(function(v) {
+            value.forEach(function (v) {
                 s += '&' + key + '=' + v;
             });
         } else {
@@ -24,9 +24,9 @@ Object.stringify = function(object) {
     return s;
 };
 
-Function.around = function(target, around) {
+Function.around = function (target, around) {
     const _this = this;
-    return function() {
+    return function () {
         const args = [target];
         for (let i = 0; i < arguments.length; i++) {
             args.push(arguments[i]);
@@ -56,6 +56,9 @@ Object.assign(String.prototype, {
             s = s.replaceAll('\\{' + i + '\\}', args[i]);
         }
         return s;
+    },
+    contains(searchString) {
+        return this.indexOf(searchString) >= 0;
     },
 });
 
@@ -148,11 +151,12 @@ const util = {
      * 从指定头信息集中获取指定头信息值
      * @param headers 头信息集
      * @param name 头信息名称
+     * @param defaultValue 默认值
      * @returns {undefined|*} 头信息值
      */
-    getHeader(headers, name) {
+    getHeader(headers, name, defaultValue) {
         if (headers && name) {
-            return headers[name] || headers[name.toLowerCase()];
+            return headers[name] || headers[name.toLowerCase()] || defaultValue;
         }
         return undefined;
     },
@@ -171,7 +175,7 @@ const util = {
     },
     maxZIndex(elements) {
         let result = -1;
-        elements.forEach(function(element) {
+        elements.forEach(function (element) {
             const zIndex = Number(element.style.zIndex);
             if (result < zIndex) {
                 result = zIndex;

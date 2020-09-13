@@ -22,7 +22,7 @@ export default {
             axios.defaults.baseURL = baseUrl;
         }
         const _this = this;
-        this.get('/api/meta/context', function(context) {
+        this.get('/api/meta/context', function (context) {
             _this.setConfig(context);
             if (typeof callback === 'function') {
                 callback(context);
@@ -97,12 +97,12 @@ export default {
             data: options.body,
         };
         if (config.params) {
-            config.paramsSerializer = function(params) {
+            config.paramsSerializer = function (params) {
                 return Object.stringify(params);
             };
         }
         if (typeof options.onUploadProgress === 'function') {
-            config.onUploadProgress = function(event) {
+            config.onUploadProgress = function (event) {
                 const ratio = (event.loaded / event.total) || 0;
                 options.onUploadProgress.call(event, ratio);
             }
@@ -111,14 +111,14 @@ export default {
     },
     _request(url, config, options) {
         const _this = this;
-        axios(url, config).then(function(response) {
+        axios(url, config).then(function (response) {
             if (_this._redirectRequest(response, config, options)) { // 执行了重定向跳转，则不作后续处理
                 return;
             }
             if (typeof options.success === 'function') {
                 options.success(response.data);
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             const response = error.response;
             if (response) {
                 if (_this._isIgnored(options, response.status)) {
@@ -132,8 +132,13 @@ export default {
                         let loginUrl = util.getHeader(response.headers, 'Login-Url');
                         if (loginUrl) {
                             // 默认登录后跳转回当前页面
+                            if (loginUrl.contains('?')) {
+                                loginUrl += '&';
+                            } else {
+                                loginUrl += '?';
+                            }
                             const loginSuccessRedirectUrl = encodeURIComponent(window.location.href);
-                            loginUrl += '&' + _this.loginSuccessRedirectParameter + '=' + loginSuccessRedirectUrl;
+                            loginUrl += _this.loginSuccessRedirectParameter + '=' + loginSuccessRedirectUrl;
                         }
                         const originalRequest = util.getHeader(response.headers, 'Original-Request');
                         let originalMethod;
@@ -144,7 +149,7 @@ export default {
                             originalUrl = array[1];
                         }
                         // 原始地址是登录验证地址或登出地址，视为框架特有请求，无需应用做个性化处理
-                        if (originalUrl === _this._ensureLoginedUrl || originalUrl.endsWith('/logout')) {
+                        if (originalUrl && (originalUrl === _this._ensureLoginedUrl || originalUrl.endsWith('/logout'))) {
                             originalUrl = undefined;
                             originalMethod = undefined;
                         }
@@ -253,7 +258,7 @@ export default {
         } else {
             this.get('/api/meta/method', {
                 url: url
-            }, function(meta) {
+            }, function (meta) {
                 metas[url] = meta;
                 if (typeof callback === 'function') {
                     callback(meta);
