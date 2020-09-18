@@ -18,11 +18,10 @@ export default {
             callback = baseUrl;
             baseUrl = undefined;
         }
-        if (baseUrl) {
-            axios.defaults.baseURL = baseUrl;
-        }
+        baseUrl = baseUrl || '';
+        axios.defaults.baseURL = baseUrl;
         const _this = this;
-        this.get('/api/meta/context', function (context) {
+        this.get('/api/meta/context', function(context) {
             _this.setConfig(context);
             if (typeof callback === 'function') {
                 callback(context);
@@ -39,8 +38,8 @@ export default {
         if (config.apps) { // 其它站点的上下文根路径
             this.apps = config.apps;
         }
-        // 不以斜杠开头说明基本路径为跨域访问路径
-        if (!axios.defaults.baseURL.startsWith('/')) {
+        // 不为空且不以斜杠开头，说明基本路径为跨域访问路径
+        if (axios.defaults.baseURL !== '' && !axios.defaults.baseURL.startsWith('/')) {
             axios.defaults.withCredentials = true;
         }
         // 声明为AJAX请求
@@ -97,12 +96,12 @@ export default {
             data: options.body,
         };
         if (config.params) {
-            config.paramsSerializer = function (params) {
+            config.paramsSerializer = function(params) {
                 return Object.stringify(params);
             };
         }
         if (typeof options.onUploadProgress === 'function') {
-            config.onUploadProgress = function (event) {
+            config.onUploadProgress = function(event) {
                 const ratio = (event.loaded / event.total) || 0;
                 options.onUploadProgress.call(event, ratio);
             }
@@ -111,14 +110,14 @@ export default {
     },
     _request(url, config, options) {
         const _this = this;
-        axios(url, config).then(function (response) {
+        axios(url, config).then(function(response) {
             if (_this._redirectRequest(response, config, options)) { // 执行了重定向跳转，则不作后续处理
                 return;
             }
             if (typeof options.success === 'function') {
                 options.success(response.data);
             }
-        }).catch(function (error) {
+        }).catch(function(error) {
             const response = error.response;
             if (response) {
                 if (_this._isIgnored(options, response.status)) {
@@ -149,7 +148,8 @@ export default {
                             originalUrl = array[1];
                         }
                         // 原始地址是登录验证地址或登出地址，视为框架特有请求，无需应用做个性化处理
-                        if (originalUrl && (originalUrl === _this._ensureLoginedUrl || originalUrl.endsWith('/logout'))) {
+                        if (originalUrl && (originalUrl === _this._ensureLoginedUrl || originalUrl.endsWith(
+                            '/logout'))) {
                             originalUrl = undefined;
                             originalMethod = undefined;
                         }
@@ -258,7 +258,7 @@ export default {
         } else {
             this.get('/api/meta/method', {
                 url: url
-            }, function (meta) {
+            }, function(meta) {
                 metas[url] = meta;
                 if (typeof callback === 'function') {
                     callback(meta);
