@@ -2,7 +2,7 @@
  * 菜单组件
  * 菜单配置中的权限配置不是服务端权限判断的依据，仅用于生成具有权限的客户端菜单，以及分配权限时展示可分配的权限范围
  */
-function isGranted (authority, item) {
+function isGranted(authority, item) {
     if (item.rank || item.permission) {
         if (item.rank) {
             if (authority.rank !== item.rank) {
@@ -20,7 +20,7 @@ function isGranted (authority, item) {
     return true;
 }
 
-function applyGrantedItemToItems (authority, item, items) {
+function applyGrantedItemToItems(authority, item, items) {
     const granted = isGranted(authority, item);
     if (granted === true) { // 授权匹配
         items.push(Object.assign({}, item));
@@ -56,7 +56,7 @@ function applyGrantedItemToItems (authority, item, items) {
     }
 }
 
-function findItem (path, items, callback) {
+function findItem(path, items, callback) {
     if (path && items && items.length && typeof callback === 'function') {
         for (let item of items) {
             // 去掉可能的请求参数部分
@@ -97,7 +97,7 @@ function findItem (path, items, callback) {
     return undefined;
 }
 
-const Menu = function Menu (config) {
+const Menu = function Menu(config) {
     this.items = config.items;
     this._url = config.url;
     this._grantedItems = null;
@@ -114,7 +114,7 @@ Menu.prototype.getItemByPath = function(path) {
     });
 };
 
-function findItemByPermission (items, permission) {
+function findItemByPermission(items, permission) {
     for (let item of items) {
         if (item.permission === permission) {
             return item;
@@ -139,7 +139,7 @@ Menu.prototype.getItemByPermission = function(permission) {
     return findItemByPermission(this.items, permission);
 }
 
-function findAssignableItems (items) {
+function findAssignableItems(items) {
     const assignableItems = [];
     items.forEach(item => {
         let assignableItem = {
@@ -196,19 +196,21 @@ Menu.prototype.loadGrantedItems = function(callback) {
     } else {
         const _this = this;
         window.tnx.app.rpc.get(this._url, function(authorities) {
-            authorities.forEach(auth => {
-                switch (auth.kind) {
-                    case 'TYPE':
-                        _this.authority.type = auth.name;
-                        break;
-                    case 'RANK':
-                        _this.authority.rank = auth.name;
-                        break;
-                    case 'PERMISSION':
-                        _this.authority.permissions.push(auth.name);
-                        break;
-                }
-            });
+            if (authorities && authorities.length) {
+                authorities.forEach(auth => {
+                    switch (auth.kind) {
+                        case 'TYPE':
+                            _this.authority.type = auth.name;
+                            break;
+                        case 'RANK':
+                            _this.authority.rank = auth.name;
+                            break;
+                        case 'PERMISSION':
+                            _this.authority.permissions.push(auth.name);
+                            break;
+                    }
+                });
+            }
             _this._grantedItems = [];
             _this.items.forEach(item => {
                 applyGrantedItemToItems(_this.authority, item, _this._grantedItems);
