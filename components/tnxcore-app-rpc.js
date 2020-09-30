@@ -38,10 +38,7 @@ export default {
         if (config.apps) { // 其它站点的上下文根路径
             this.apps = config.apps;
         }
-        // 不为空且不以斜杠开头，说明基本路径为跨域访问路径
-        if (axios.defaults.baseURL !== '' && !axios.defaults.baseURL.startsWith('/')) {
-            axios.defaults.withCredentials = true;
-        }
+        axios.defaults.withCredentials = true;
         // 声明为AJAX请求
         Object.assign(axios.defaults.headers.common, config.headers, {
             'X-Requested-With': 'XMLHttpRequest'
