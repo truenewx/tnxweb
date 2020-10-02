@@ -54,6 +54,7 @@ export default {
     data() {
         return {
             id: 'upload-container-' + new Date().getTime(),
+            alone: rpc.apps.fss.startsWith(rpc.getBaseUrl()), // FSS是否独立部署的服务
             action: rpc.apps.fss + '/upload/' + this.type,
             uploadLimit: {},
             tipMessages: {
@@ -230,28 +231,31 @@ export default {
         beforeUpload: function(file) {
             if (this.validate(file)) {
                 const vm = this;
-                return new Promise(function(resolve, reject) {
-                    // 确保在fss服务中已登录
-                    rpc.ensureLogined(function() {
-                        resolve(file);
-                    }, {
-                        base: 'fss',
-                        toLogin: function(loginFormUrl, originalUrl, originalMethod) {
-                            // 此时已可知在CAS服务器上未登录，即未登录任一服务
-                            reject(file);
-                            // 从fss服务一定无法取得登录表单地址，改为从当前服务获取
-                            rpc.get('/authentication/login-url', function(loginUrl) {
-                                if (loginUrl) {
-                                    // 默认登录后跳转回当前页面
-                                    loginUrl += loginUrl.contains('?') ? '&' : '?';
-                                    loginUrl += rpc.loginSuccessRedirectParameter + '=' + window.location.href;
-                                    rpc.toLogin(loginUrl, vm.action, 'POST');
-                                }
-                            });
-                            return true;
-                        }
+                if (this.alone) {
+                    return new Promise(function(resolve, reject) {
+                        // 确保在fss服务中已登录
+                        rpc.ensureLogined(function() {
+                            resolve(file);
+                        }, {
+                            base: 'fss',
+                            toLogin: function(loginFormUrl, originalUrl, originalMethod) {
+                                // 此时已可知在CAS服务器上未登录，即未登录任一服务
+                                reject(file);
+                                // 从fss服务一定无法取得登录表单地址，改为从当前服务获取
+                                rpc.get('/authentication/login-url', function(loginUrl) {
+                                    if (loginUrl) {
+                                        // 默认登录后跳转回当前页面
+                                        loginUrl += loginUrl.contains('?') ? '&' : '?';
+                                        loginUrl += rpc.loginSuccessRedirectParameter + '=' + window.location.href;
+                                        rpc.toLogin(loginUrl, vm.action, 'POST');
+                                    }
+                                });
+                                return true;
+                            }
+                        });
                     });
-                });
+                }
+                return true;
             }
             return false;
         },
