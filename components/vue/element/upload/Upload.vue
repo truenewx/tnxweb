@@ -54,7 +54,7 @@ export default {
     data() {
         return {
             id: 'upload-container-' + new Date().getTime(),
-            alone: rpc.apps.fss.startsWith(rpc.getBaseUrl()), // FSS是否独立部署的服务
+            alone: !rpc.apps.fss.startsWith(rpc.getBaseUrl()), // FSS是否独立部署的服务
             action: rpc.apps.fss + '/upload/' + this.type,
             uploadLimit: {},
             tipMessages: {
@@ -229,10 +229,10 @@ export default {
             return true;
         },
         beforeUpload: function(file) {
-            if (this.validate(file)) {
-                const vm = this;
-                if (this.alone) {
-                    return new Promise(function(resolve, reject) {
+            const vm = this;
+            return new Promise(function(resolve, reject) {
+                if (vm.validate(file)) {
+                    if (vm.alone) {
                         // 确保在fss服务中已登录
                         rpc.ensureLogined(function() {
                             resolve(file);
@@ -253,11 +253,13 @@ export default {
                                 return true;
                             }
                         });
-                    });
+                    } else {
+                        resolve(file);
+                    }
+                } else {
+                    reject(file);
                 }
-                return true;
-            }
-            return false;
+            });
         },
         onProgress: function(event, file, fileList) {
             this._resizeImage(file, fileList);
@@ -305,9 +307,7 @@ export default {
             }
         },
         onError: function(error, file, fileList) {
-            if (error.status === 401) {
-                console.error(error.message);
-            }
+            console.error(error.message);
         },
         removeFile: function(file) {
             this.uploadFiles.remove(function(f) {
