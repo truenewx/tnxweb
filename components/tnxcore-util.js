@@ -6,12 +6,12 @@ import md5 from 'md5';
  * @param object 对象
  * @returns {string} 拼凑成的字符串
  */
-Object.stringify = function (object) {
+Object.stringify = function(object) {
     let s = '';
-    Object.keys(object).forEach(function (key) {
+    Object.keys(object).forEach(function(key) {
         const value = object[key];
         if (value instanceof Array) {
-            value.forEach(function (v) {
+            value.forEach(function(v) {
                 s += '&' + key + '=' + v;
             });
         } else {
@@ -24,9 +24,9 @@ Object.stringify = function (object) {
     return s;
 };
 
-Function.around = function (target, around) {
+Function.around = function(target, around) {
     const _this = this;
-    return function () {
+    return function() {
         const args = [target];
         for (let i = 0; i < arguments.length; i++) {
             args.push(arguments[i]);
@@ -175,7 +175,7 @@ const util = {
     },
     maxZIndex(elements) {
         let result = -1;
-        elements.forEach(function (element) {
+        elements.forEach(function(element) {
             const zIndex = Number(element.style.zIndex);
             if (result < zIndex) {
                 result = zIndex;
@@ -241,6 +241,16 @@ const util = {
                 }
             }
             return capacity + units[series];
+        }
+        return undefined;
+    },
+    getAnchor() {
+        const anchor = window.location.hash;
+        if (anchor) {
+            const index = anchor.indexOf('#');
+            if (index >= 0) {
+                return anchor.substr(index + 1);
+            }
         }
         return undefined;
     },
