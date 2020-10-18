@@ -52,6 +52,15 @@ el-button {
     vertical-align: unset;
 }
 
+.el-message-box .el-message-box__btns {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.el-message-box .el-message-box__btns .el-button {
+    margin-left: 10px;
+}
+
 .el-message {
     min-width: unset;
     top: unset;
