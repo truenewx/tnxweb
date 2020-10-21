@@ -1,4 +1,5 @@
-import '../components/jquery/bootstrap/base-4.5.0.css';
+import '../components/jquery/bootstrap/base-4.5.3.css';
+import '../components/jquery/bootstrap/tnxbs.css';
 import 'element-ui/lib/theme-chalk/index.css';
 import '../components/vue/tnxvue.css';
 import '../components/vue/element/tnxel.css';

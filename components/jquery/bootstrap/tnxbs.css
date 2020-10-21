@@ -1,0 +1,11 @@
+/*!
+ * tnxbs.css
+ * 对Bootstrap的通用调整
+ */
+[role="button"] {
+    cursor: pointer;
+}
+
+.text-transparent {
+    color: transparent !important;
+}
