@@ -11,8 +11,8 @@
         node-key="id"
         class="px-1 py-2">
         <div class="permission-node" slot-scope="{node,data}">
-            <span>{{data.label}}</span>
-            <span class="text-muted" :class="{'d-none': !data.remark}">({{data.remark}})</span>
+            <span v-if="node">{{ data.label }}</span>
+            <span class="text-muted" :class="{'d-none': !data.remark}">({{ data.remark }})</span>
         </div>
     </el-tree>
 </template>
