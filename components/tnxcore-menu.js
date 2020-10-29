@@ -3,6 +3,7 @@
  * 菜单配置中的权限配置不是服务端权限判断的依据，仅用于生成具有权限的客户端菜单，以及分配权限时展示可分配的权限范围
  */
 function isGranted(authority, item) {
+    prepareItem(item);
     if (item.rank || item.permission) {
         if (item.rank) {
             if (authority.rank !== item.rank) {
@@ -18,6 +19,19 @@ function isGranted(authority, item) {
         return undefined;
     }
     return true;
+}
+
+function prepareItem(item) {
+    if (item.path && item.permission === true) {
+        item.permission = getDefaultPermission(item.path);
+    }
+}
+
+function getDefaultPermission(path) {
+    let permission = path.replaceAll(/\/\{[^}]+\}\//g, '/');
+    permission = permission.replaceAll(/\//g, '.');
+    const baseApp = window.tnx.app.rpc.baseApp;
+    return baseApp ? (baseApp + permission) : permission;
 }
 
 function applyGrantedItemToItems(authority, item, items) {
@@ -116,6 +130,7 @@ Menu.prototype.getItemByPath = function(path) {
 
 function findItemByPermission(items, permission) {
     for (let item of items) {
+        prepareItem(item);
         if (item.permission === permission) {
             return item;
         }
@@ -146,6 +161,7 @@ function findAssignableItems(items) {
             subs: [],
             operations: [],
         };
+        prepareItem(item);
         if (item.permission) {
             Object.assign(assignableItem, item, {
                 subs: [],

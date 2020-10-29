@@ -4,7 +4,11 @@ import axios from "axios";
 
 export default {
     loginSuccessRedirectParameter: '_next',
+    baseApp: undefined,
     apps: {},
+    setBaseUrl(baseUrl) {
+        axios.defaults.baseURL = baseUrl || '';
+    },
     getBaseUrl() {
         return axios.defaults.baseURL;
     },
@@ -18,8 +22,8 @@ export default {
             callback = baseUrl;
             baseUrl = undefined;
         }
-        baseUrl = baseUrl || '';
-        axios.defaults.baseURL = baseUrl;
+        this.setBaseUrl(baseUrl);
+
         const _this = this;
         this.get('/api/meta/context', function(context) {
             _this.setConfig(context);
@@ -29,20 +33,21 @@ export default {
         });
     },
     setConfig(config) {
-        if (config.baseUrl !== undefined && config.baseUrl !== null) {
-            axios.defaults.baseURL = config.baseUrl;
+        this.baseApp = config.baseApp;
+        if (config.apps) { // 相关应用的上下文根路径
+            this.apps = config.apps;
+        }
+        if (this.baseApp && this.apps) {
+            axios.defaults.baseURL = this.apps[this.baseApp];
         }
         if (config.loginSuccessRedirectParameter) {
             this.loginSuccessRedirectParameter = config.loginSuccessRedirectParameter;
         }
-        if (config.apps) { // 其它站点的上下文根路径
-            this.apps = config.apps;
-        }
-        axios.defaults.withCredentials = true;
         // 声明为AJAX请求
         Object.assign(axios.defaults.headers.common, config.headers, {
             'X-Requested-With': 'XMLHttpRequest'
         });
+        axios.defaults.withCredentials = true;
     },
     get(url, params, callback, options) {
         if (typeof params === 'function' || (callback && typeof callback === 'object')) {
