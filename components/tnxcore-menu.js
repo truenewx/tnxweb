@@ -11,6 +11,9 @@ function isGranted(authority, item) {
             }
         }
         if (item.permission) {
+            if (authority.permissions.contains('*')) {
+                return true;
+            }
             if (!authority.permissions.containsIgnoreCase(item.permission)) {
                 return false;
             }
