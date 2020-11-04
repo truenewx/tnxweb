@@ -115,4 +115,8 @@ export default {
     float: right;
     margin-right: 6px;
 }
+
+.el-tree.border {
+    border-radius: 4px;
+}
 </style>

@@ -6,6 +6,60 @@ body {
     margin: 0;
 }
 
+.el-header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.el-header ul.tnxel-nav {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    margin: 0;
+    height: 100%;
+}
+
+.el-header ul.tnxel-nav li {
+    display: flex;
+    align-items: center;
+    color: inherit;
+}
+
+.el-header ul.tnxel-nav li i {
+    font-size: 18px;
+}
+
+.el-header ul.tnxel-nav li a {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.el-header ul.tnxel-nav li a i,
+.el-header ul.tnxel-nav li button i {
+    color: rgba(96, 98, 102, 0.7);
+}
+
+.el-header ul.tnxel-nav li a:hover i {
+    color: rgba(96, 98, 102, 1);
+}
+
+.el-header ul.tnxel-nav li button {
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.el-header ul.tnxel-nav li .el-badge {
+    height: 100%;
+}
+
+.el-header ul.tnxel-nav li .el-badge .el-badge__content.is-fixed {
+    top: 16px;
+    right: 24px;
+}
+
 .el-divider__text, .el-link {
     font-weight: unset;
     font-size: unset;
@@ -36,6 +90,14 @@ body {
 .el-form-item__error.el-form-item__error--inline {
     margin-left: 0;
     padding-top: 0;
+}
+
+.el-form .el-card__body {
+    padding: 1rem 1rem 0 1rem;
+}
+
+.el-form--inline .el-form-item {
+    margin-right: 1rem;
 }
 
 el-button {
@@ -150,4 +212,8 @@ a:hover,
 
 [slot] {
     display: none;
+}
+
+.bg-primary .el-dropdown {
+    color: #fff;
 }
