@@ -1,15 +1,15 @@
 <template>
     <div class="tnxel-tag-select">
-        <el-input prefix-icon="el-icon-search" :placeholder="'输入' + keywordCaption + '进行筛选'"
+        <el-input prefix-icon="el-icon-search" :placeholder="'可输入' + keywordCaption + '进行筛选'"
             :clearable="true" v-model="keyword" v-if="paged"/>
         <div class="tnxel-tag-group" v-if="tags">
             <el-tag v-for="tag in tags" :key="tag.key" :type="type" :size="tagSize"
                 :effect="isSelected(tag.key) ? 'dark' : 'plain'" @click="select(tag.key)">
-                {{tag.text}}
+                {{ tag.text }}
             </el-tag>
             <div class="d-flex justify-content-between" v-if="paged && paged.pageCount > 1">
                 <div class="el-pagination">
-                    <span class="el-pagination__total">已选择 {{selectedKeys.length}} 个</span>
+                    <span class="el-pagination__total">已选择 {{ selectedKeys.length }} 个</span>
                 </div>
                 <el-pagination layout="prev, pager, next" background @current-change="query"
                     :total="paged.total" :page-size="paged.pageSize" :current-page="paged.pageNo"/>
@@ -144,7 +144,7 @@ export default {
 <style scoped>
 .tnxel-tag-select .el-input {
     margin-bottom: 5px;
-    width: 200px;
+    width: 210px;
 }
 
 .tnxel-tag-select .tnxel-tag-group .el-tag {
