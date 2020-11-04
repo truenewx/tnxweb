@@ -184,22 +184,6 @@ el-button {
     display: inline-flex;
 }
 
-a,
-.link,
-.el-link.el-link--primary {
-    color: #409eff;
-    text-decoration: none;
-    vertical-align: middle;
-}
-
-a:hover,
-.link:hover,
-.el-link.el-link--primary:hover {
-    color: #0056b3;
-    cursor: pointer;
-    text-decoration: none;
-}
-
 .el-pagination {
     padding: 0;
     margin-top: 1rem;
@@ -212,8 +196,4 @@ a:hover,
 
 [slot] {
     display: none;
-}
-
-.bg-primary .el-dropdown {
-    color: #fff;
 }
