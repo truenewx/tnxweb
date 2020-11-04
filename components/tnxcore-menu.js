@@ -165,19 +165,15 @@ function findAssignableItems(items) {
             operations: [],
         };
         prepareItem(item);
-        if (item.permission) {
-            Object.assign(assignableItem, item, {
-                subs: [],
-                operations: [],
-            });
-        }
         if (item.subs && item.subs.length) {
             assignableItem.subs = findAssignableItems(item.subs);
         }
         if (item.operations && item.operations.length) {
             assignableItem.operations = findAssignableItems(item.operations);
         }
-        if (assignableItem.caption || assignableItem.subs.length || assignableItem.operations.length) {
+        // 当前菜单有许可限定，或有可分配的子级或操作，则当前菜单项为可分配项
+        if (item.permission || assignableItem.subs.length || assignableItem.operations.length) {
+            assignableItem = Object.assign({}, item, assignableItem);
             assignableItems.push(assignableItem);
         }
     });
