@@ -197,3 +197,25 @@ el-button {
 [slot] {
     display: none;
 }
+
+.el-tooltip__popper.is-light {
+    border-color: #EBEEF5;
+    color: #606266;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.el-tooltip__popper.is-light[x-placement^=top] .popper__arrow {
+    border-top-color: #EBEEF5;
+}
+
+.el-tooltip__popper.is-light[x-placement^=bottom] .popper__arrow {
+    border-bottom-color: #EBEEF5;
+}
+
+.el-tooltip__popper.is-light[x-placement^=left] .popper__arrow {
+    border-left-color: #EBEEF5;
+}
+
+.el-tooltip__popper.is-light[x-placement^=right] .popper__arrow {
+    border-right-color: #EBEEF5;
+}
