@@ -16,8 +16,7 @@
             :multiple="uploadLimit.number > 1"
             :accept="uploadAccept">
             <i slot="default" class="el-icon-plus"></i>
-            <div slot="file" slot-scope="{file}" class="el-upload-list__panel"
-                :data-file-id="getFileId(file)">
+            <div slot="file" slot-scope="{file}" class="el-upload-list__panel" :data-file-id="getFileId(file)">
                 <img class="el-upload-list__item-thumbnail" :src="file.url">
                 <label class="el-upload-list__item-status-label">
                     <i class="el-icon-upload-success el-icon-check"></i>
@@ -160,12 +159,25 @@ export default {
                 }
                 if (initialFiles instanceof Array) {
                     const fileList = [];
-                    initialFiles.forEach(file => {
-                        fileList.push({
-                            name: file.name,
-                            url: 'http:' + (file.thumbnailReadUrl || file.readUrl),
-                            storageUrl: file.storageUrl,
-                        });
+                    initialFiles.forEach(initialFile => {
+                        let url = initialFile.thumbnailReadUrl || initialFile.readUrl;
+                        if (url.startsWith('//')) {
+                            url = window.location.protocol + url;
+                        }
+                        const file = {
+                            name: initialFile.name,
+                            url: url,
+                            storageUrl: initialFile.storageUrl,
+                        };
+                        fileList.push(file);
+                        if (!initialFile.width || !initialFile.height) {
+                            const image = new Image();
+                            image.src = url;
+                            image.onload = function() {
+                                file.width = image.width;
+                                file.height = image.height;
+                            }
+                        }
                     });
                     return fileList;
                 }
