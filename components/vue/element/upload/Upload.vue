@@ -159,30 +159,25 @@ export default {
                 }
                 if (initialFiles instanceof Array) {
                     const fileList = [];
+                    const _this = this;
                     initialFiles.forEach(initialFile => {
-                        let url = initialFile.thumbnailReadUrl || initialFile.readUrl;
-                        if (url.startsWith('//')) {
-                            url = window.location.protocol + url;
-                        }
-                        const file = {
+                        fileList.push({
                             name: initialFile.name,
-                            url: url,
+                            url: _this._getFullReadUrl(initialFile.thumbnailReadUrl || initialFile.readUrl),
+                            previewUrl: _this._getFullReadUrl(initialFile.readUrl),
                             storageUrl: initialFile.storageUrl,
-                        };
-                        fileList.push(file);
-                        if (!initialFile.width || !initialFile.height) {
-                            const image = new Image();
-                            image.src = url;
-                            image.onload = function() {
-                                file.width = image.width;
-                                file.height = image.height;
-                            }
-                        }
+                        });
                     });
                     return fileList;
                 }
             }
             return [];
+        },
+        _getFullReadUrl: function(readUrl) {
+            if (readUrl && readUrl.startsWith('//')) {
+                return window.location.protocol + readUrl;
+            }
+            return readUrl;
         },
         getFileId: function(file) {
             if (!file.id) {
@@ -334,6 +329,20 @@ export default {
             }
         },
         previewFile: function(file) {
+            if (!file.width || !file.height) {
+                const image = new Image();
+                image.src = file.previewUrl || file.url;
+                const _this = this;
+                image.onload = function() {
+                    file.width = image.width;
+                    file.height = image.height;
+                    _this._doPreviewFile(file);
+                }
+            } else {
+                this._doPreviewFile(file);
+            }
+        },
+        _doPreviewFile: function(file) {
             const dialogPadding = 16;
             let top = (util.getDocHeight() - file.height) / 2 - dialogPadding;
             top = Math.max(top, 5); // 最高顶部留5px空隙
