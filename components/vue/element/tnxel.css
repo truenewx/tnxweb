@@ -6,9 +6,14 @@ body {
     margin: 0;
 }
 
-.el-header {
+el-header, .el-header {
     padding-left: 1rem;
     padding-right: 1rem;
+}
+
+el-header a img,
+.el-header a img {
+    margin-top: 4px;
 }
 
 .el-header ul.tnxel-nav {
