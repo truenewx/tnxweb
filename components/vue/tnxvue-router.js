@@ -32,13 +32,21 @@ function applyItemsToRoutes(items, routes, fnImportPage) {
 }
 
 const Router = function Router(menu, fnImportPage) {
-    this.menu = menu;
+    if (Array.isArray(menu)) {
+        this.items = [];
+        let _this = this;
+        menu.forEach(function(m) {
+            _this.items = _this.items.concat(m.items);
+        });
+    } else {
+        this.items = menu.items;
+    }
     this.fnImportPage = fnImportPage;
 }
 
 Router.prototype.getRoutes = function() {
     const routes = [];
-    applyItemsToRoutes(this.menu.items, routes, this.fnImportPage);
+    applyItemsToRoutes(this.items, routes, this.fnImportPage);
     return routes;
 }
 
