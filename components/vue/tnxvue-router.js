@@ -1,7 +1,7 @@
 /**
- * 路由器组件
+ * 基于Vue的路由器支持组件
  */
-function addRoute (path, routes, fnImportPage) {
+function addRoute(path, routes, fnImportPage) {
     if (path) {
         routes.push({
             path: path,
@@ -15,7 +15,7 @@ function addRoute (path, routes, fnImportPage) {
     return false;
 }
 
-function applyItemsToRoutes (items, routes, fnImportPage) {
+function applyItemsToRoutes(items, routes, fnImportPage) {
     if (items && items.length) {
         items.forEach(item => {
             if (addRoute(item.path, routes, fnImportPage)) {
@@ -31,7 +31,7 @@ function applyItemsToRoutes (items, routes, fnImportPage) {
     }
 }
 
-const Router = function Router (menu, fnImportPage) {
+const Router = function Router(menu, fnImportPage) {
     this.menu = menu;
     this.fnImportPage = fnImportPage;
 }
