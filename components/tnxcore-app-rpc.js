@@ -85,10 +85,10 @@ export default {
         this.request(url, options);
     },
     request(url, options) {
-        if (options.base) {
-            const baseUrl = this.apps[options.base];
-            if (baseUrl) {
-                url = baseUrl + url;
+        if (options.app) {
+            const appBaseUrl = this.apps[options.app];
+            if (appBaseUrl) {
+                url = appBaseUrl + url;
             }
         }
         const config = {

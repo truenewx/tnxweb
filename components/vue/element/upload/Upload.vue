@@ -146,7 +146,7 @@ export default {
                     });
                 }
             }, {
-                base: 'fss'
+                app: 'fss'
             });
         });
     },
@@ -244,7 +244,7 @@ export default {
                         rpc.ensureLogined(function() {
                             resolve(file);
                         }, {
-                            base: 'fss',
+                            app: 'fss',
                             toLogin: function(loginFormUrl, originalUrl, originalMethod) {
                                 // 此时已可知在CAS服务器上未登录，即未登录任一服务
                                 reject(file);
