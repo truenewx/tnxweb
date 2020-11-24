@@ -219,3 +219,81 @@ el-button {
 .el-tooltip__popper.is-light[x-placement^=right] .popper__arrow {
     border-right-color: #EBEEF5;
 }
+
+.text-primary {
+    color: #409EFF !important;
+}
+
+.text-success {
+    color: #67C23A !important;
+}
+
+.text-warning {
+    color: #E6A23C !important;
+}
+
+.text-danger {
+    color: #F56C6C !important;
+}
+
+.text-info {
+    color: #606266 !important;
+}
+
+.text-muted {
+    color: #909399 !important;
+}
+
+.bg-primary {
+    background-color: #409EFF !important;
+    color: #ffffff;
+}
+
+.bg-success {
+    background-color: #67C23A !important;
+    color: #ffffff;
+}
+
+.bg-warning {
+    background-color: #E6A23C !important;
+    color: #ffffff;
+}
+
+.bg-danger {
+    background-color: #F56C6C !important;
+    color: #ffffff;
+}
+
+.bg-info {
+    background-color: #909399 !important;
+    color: #ffffff;
+}
+
+.bg-muted {
+    background-color: #C0C4CC !important;
+}
+
+.bg-white {
+    background-color: #fff !important;
+}
+
+.bg-primary a,
+.bg-primary a:hover,
+.bg-primary .el-link--default,
+.bg-primary .el-link--default:hover,
+.bg-primary .el-dropdown {
+    color: #ffffff;
+}
+
+.bg-primary .el-menu {
+    background-color: #409EFF !important;
+}
+
+.bg-primary .el-menu-item a {
+    color: #ffffff;
+}
+
+.bg-primary .el-menu-item:hover a,
+.bg-primary .el-menu-item a:hover {
+    color: #409EFF;
+}
