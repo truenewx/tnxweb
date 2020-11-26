@@ -16,7 +16,7 @@ const messages = {
     maxValue: "{0}最大可以为{1}",
     minValue: "{0}最小可以为{1}",
     email: "{0}只能包含字母、数字、下划线、-和.，@两边各自的长度应小于64",
-    mobilePhone: "{0}只能是以1开头的11位数字手机号码",
+    cellphone: "{0}只能是以1开头的11位数字手机号码",
     url: "{0}应为格式正确的网址链接",
     regex: "{0}格式错误{1}",
     notContains: "{0}不能包含：{1}",
@@ -25,7 +25,7 @@ const messages = {
     forbiddenTags: "{0}不能包含标签：{1}"
 }
 
-export function getErrorMessage (validationName, fieldCaption) {
+export function getErrorMessage(validationName, fieldCaption) {
     let message = messages[validationName];
     if (message) {
         fieldCaption = fieldCaption || '';
