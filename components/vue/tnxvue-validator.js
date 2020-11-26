@@ -4,7 +4,15 @@
  */
 import validator from '../tnxcore-validator';
 
-function getRuleType (metaType) {
+const regExps = {
+    number: /^-?([1-9]\d{0,2}((,?\d{3})*|\d*)(\.\d*)?|0?\.\d*|0)$/,
+    integer: /^(-?[1-9]\d{0,2}(,?\d{3}))|0*$/,
+    email: /^[a-zA-Z0-9_\-]([a-zA-Z0-9_\-\.]{0,62})@[a-zA-Z0-9_\-]([a-zA-Z0-9_\-\.]{0,62})$/,
+    cellphone: /^1[34578]\d{9}$/,
+    url: /^https?:\/\/[A-Za-z0-9]+(\.?[A-Za-z0-9_-]+)*(:[0-9]+)?(\/\S*)?$/
+}
+
+function getRuleType(metaType) {
     switch (metaType) {
         case 'text':
             return 'string';
@@ -14,7 +22,7 @@ function getRuleType (metaType) {
     return metaType;
 }
 
-function getRule (validationName, validationValue, fieldMeta) {
+function getRule(validationName, validationValue, fieldMeta) {
     let rule;
     switch (validationName) {
         case 'required':
@@ -27,9 +35,22 @@ function getRule (validationName, validationValue, fieldMeta) {
                 }
             }
             break;
+        case 'cellphone':
+            rule = {
+                validator(r, fieldValue, callback, source, options) {
+                    if (validationValue && fieldValue) {
+                        if (!regExps.cellphone.test(fieldValue)) {
+                            const message = validator.getErrorMessage(validationName, fieldMeta.caption);
+                            return callback(new Error(message));
+                        }
+                    }
+                    return callback();
+                }
+            };
+            break;
         case 'maxLength':
             rule = {
-                validator (r, fieldValue, callback, source, options) {
+                validator(r, fieldValue, callback, source, options) {
                     if (typeof validationValue === 'number' && fieldValue) {
                         // 回车符计入长度
                         const enterLength = fieldValue.indexOf('\n') < 0 ? 0 : fieldValue.match(/\n/g).length;
@@ -42,11 +63,11 @@ function getRule (validationName, validationValue, fieldMeta) {
                     }
                     return callback();
                 }
-            }
+            };
             break;
         case 'notContainsHtmlChars':
             rule = {
-                validator (r, fieldValue, callback, source, options) {
+                validator(r, fieldValue, callback, source, options) {
                     if (typeof validationValue && fieldValue) {
                         const limitedValues = ['<', '>', '\'', '"', '/', '\\'];
                         for (let i = 0; i < limitedValues.length; i++) {
@@ -60,7 +81,7 @@ function getRule (validationName, validationValue, fieldMeta) {
                     }
                     return callback();
                 }
-            }
+            };
             break;
     }
     if (rule) {
@@ -79,7 +100,7 @@ function getRule (validationName, validationValue, fieldMeta) {
  * @param meta
  * @returns {{}}
  */
-export function getRules (meta) {
+export function getRules(meta) {
     const rules = {};
     Object.keys(meta).forEach(fieldName => {
         const fieldMeta = meta[fieldName];

@@ -96,6 +96,7 @@ Object.assign(tnxvue.util, {
 });
 
 // 元数据到async-validator组件规则的转换处理
+tnxvue.app.validator = validator;
 tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
     getMeta.call(tnxvue.app.rpc, url, function(meta) {
         if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
