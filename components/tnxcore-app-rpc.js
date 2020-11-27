@@ -184,6 +184,9 @@ export default {
                     }
                 }
             }
+            _this.error({
+                message: '非常抱歉，服务器出现了错误。不过放心，一切还在掌控之中...'
+            });
             console.error(url + ':\n' + error.stack);
         });
     },
@@ -239,10 +242,11 @@ export default {
     },
     getErrorMessage(errors) {
         let message = '';
-        if (errors instanceof Array) {
-            for (let i = 0; i < errors.length; i++) {
-                message += errors[i].message + '\n';
-            }
+        if (!Array.isArray(errors)) {
+            errors = [errors];
+        }
+        for (let i = 0; i < errors.length; i++) {
+            message += errors[i].message + '\n';
         }
         return message.trim();
     },
