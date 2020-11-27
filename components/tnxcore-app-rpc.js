@@ -182,11 +182,14 @@ export default {
                         }
                         break;
                     }
+                    case 500: {
+                        _this.error({
+                            message: '非常抱歉，服务器出现了错误。不过放心，一切还在掌控之中...'
+                        });
+                        break;
+                    }
                 }
             }
-            _this.error({
-                message: '非常抱歉，服务器出现了错误。不过放心，一切还在掌控之中...'
-            });
             console.error(url + ':\n' + error.stack);
         });
     },

@@ -24,6 +24,7 @@
     "element-ui": "^2.13.2",
     "jquery": "^3.5.1",
     "md5": "^2.3.0",
+    "base-64": "^1.0.0",
     "vue": "^2.6.12"
   },
   "devDependencies": {

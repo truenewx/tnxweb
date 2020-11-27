@@ -5,6 +5,9 @@
 import $ from 'jquery';
 import tnxcore from '../tnxcore.js';
 
+$.toJSON = JSON.stringify;
+$.parseJSON = JSON.parse;
+
 const tnxjq = $.extend({}, tnxcore, {
     libs: $.extend({}, tnxcore.libs, {$})
 });

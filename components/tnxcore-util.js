@@ -1,5 +1,6 @@
 // tnxcore-util.js
 import md5 from 'md5';
+import base64 from 'base-64';
 
 /**
  * 将指定对象中的所有字段拼凑成形如a=a1&b=b1的字符串
@@ -147,6 +148,7 @@ Object.assign(Array.prototype, {
 
 const util = {
     md5: md5,
+    base64: base64,
     /**
      * 从指定头信息集中获取指定头信息值
      * @param headers 头信息集
