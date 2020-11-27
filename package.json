@@ -48,9 +48,10 @@
       "parser": "babel-eslint"
     },
     "rules": {
+      "eqeqeq": "warn",
       "no-unused-vars": "warn",
       "no-undef": "warn",
-      "eqeqeq": "warn"
+      "no-useless-escape": "warn"
     }
   },
   "browserslist": [
