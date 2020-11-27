@@ -5,8 +5,8 @@
         status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
-            <el-button type="primary" @click="toSubmit">{{submitText}}</el-button>
-            <el-button @click="$router.back()">{{cancelText}}</el-button>
+            <el-button type="primary" @click="toSubmit">{{ submitText }}</el-button>
+            <el-button @click="$router.back()">{{ cancelText }}</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -28,7 +28,7 @@ export default {
         submit: Function,
         submitText: {
             type: String,
-            default: () => '确定' // TODO 国际化
+            default: () => '提交' // TODO 国际化
         },
         cancelText: {
             type: String,
