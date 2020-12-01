@@ -1,8 +1,7 @@
 <template>
     <el-form label-position="right" label-width="auto" ref="form" :model="model"
         :rules="validationRules" :validate-on-rule-change="false" :inline-message="true"
-        :disabled="disabled"
-        status-icon>
+        :disabled="disabled" status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
             <el-button type="primary" @click="toSubmit">{{ submitText }}</el-button>
@@ -49,6 +48,8 @@ export default {
                     vm.onRulesLoaded(meta.rules);
                 }
                 vm.validationRules = meta.rules;
+                delete meta.rules;
+                this.$emit('meta', meta);
             });
         } else if (this.rules) {
             this.validationRules = this.rules;
@@ -73,6 +74,8 @@ export default {
                     }
                     if (typeof callback === 'function') {
                         callback();
+                    } else {
+                        vm.$emit('submit');
                     }
                 }
             });
