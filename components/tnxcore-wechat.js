@@ -17,17 +17,20 @@
 }(window, document);
 // 以上来自于 http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js
 
-const webLogin = function(options) {
-    // 微信接口要求必须为生产环境域名
-    const productDomain = options.productDomain;
+const WebApp = function WebApp(appId, productDomain) {
+    this.appId = appId;
+    this.productDomain = productDomain; // 微信接口要求必须为生产环境域名
+}
+
+WebApp.prototype.login = function(containerId, redirectUri, options) {
     const protocol = window.location.protocol;
     const host = window.location.host;
 
-    let url = protocol + '//' + productDomain;
-    if (host !== productDomain) { // 不是生产环境则借助于生产环境的直接重定向能力进行再跳转
+    let url = protocol + '//' + this.productDomain;
+    if (host !== this.productDomain) { // 不是生产环境则借助于生产环境的直接重定向能力进行再跳转
         url += '/redirect/' + protocol.substr(0, protocol.length - 1) + '/' + host;
     }
-    url += options.redirectUri;
+    url += redirectUri;
 
     let state = undefined;
     if (options.state) {
@@ -41,12 +44,13 @@ const webLogin = function(options) {
     }
 
     new window.WxLogin({
-        id: options.containerId,
-        appid: options.appId,
+        id: containerId,
+        appid: this.appId,
         scope: "snsapi_login",
         redirect_uri: encodeURI(url),
         href: cssHref,
         state: state,
     });
 };
-export default {webLogin}
+
+export default {WebApp}
