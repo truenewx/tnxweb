@@ -5,11 +5,13 @@
 
 import util from './tnxcore-util';
 import app from "./tnxcore-app";
+import wechat from './tnxcore-wechat';
 
 const tnxcore = {
     libs: {},
     util: util,
     app: app,
+    wechat: wechat,
     alert(message, title, callback) {
         if (typeof title === 'function') {
             callback = title;
