@@ -35,7 +35,7 @@ WebApp.prototype.login = function(containerId, redirectUri, options) {
     let state = undefined;
     if (options.state) {
         state = JSON.stringify(options.state);
-        state = util.base64.encode(state);
+        state = window.tnx.util.base64.encode(state);
     }
 
     let cssHref = undefined;
@@ -53,4 +53,5 @@ WebApp.prototype.login = function(containerId, redirectUri, options) {
     });
 };
 
+export {WebApp};
 export default {WebApp}
