@@ -95,6 +95,13 @@ Object.assign(tnxvue.util, {
     }
 });
 
+tnxvue.app.isProduction = function() {
+    if (process && process.env && process.env.NODE_ENV !== 'production') {
+        return false;
+    }
+    return true;
+};
+
 // 元数据到async-validator组件规则的转换处理
 tnxvue.app.validator = validator;
 tnxvue.app.rpc.getMeta = Function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
