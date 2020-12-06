@@ -28,9 +28,21 @@ WebApp.prototype.login = function(containerId, redirectUri, options) {
 
     let url = protocol + '//' + this.productDomain;
     if (host !== this.productDomain) { // 不是生产环境则借助于生产环境的直接重定向能力进行再跳转
-        url += '/redirect/' + protocol.substr(0, protocol.length - 1) + '/' + host;
+        url += '/redirect/';
+        if (redirectUri.startsWith('/')) { // 目标跳转地址是相对地址，则加上当前网站根地址
+            url += protocol.substr(0, protocol.length - 1) + '/' + host + redirectUri;
+        } else { // 不以/开头，视为绝对地址
+            let index = redirectUri.indexOf('://');
+            if (index < 0) { // 绝对地址中一定包含://
+                console.error('错误的跳转目标地址：' + redirectUri);
+                return;
+            }
+            url += redirectUri.substr(0, index); // 协议部分
+            url += redirectUri.substr(index + 2);
+        }
+    } else {
+        url += redirectUri;
     }
-    url += redirectUri;
 
     let state = undefined;
     if (options.state) {
