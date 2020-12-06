@@ -1,6 +1,7 @@
 // tnxvue-validator.js
 /**
- * 校验规则转换器，将服务端元数据中的校验规则转换为async-validator组件的规则
+ * 校验规则转换器，将服务端元数据中的校验规则转换为async-validator组件的规则。
+ * async-validator组件详见：https://github.com/yiminghe/async-validator
  */
 import validator from '../tnxcore-validator';
 
@@ -12,14 +13,21 @@ const regExps = {
     url: /^https?:\/\/[A-Za-z0-9]+(\.?[A-Za-z0-9_-]+)*(:[0-9]+)?(\/\S*)?$/
 }
 
+/**
+ * async-validator组件支持的类型清单
+ */
+const ruleTypes = ['string', 'number', 'boolean', 'method', 'regexp', 'integer', 'float', 'array', 'object', 'enum',
+    'date', 'url', 'hex', 'email', 'any'];
+
 function getRuleType(metaType) {
+    if (ruleTypes.contains(metaType)) {
+        return metaType;
+    }
     switch (metaType) {
-        case 'text':
-            return 'string';
         case 'decimal':
             return 'float';
     }
-    return metaType;
+    return ruleTypes[0];
 }
 
 function getRule(validationName, validationValue, fieldMeta) {

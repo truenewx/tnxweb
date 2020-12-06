@@ -46,6 +46,8 @@ export default {
             this.tnx.app.rpc.getMeta(this.rules, meta => {
                 if (vm.onRulesLoaded) {
                     vm.onRulesLoaded(meta.rules);
+                } else {
+                    vm.$emit('rules-loaded', meta.rules);
                 }
                 vm.validationRules = meta.rules;
                 delete meta.rules;
