@@ -88,8 +88,8 @@ el-header a img,
     margin-right: 4px;
 }
 
-.el-form-item__error {
-    padding-top: 1px;
+.el-form-item__error--inline {
+    margin-top: 10px;
 }
 
 .el-form-item__content {
