@@ -75,7 +75,7 @@ export default {
                         callback = vm.submit;
                     }
                     if (typeof callback === 'function') {
-                        if (disabled) {
+                        if (disabled !== false) {
                             vm.disable();
                         }
                         callback(vm);
