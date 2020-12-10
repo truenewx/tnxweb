@@ -170,14 +170,14 @@ export default {
                                 }
                             });
                             // 转换错误消息之后，与403错误做相同处理
-                            if (_this._handleErrors(errors, options)) {
+                            if (_this.handleErrors(errors, options)) {
                                 return;
                             }
                         }
                         break;
                     }
                     case 403: {
-                        if (_this._handleErrors(response.data.errors, options)) {
+                        if (_this.handleErrors(response.data.errors, options)) {
                             return;
                         }
                         break;
@@ -228,7 +228,7 @@ export default {
     toLogin(loginFormUrl, originalUrl, originalMethod) {
         return false;
     },
-    _handleErrors(errors, options) {
+    handleErrors(errors, options) {
         if (errors) {
             if (options && typeof options.error === 'function') {
                 options.error(errors);

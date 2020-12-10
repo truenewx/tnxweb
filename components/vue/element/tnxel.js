@@ -153,6 +153,14 @@ const tnxel = Object.assign({}, tnxvue, {
 tnxel.libs.Vue.use(tnxel);
 tnxel.libs.Vue_UMD.use(tnxel);
 
+const rpc = tnxel.app.rpc;
+rpc.handleErrors = Function.around(rpc.handleErrors, function(handleErrors, errors, options) {
+    if (options.form && options.form.disable) {
+        options.form.disable(false);
+    }
+    handleErrors.call(rpc, errors, options);
+});
+
 window.tnx = tnxel;
 
 export default tnxel;
