@@ -67,7 +67,7 @@ export default {
         validateField(props, callback) {
             this.$refs.form.validateField(props, callback);
         },
-        toSubmit(callback) {
+        toSubmit(callback, disabled) {
             const vm = this;
             this.validate(function(success) {
                 if (success) {
@@ -75,9 +75,10 @@ export default {
                         callback = vm.submit;
                     }
                     if (typeof callback === 'function') {
-                        callback();
-                    } else {
-                        vm.$emit('submit');
+                        if (disabled) {
+                            vm.disable();
+                        }
+                        callback(vm);
                     }
                 }
             });
