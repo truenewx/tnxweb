@@ -183,9 +183,9 @@ export default {
                         break;
                     }
                     case 500: {
-                        _this.error({
+                        _this.handleErrors({
                             message: '非常抱歉，服务器出现了错误。不过放心，一切还在掌控之中...'
-                        });
+                        }, options);
                         break;
                     }
                 }
