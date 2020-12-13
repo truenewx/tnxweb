@@ -230,6 +230,19 @@ const util = {
             + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
         return new RegExp(regex).test(s);
     },
+    isIntranetHostname(hostname) {
+        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0:0:0:0:0:0:0:1') { // 本机
+            return true;
+        }
+        if (hostname.startsWith('192.168.') || hostname.startsWith('10.')) { // 192.168网段或10网段
+            return true;
+        } else if (hostname.startsWith('172.')) { // 172.16-172.31网段
+            let seg = hostname.substring(4, hostname.indexOf('.', 4)); // 取第二节
+            let value = parseInt(seg);
+            return 16 <= value && value <= 31;
+        }
+        return false;
+    },
     getCapacityCaption(capacity, scale) {
         if (typeof capacity === 'number') {
             scale = scale || 0;
