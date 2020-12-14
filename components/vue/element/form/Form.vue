@@ -1,6 +1,6 @@
 <template>
     <el-form label-position="right" label-width="auto" ref="form" :model="model"
-        :rules="validationRules" :validate-on-rule-change="false" :inline-message="true"
+        :rules="validationRules" :validate-on-rule-change="false" :inline-message="inlineMessage"
         :disabled="disabled" status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
@@ -32,6 +32,10 @@ export default {
         cancelText: {
             type: String,
             default: () => '取消'
+        },
+        inlineMessage: {
+            type: Boolean,
+            default: () => true
         }
     },
     data() {
