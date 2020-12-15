@@ -3,12 +3,8 @@
  * 基于Vue的扩展支持
  */
 import Vue from 'vue';
-import Vue_UMD from 'vue/dist/vue';
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
-
-Vue.umd = false;
-Vue_UMD.umd = true;
 
 function getDefaultDialogButtons(type, callback) {
     if (type) {
@@ -56,7 +52,7 @@ const components = {
 };
 
 const tnxvue = Object.assign({}, tnxcore, {
-    libs: Object.assign({}, tnxcore.libs, {Vue, Vue_UMD}),
+    libs: Object.assign({}, tnxcore.libs, {Vue}),
     components,
     install(Vue) {
         Object.keys(components).forEach(key => {
@@ -129,7 +125,6 @@ tnxvue.app.page.init = Function.around(tnxvue.app.page.init, function(init, page
 });
 
 Vue.use(tnxvue);
-Vue_UMD.use(tnxvue);
 
 window.tnx = tnxvue;
 

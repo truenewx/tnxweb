@@ -151,7 +151,6 @@ const tnxel = Object.assign({}, tnxvue, {
 });
 
 tnxel.libs.Vue.use(tnxel);
-tnxel.libs.Vue_UMD.use(tnxel);
 
 const rpc = tnxel.app.rpc;
 rpc.handleErrors = Function.around(rpc.handleErrors, function(handleErrors, errors, options) {
