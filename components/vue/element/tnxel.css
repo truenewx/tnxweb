@@ -78,14 +78,26 @@ el-header a img,
     margin-bottom: 0;
 }
 
-.el-form-item__label {
+.el-form--label-right .el-form-item__label {
     padding-right: 1rem;
 }
 
-.el-form-item__label:before {
+.el-form--label-right .el-form-item__label:before {
     content: '*';
     color: transparent;
     margin-right: 4px;
+}
+
+.el-form--label-top .el-form-item__label {
+    padding-bottom: 0;
+}
+
+.el-form--label-top button {
+    width: 100%;
+}
+
+.el-form--label-top .el-button + .el-button {
+    margin: 10px 0 0 0;
 }
 
 .el-form-item__error--inline {

@@ -1,5 +1,5 @@
 <template>
-    <el-form label-position="right" label-width="auto" ref="form" :model="model"
+    <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
         :rules="validationRules" :validate-on-rule-change="false" :inline-message="inlineMessage"
         :disabled="disabled" status-icon>
         <slot></slot>
@@ -36,6 +36,10 @@ export default {
         inlineMessage: {
             type: Boolean,
             default: () => true
+        },
+        vertical: {
+            type: Boolean,
+            default: () => false
         }
     },
     data() {
