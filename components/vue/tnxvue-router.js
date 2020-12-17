@@ -1,6 +1,8 @@
 /**
  * 基于Vue的路由器支持组件
  */
+import VueRouter from 'vue-router';
+
 function addRoute(path, routes, fnImportPage) {
     if (path) {
         routes.push({
@@ -48,6 +50,13 @@ Router.prototype.getRoutes = function() {
     const routes = [];
     applyItemsToRoutes(this.items, routes, this.fnImportPage);
     return routes;
+}
+
+Router.prototype.createVueRouter = function() {
+    const vueRouter = new VueRouter({
+        routes: this.getRoutes()
+    });
+    return vueRouter;
 }
 
 export default Router;
