@@ -92,12 +92,28 @@ el-header a img,
     padding-bottom: 0;
 }
 
+.el-form--label-top .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
+    content: '';
+    margin-right: 0;
+}
+
+.el-form--label-top .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:after {
+    content: '*';
+    color: #F56C6C;
+    margin-left: 4px;
+}
+
 .el-form--label-top button {
     width: 100%;
 }
 
 .el-form--label-top .el-button + .el-button {
     margin: 10px 0 0 0;
+}
+
+.el-form-item__error {
+    position: unset;
+    margin-top: 4px;
 }
 
 .el-form-item__error--inline {
@@ -111,6 +127,23 @@ el-header a img,
 .el-form-item__content p {
     margin-block-start: 10px;
     margin-block-end: 10px;
+}
+
+.form-item-tip {
+    font-size: 12px;
+    line-height: 1;
+    color: #909399;
+    margin-top: 8px;
+}
+
+.el-form > .form-item-tip {
+    margin-top: -6px;
+    margin-bottom: 1rem;
+}
+
+.is-error .form-item-tip,
+.is-success .el-form-item__error {
+    display: none;
 }
 
 .el-card__body {

@@ -1,11 +1,11 @@
 <template>
     <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
-        :rules="validationRules" :validate-on-rule-change="false" :inline-message="inlineMessage"
+        :rules="validationRules" :validate-on-rule-change="false" :inline-message="!vertical"
         :disabled="disabled" status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
             <el-button type="primary" @click="toSubmit">{{ submitText }}</el-button>
-            <el-button @click="$router.back()">{{ cancelText }}</el-button>
+            <el-button type="default" @click="toCancel">{{ cancelText }}</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -25,6 +25,7 @@ export default {
         rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
         onRulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: Function,
+        cancel: Function,
         submitText: {
             type: String,
             default: () => '提交' // TODO 国际化
@@ -32,10 +33,6 @@ export default {
         cancelText: {
             type: String,
             default: () => '取消'
-        },
-        inlineMessage: {
-            type: Boolean,
-            default: () => true
         },
         vertical: {
             type: Boolean,
@@ -91,6 +88,13 @@ export default {
                 }
             });
         },
+        toCancel() {
+            if (this.cancel) {
+                this.cancel();
+            } else {
+                this.$router.back();
+            }
+        }
     }
 }
 </script>
