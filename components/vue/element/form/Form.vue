@@ -25,7 +25,7 @@ export default {
         rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
         onRulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: Function,
-        cancel: Function,
+        cancel: [String, Function],
         submitText: {
             type: String,
             default: () => '提交' // TODO 国际化
@@ -89,8 +89,10 @@ export default {
             });
         },
         toCancel() {
-            if (this.cancel) {
+            if (typeof this.cancel === 'function') {
                 this.cancel();
+            } else if (typeof this.cancel === 'string') {
+                this.$router.back(this.cancel);
             } else {
                 this.$router.back();
             }

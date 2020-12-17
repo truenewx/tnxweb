@@ -1,8 +1,6 @@
 /**
- * 基于Vue的路由器支持组件
+ * 基于Vue的路由器构建函数
  */
-import VueRouter from 'vue-router';
-
 function addRoute(path, routes, fnImportPage) {
     if (path) {
         routes.push({
@@ -33,30 +31,35 @@ function applyItemsToRoutes(items, routes, fnImportPage) {
     }
 }
 
-const Router = function Router(menu, fnImportPage) {
+export default function(VueRouter, menu, fnImportPage) {
+    let items;
     if (Array.isArray(menu)) {
-        this.items = [];
+        items = [];
         let _this = this;
         menu.forEach(function(m) {
-            _this.items = _this.items.concat(m.items);
+            items = items.concat(m.items);
         });
     } else {
-        this.items = menu.items;
+        items = menu.items;
     }
-    this.fnImportPage = fnImportPage;
-}
 
-Router.prototype.getRoutes = function() {
     const routes = [];
-    applyItemsToRoutes(this.items, routes, this.fnImportPage);
-    return routes;
-}
+    applyItemsToRoutes(items, routes, fnImportPage);
 
-Router.prototype.createVueRouter = function() {
-    const vueRouter = new VueRouter({
-        routes: this.getRoutes()
+    const router = new VueRouter({routes});
+    router.afterEach((to, from) => {
+        router.prev = from;
     });
-    return vueRouter;
+    router.back = Function.around(router.back, function(back, path) {
+        if (path) {
+            if (router.prev && router.prev.path === path) {
+                back.call(router);
+            } else {
+                router.replace(path);
+            }
+        } else {
+            back.call(router);
+        }
+    });
+    return router;
 }
-
-export default Router;

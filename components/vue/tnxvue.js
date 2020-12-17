@@ -5,6 +5,7 @@
 import Vue from 'vue';
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
+import buildRouter from './tnxvue-router';
 
 function getDefaultDialogButtons(type, callback) {
     if (type) {
@@ -54,6 +55,7 @@ const components = {
 const tnxvue = Object.assign({}, tnxcore, {
     libs: Object.assign({}, tnxcore.libs, {Vue}),
     components,
+    buildRouter,
     install(Vue) {
         Object.keys(components).forEach(key => {
             const component = components[key];
