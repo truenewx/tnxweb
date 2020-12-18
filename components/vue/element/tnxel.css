@@ -146,6 +146,13 @@ el-header a img,
     display: none;
 }
 
+/**
+ * 与默认按钮的边框颜色保持一致
+ */
+.el-card {
+    border-color: #DCDFE6;
+}
+
 .el-card__body {
     padding: 1rem;
 }
@@ -160,6 +167,10 @@ el-header a img,
 
 el-button {
     visibility: hidden;
+}
+
+.el-button i + span {
+    margin-left: 5px;
 }
 
 .el-alert {

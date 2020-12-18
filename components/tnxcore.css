@@ -44,3 +44,7 @@ a.plain:focus {
 .w-fit-content {
     width: fit-content;
 }
+
+.font-size-100 {
+    font-size: 1rem !important;
+}
