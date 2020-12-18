@@ -289,6 +289,10 @@ el-button {
     border-right-color: #EBEEF5;
 }
 
+.el-dropdown-menu__item .el-avatar--icon i {
+    margin: 0;
+}
+
 .text-primary {
     color: #409EFF !important;
 }
