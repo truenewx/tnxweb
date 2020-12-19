@@ -58,7 +58,9 @@ const tnxel = Object.assign({}, tnxvue, {
             callback = title;
             title = '提示';
         }
-        options = Object.assign({}, options, {
+        options = Object.assign({
+            dangerouslyUseHTMLString: true,
+        }, options, {
             type: 'warning',
         });
         this._closeMessage();
@@ -66,7 +68,9 @@ const tnxel = Object.assign({}, tnxvue, {
         this._handleZIndex('.el-message-box__wrapper:last');
     },
     success(message, callback, options) {
-        options = Object.assign({}, options, {
+        options = Object.assign({
+            dangerouslyUseHTMLString: true,
+        }, options, {
             type: 'success',
         });
         this._closeMessage();
@@ -74,7 +78,9 @@ const tnxel = Object.assign({}, tnxvue, {
         this._handleZIndex('.el-message-box__wrapper:last');
     },
     error(message, callback, options) {
-        options = Object.assign({}, options, {
+        options = Object.assign({
+            dangerouslyUseHTMLString: true,
+        }, options, {
             type: 'error',
         });
         this._closeMessage();
@@ -87,7 +93,9 @@ const tnxel = Object.assign({}, tnxvue, {
             callback = title;
             title = '确认';
         }
-        options = Object.assign({}, options, {
+        options = Object.assign({
+            dangerouslyUseHTMLString: true,
+        }, options, {
             type: 'info',
             iconClass: 'el-icon-question',
         });
@@ -111,6 +119,7 @@ const tnxel = Object.assign({}, tnxvue, {
         options = Object.assign({
             type: 'success', // 默认为成功主题，可更改为其它主题
             offset: this.util.getDocHeight() * 0.4,
+            dangerouslyUseHTMLString: true,
         }, options, {
             center: true, // 因为是竖向排列，所以必须居中
             showClose: false,
@@ -127,8 +136,10 @@ const tnxel = Object.assign({}, tnxvue, {
             options = message;
             message = undefined;
         }
-        options = Object.assign({}, options, {
-            text: message
+        options = Object.assign({
+            dangerouslyUseHTMLString: true,
+        }, options, {
+            text: message,
         });
         this._closeMessage();
         window.tnx.loadingInstance = Loading.service(options);
