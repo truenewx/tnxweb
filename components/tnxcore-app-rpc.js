@@ -98,6 +98,11 @@ export default {
             data: options.body,
         };
         if (config.params) {
+            Object.keys(config.params).forEach(key => {
+                if (config.params[key] === undefined || config.params[key] === null) {
+                    delete config.params[key];
+                }
+            });
             config.paramsSerializer = function(params) {
                 return Object.stringify(params);
             };
