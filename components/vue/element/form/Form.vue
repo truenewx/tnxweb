@@ -4,8 +4,8 @@
         :disabled="disabled" status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
-            <el-button type="primary" @click="toSubmit">{{ submitText }}</el-button>
-            <el-button type="default" @click="toCancel">{{ cancelText }}</el-button>
+            <el-button type="primary" @click="toSubmit">{{ _submitText }}</el-button>
+            <el-button type="default" @click="toCancel" v-if="cancel !== false">{{ cancelText }}</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -25,11 +25,8 @@ export default {
         rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
         onRulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: Function,
-        cancel: [String, Function],
-        submitText: {
-            type: String,
-            default: () => '提交' // TODO 国际化
-        },
+        submitText: String,
+        cancel: [String, Function, Boolean],
         cancelText: {
             type: String,
             default: () => '取消'
@@ -44,6 +41,11 @@ export default {
             validationRules: {},
             disabled: false,
         };
+    },
+    computed: {
+        _submitText() {
+            return this.cancel === false ? '保存' : '提交';
+        }
     },
     created() {
         if (typeof this.rules === 'string') {
@@ -93,7 +95,7 @@ export default {
                 this.cancel();
             } else if (typeof this.cancel === 'string') {
                 this.$router.back(this.cancel);
-            } else {
+            } else if (this.cancel !== false) {
                 this.$router.back();
             }
         }
