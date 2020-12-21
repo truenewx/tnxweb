@@ -48,13 +48,18 @@ export default {
             type: String,
             required: true,
         },
+        modelIdentity: String,
         files: [Object, Array],
     },
     data() {
+        let action = rpc.apps.fss + '/upload/' + this.type;
+        if (this.modelIdentity) {
+            action += '/' + this.modelIdentity;
+        }
         return {
             id: 'upload-container-' + new Date().getTime(),
             alone: !rpc.apps.fss.startsWith(rpc.getBaseUrl()), // FSS是否独立部署的服务
-            action: rpc.apps.fss + '/upload/' + this.type,
+            action: action,
             uploadLimit: {},
             tipMessages: {
                 number: '最多只能上传{0}个文件',
