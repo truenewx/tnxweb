@@ -78,6 +78,10 @@ el-header a img,
     margin-bottom: 0;
 }
 
+.el-form-item__label {
+    font-weight: 560;
+}
+
 .el-form--label-right .el-form-item__label {
     padding-right: 1rem;
 }
@@ -153,8 +157,16 @@ el-header a img,
     border-color: #DCDFE6;
 }
 
+.el-card__header {
+    padding: 1rem;
+}
+
 .el-card__body {
     padding: 1rem;
+}
+
+.el-card__body .card-body-text {
+    font-size: 14px;
 }
 
 .el-form .el-card__body {
