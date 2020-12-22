@@ -2,6 +2,8 @@
 import md5 from 'md5';
 import base64 from 'base-64';
 
+// 不要在Object.prototype中添加函数，否则vue会报错
+
 /**
  * 将指定对象中的所有字段拼凑成形如a=a1&b=b1的字符串
  * @param object 对象
@@ -9,18 +11,28 @@ import base64 from 'base-64';
  */
 Object.stringify = function(object) {
     let s = '';
-    Object.keys(object).forEach(function(key) {
-        const value = object[key];
-        if (value instanceof Array) {
-            value.forEach(function(v) {
-                s += '&' + key + '=' + v;
-            });
-        } else {
-            s += '&' + key + '=' + value;
+    if (typeof object === 'object') {
+        Object.keys(object).forEach(key => {
+            let value = object[key];
+            switch (typeof value) {
+                case 'function':
+                    value = value();
+                    break;
+                case 'object':
+                    if (typeof value.toString === 'function') {
+                        value = value.toString();
+                    } else {
+                        value = null;
+                    }
+                    break;
+            }
+            if (value) {
+                s += '&' + key + '=' + value;
+            }
+        });
+        if (s.length) { // 去掉头部多余的&
+            s = s.substr(1);
         }
-    });
-    if (s.length > 0) {
-        s = s.substr(1);
     }
     return s;
 };
@@ -36,7 +48,52 @@ Function.around = function(target, around) {
     }
 };
 
-// 不要在Object.prototype中添加函数，否则vue会报错
+/**
+ * 获取在[min,max)范围内的随机整数值
+ * @param min 最小值
+ * @param max 最大值
+ * @returns {number} 随机整数值
+ */
+Number.randomInt = function(min, max) {
+    if (min > max) { // 最小值如果大于最大值，则互换
+        let temp = min;
+        min = max;
+        max = temp;
+    }
+    let result = Math.ceil(min + (max - min) * Math.random()); // 用ceil()方法以确保结果一定不小于最小值
+    if (result >= max) { // 确保不大于最大值
+        result = max;
+    }
+    return result;
+}
+
+Object.assign(Number.prototype, {
+    /**
+     * 获取当前数值四舍五入到指定精度后的结果
+     * @param scale 精度，即小数点后的位数
+     * @returns {number} 四舍五入后的结果数值
+     */
+    halfUp(scale) {
+        const p = Math.pow(10, scale);
+        return Math.round(this * p) / p;
+    },
+    toPercent(scale) {
+        return (this * 100).halfUp(scale) + "%";
+    }
+});
+
+String.random = function(length, chars) {
+    if (length >= 0) {
+        chars = chars || 'abcdefghijklmnopqrstuvwxyz'; // 默认取值范围为所有小写字母
+        let s = '';
+        for (let i = 0; i < length; i++) {
+            s += chars.charAt(Number.randomInt(0, chars.length));
+        }
+        return s;
+    }
+    return undefined;
+}
+
 Object.assign(String.prototype, {
     firstToLowerCase() {
         return this.substring(0, 1).toLowerCase() + this.substring(1);
@@ -61,21 +118,6 @@ Object.assign(String.prototype, {
     contains(searchString) {
         return this.indexOf(searchString) >= 0;
     },
-});
-
-Object.assign(Number.prototype, {
-    /**
-     * 获取当前数值四舍五入到指定精度后的结果
-     * @param scale 精度，即小数点后的位数
-     * @returns {number} 四舍五入后的结果数值
-     */
-    halfUp(scale) {
-        const p = Math.pow(10, scale);
-        return Math.round(this * p) / p;
-    },
-    toPercent(scale) {
-        return (this * 100).halfUp(scale) + "%";
-    }
 });
 
 Object.assign(Element.prototype, {
@@ -269,6 +311,37 @@ const util = {
         }
         return undefined;
     },
+    /**
+     * 与URL有关的工具方法
+     */
+    url: {
+        /**
+         * 为指定URL附加参数
+         * @param url 原URL
+         * @param params 附加的参数集
+         * @return {string} 新的URL
+         */
+        appendParams(url, params) {
+            if (typeof url === 'string') {
+                let parameterString = Object.stringify(params);
+                if (parameterString.length) {
+                    return url += (url.contains('?') ? '&' : '?') + parameterString;
+                }
+            }
+            return url;
+        },
+        /**
+         * 为指定URL附加一个随机参数，用于刷新资源
+         * @param url URL
+         * @return {string} 新的URL
+         */
+        appendRandomParam(url) {
+            let params = {};
+            let key = '_' + String.random(8);
+            params[key] = new Date().getTime();
+            return this.appendParams(url, params);
+        }
+    }
 };
 
 export default util;
