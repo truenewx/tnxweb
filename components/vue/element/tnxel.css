@@ -411,3 +411,7 @@ el-button {
 .border-white {
     border-color: #fff !important;
 }
+
+.el-avatar img {
+    width: 100%;
+}
