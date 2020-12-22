@@ -26,6 +26,8 @@ function getRuleType(metaType) {
     switch (metaType) {
         case 'decimal':
             return 'float';
+        case 'regex':
+            return 'regexp';
     }
     return ruleTypes[0];
 }
@@ -64,8 +66,8 @@ function getRule(validationName, validationValue, fieldMeta) {
                         const enterLength = fieldValue.indexOf('\n') < 0 ? 0 : fieldValue.match(/\n/g).length;
                         const fieldLength = fieldValue.length + enterLength;
                         if (fieldLength > validationValue) {
-                            const message = validator.getErrorMessage(validationName,
-                                fieldMeta.caption, validationValue, fieldLength - validationValue);
+                            const message = validator.getErrorMessage(validationName, fieldMeta.caption,
+                                validationValue, fieldLength - validationValue);
                             return callback(new Error(message));
                         }
                     }
@@ -81,8 +83,7 @@ function getRule(validationName, validationValue, fieldMeta) {
                         for (let i = 0; i < limitedValues.length; i++) {
                             if (fieldValue.indexOf(limitedValues[i]) >= 0) {
                                 const s = limitedValues.join(' ');
-                                const message = validator.getErrorMessage('notContains',
-                                    fieldMeta.caption, s);
+                                const message = validator.getErrorMessage('notContains', fieldMeta.caption, s);
                                 return callback(new Error(message));
                             }
                         }
@@ -91,13 +92,20 @@ function getRule(validationName, validationValue, fieldMeta) {
                 }
             };
             break;
+        case 'regex':
+            rule = {
+                type: 'regexp',
+                pattern: validationValue[0],
+                message: fieldMeta.caption + validationValue[1],
+            }
+            break;
     }
     if (rule) {
         let metaType = 'text';
         if (fieldMeta.type) {
             metaType = fieldMeta.type.toLowerCase();
         }
-        rule.type = getRuleType(metaType);
+        rule.type = rule.type || getRuleType(metaType);
         rule.trigger = metaType === 'option' ? 'change' : 'blur';
     }
     return rule;
