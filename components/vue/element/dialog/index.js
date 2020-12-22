@@ -28,6 +28,7 @@ export default function(content, title, buttons, options, contentProps) {
             title: title,
             contentProps: contentProps,
             buttons: buttons,
+            theme: options.theme,
         }
     }).$mount('#' + dialogId);
     dialog.options = Object.assign(dialog.options, options);

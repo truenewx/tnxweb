@@ -7,7 +7,7 @@ import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 import buildRouter from './tnxvue-router';
 
-function getDefaultDialogButtons(type, callback) {
+function getDefaultDialogButtons(type, callback, theme) {
     if (type) {
         if (type === 'confirm') {
             return [{
@@ -19,7 +19,7 @@ function getDefaultDialogButtons(type, callback) {
                 }
             }, {
                 text: '确定',
-                type: 'primary',
+                type: theme || 'primary',
                 click(close) {
                     if (typeof callback === 'function') {
                         return callback.call(this, true, close);
@@ -29,7 +29,7 @@ function getDefaultDialogButtons(type, callback) {
         } else {
             return [{
                 text: '确定',
-                type: 'primary',
+                type: theme || 'primary',
                 click(close) {
                     if (typeof callback === 'function') {
                         return callback.call(this, close);
@@ -73,7 +73,7 @@ const tnxvue = Object.assign({}, tnxcore, {
             options = options || {};
         }
         const title = component.title || options.title;
-        const buttons = options.buttons || getDefaultDialogButtons(options.type, options.click);
+        const buttons = options.buttons || getDefaultDialogButtons(options.type, options.click, options.theme);
         delete options.title;
         delete options.type;
         delete options.click;
@@ -88,8 +88,7 @@ Object.assign(tnxvue.util, {
      * @returns {boolean} 是否组件实例
      */
     isComponent: obj => {
-        return (typeof obj === 'object') && (typeof obj.data === 'function')
-            && (typeof obj.render === 'function');
+        return (typeof obj === 'object') && (typeof obj.data === 'function') && (typeof obj.render === 'function');
     }
 });
 

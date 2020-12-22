@@ -430,6 +430,7 @@ export default {
 
 .el-form-item__content .el-upload__tip {
     line-height: 1;
+    margin-top: 0;
 }
 
 </style>

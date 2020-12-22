@@ -1,5 +1,6 @@
 <template>
     <el-dialog
+        :class="this.theme ? ('theme-' + this.theme) : ''"
         :visible.sync="visible"
         :destroy-on-close="true"
         :append-to-body="true"
@@ -12,12 +13,10 @@
         :top="top"
         :before-close="beforeClose"
         @closed="onClosed">
-        <div slot="title" class="dialog-title" :class="{'border-bottom': title}"
-            v-html="title"></div>
+        <div slot="title" class="dialog-title" :class="{'border-bottom': title}" v-html="title"></div>
         <div v-if="contentValue" v-html="contentValue"></div>
         <tnxel-dialog-content ref="content" v-bind="contentProps" v-else></tnxel-dialog-content>
-        <div slot="footer" class="dialog-footer"
-            :class="{'border-top': buttons && buttons.length}">
+        <div slot="footer" class="dialog-footer" :class="{'border-top': buttons && buttons.length}">
             <el-button v-for="(button, index) in buttons" :type="button.type" :key="index"
                 @click="btnClick(index)">{{ button.caption || button.text }}
             </el-button>
@@ -30,7 +29,7 @@ import $ from 'jquery';
 
 export default {
     name: 'TnxelDialog',
-    props: ['title', 'content', 'contentProps', 'buttons'],
+    props: ['title', 'content', 'contentProps', 'buttons', 'theme'],
     data() {
         return {
             visible: true,
