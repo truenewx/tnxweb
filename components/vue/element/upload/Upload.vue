@@ -380,7 +380,11 @@ export default {
                         return;
                     }
                 }
-                resolve(storageUrls);
+                try {
+                    resolve(storageUrls);
+                } catch (error) {
+                    console.error(error);
+                }
             });
         }
     }
