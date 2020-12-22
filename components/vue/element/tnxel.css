@@ -314,61 +314,9 @@ el-button {
     color: #409EFF !important;
 }
 
-.text-success {
-    color: #67C23A !important;
-}
-
-.text-warning {
-    color: #E6A23C !important;
-}
-
-.text-danger {
-    color: #F56C6C !important;
-}
-
-.text-info {
-    color: #606266 !important;
-}
-
-.text-muted {
-    color: #909399 !important;
-}
-
-.text-white {
-    color: #ffffff !important;
-}
-
 .bg-primary {
     background-color: #409EFF !important;
     color: #ffffff;
-}
-
-.bg-success {
-    background-color: #67C23A !important;
-    color: #ffffff;
-}
-
-.bg-warning {
-    background-color: #E6A23C !important;
-    color: #ffffff;
-}
-
-.bg-danger {
-    background-color: #F56C6C !important;
-    color: #ffffff;
-}
-
-.bg-info {
-    background-color: #909399 !important;
-    color: #ffffff;
-}
-
-.bg-muted {
-    background-color: #fafafa !important;
-}
-
-.bg-white {
-    background-color: #fff !important;
 }
 
 .bg-primary a,
@@ -390,4 +338,76 @@ el-button {
 .bg-primary .el-menu-item:hover a,
 .bg-primary .el-menu-item a:hover {
     color: #409EFF;
+}
+
+.border-primary {
+    border-color: #409EFF !important;
+}
+
+.text-success {
+    color: #67C23A !important;
+}
+
+.bg-success {
+    background-color: #67C23A !important;
+    color: #ffffff;
+}
+
+.border-success {
+    border-color: #67C23A !important;
+}
+
+.text-warning {
+    color: #E6A23C !important;
+}
+
+.bg-warning {
+    background-color: #E6A23C !important;
+    color: #ffffff;
+}
+
+.border-warning {
+    border-color: #E6A23C !important;
+}
+
+.text-danger {
+    color: #F56C6C !important;
+}
+
+.bg-danger {
+    background-color: #F56C6C !important;
+    color: #ffffff;
+}
+
+.border-danger {
+    border-color: #F56C6C !important;
+}
+
+.text-info {
+    color: #606266 !important;
+}
+
+.bg-info {
+    background-color: #909399 !important;
+    color: #ffffff;
+}
+
+.text-muted {
+    color: #909399 !important;
+}
+
+.bg-muted {
+    background-color: #fafafa !important;
+}
+
+.text-white {
+    color: #ffffff !important;
+}
+
+.bg-white {
+    background-color: #fff !important;
+}
+
+.border-white {
+    border-color: #fff !important;
 }
