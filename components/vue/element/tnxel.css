@@ -275,6 +275,11 @@ el-button {
     padding: 0 0.5rem;
 }
 
+.el-tag.rounded-pill {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
 [slot] {
     display: none;
 }
