@@ -1,10 +1,10 @@
 <template>
     <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
         :rules="validationRules" :validate-on-rule-change="false" :inline-message="!vertical"
-        :disabled="disabled" status-icon>
+        :disabled="disabled" :class="theme ? ('theme-' + theme) : null" status-icon>
         <slot></slot>
         <el-form-item v-if="submit">
-            <el-button :type="submitType" :plain="submitPlain" @click="toSubmit">{{ _submitText }}</el-button>
+            <el-button :type="theme || 'primary'" @click="toSubmit">{{ _submitText }}</el-button>
             <el-button type="default" @click="toCancel" v-if="cancel !== false">{{ cancelText }}</el-button>
         </el-form-item>
     </el-form>
@@ -26,11 +26,11 @@ export default {
         onRulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: Function,
         submitText: String,
-        submitTheme: {
-            type: String,
-            default: () => 'primary'
+        theme: String,
+        cancel: {
+            type: [String, Function, Boolean],
+            default: () => true
         },
-        cancel: [String, Function, Boolean],
         cancelText: {
             type: String,
             default: () => '取消'
@@ -47,16 +47,6 @@ export default {
         };
     },
     computed: {
-        submitPlain() {
-            return this.submitTheme.endsWith('-plain');
-        },
-        submitType() {
-            if (this.submitPlain) {
-                let index = this.submitTheme.lastIndexOf('-plain');
-                return this.submitTheme.substr(0, index);
-            }
-            return this.submitTheme;
-        },
         _submitText() {
             if (this.submitText) {
                 return this.submitText;
