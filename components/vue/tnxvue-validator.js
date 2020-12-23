@@ -78,7 +78,7 @@ function getRule(validationName, validationValue, fieldMeta) {
         case 'notContainsHtmlChars':
             rule = {
                 validator(r, fieldValue, callback, source, options) {
-                    if (typeof validationValue && fieldValue) {
+                    if (validationValue && fieldValue) {
                         const limitedValues = ['<', '>', '\'', '"', '/', '\\'];
                         for (let i = 0; i < limitedValues.length; i++) {
                             if (fieldValue.indexOf(limitedValues[i]) >= 0) {
@@ -94,9 +94,22 @@ function getRule(validationName, validationValue, fieldMeta) {
             break;
         case 'regex':
             rule = {
-                type: 'regexp',
-                pattern: validationValue[0],
-                message: fieldMeta.caption + validationValue[1],
+                validator(r, fieldValue, callback, source, options) {
+                    if (fieldValue) {
+                        let pattern = '^' + validationValue[0] + '$';
+                        let regexp = new RegExp(pattern, 'gi');
+                        if (!regexp.test(fieldValue)) {
+                            let message = validationValue[1];
+                            if (message) {
+                                message = (fieldMeta.caption || '') + message;
+                            } else {
+                                message = validator.getErrorMessage('regex', fieldMeta.caption, '');
+                            }
+                            return callback(new Error(message));
+                        }
+                    }
+                    return callback();
+                }
             }
             break;
     }
