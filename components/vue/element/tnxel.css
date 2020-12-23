@@ -200,6 +200,10 @@ el-button {
     display: inline-flex;
 }
 
+.el-alert .el-alert__title {
+    font-size: 14px;
+}
+
 .el-message-box {
     vertical-align: unset;
 }

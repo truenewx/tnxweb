@@ -11,12 +11,14 @@ import Upload from './upload';
 import PermissionTree from './permission-tree';
 import Form from './form';
 import TagSelect from './tag-select';
+import Alert from './alert';
 
 const components = Object.assign({}, tnxvue.components, {
     Upload,
     PermissionTree,
     Form,
     TagSelect,
+    Alert,
 });
 
 const tnxel = Object.assign({}, tnxvue, {
