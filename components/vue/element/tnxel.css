@@ -345,6 +345,7 @@ el-button {
 }
 
 .bg-primary .el-menu-item:hover a,
+.bg-primary .el-menu-item.is-active a,
 .bg-primary .el-menu-item a:hover {
     color: #409EFF;
 }
