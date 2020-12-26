@@ -33,7 +33,7 @@ function getRuleType(metaType) {
 }
 
 function getRule(validationName, validationValue, fieldMeta) {
-    let rule;
+    let rule = undefined;
     switch (validationName) {
         case 'required':
         case 'notEmpty':
@@ -76,21 +76,31 @@ function getRule(validationName, validationValue, fieldMeta) {
             };
             break;
         case 'notContainsHtmlChars':
-            rule = {
-                validator(r, fieldValue, callback, source, options) {
-                    if (validationValue && fieldValue) {
-                        const limitedValues = ['<', '>', '\'', '"', '/', '\\'];
-                        for (let i = 0; i < limitedValues.length; i++) {
-                            if (fieldValue.indexOf(limitedValues[i]) >= 0) {
-                                const s = limitedValues.join(' ');
-                                const message = validator.getErrorMessage('notContains', fieldMeta.caption, s);
-                                return callback(new Error(message));
+            if (validationValue === true) {
+                rule = {
+                    validator(r, fieldValue, callback, source, options) {
+                        if (validationValue && fieldValue) {
+                            const limitedValues = ['<', '>', '\'', '"', '/', '\\'];
+                            for (let i = 0; i < limitedValues.length; i++) {
+                                if (fieldValue.indexOf(limitedValues[i]) >= 0) {
+                                    const s = limitedValues.join(' ');
+                                    const message = validator.getErrorMessage('notContains', fieldMeta.caption, s);
+                                    return callback(new Error(message));
+                                }
                             }
                         }
+                        return callback();
                     }
-                    return callback();
+                };
+            }
+            break;
+        case 'email':
+            if (validationValue === true) {
+                rule = {
+                    type: validationName,
+                    message: validator.getErrorMessage(validationName, fieldMeta.caption),
                 }
-            };
+            }
             break;
         case 'regex':
             rule = {
