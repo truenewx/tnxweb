@@ -48,13 +48,13 @@ export default {
             type: String,
             required: true,
         },
-        modelIdentity: String,
+        scope: String,
         files: [Object, Array],
     },
     data() {
         let action = rpc.apps.fss + '/upload/' + this.type;
-        if (this.modelIdentity) {
-            action += '/' + this.modelIdentity;
+        if (this.scope) {
+            action += '/' + this.scope;
         }
         return {
             id: 'upload-container-' + new Date().getTime(),
