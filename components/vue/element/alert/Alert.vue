@@ -1,7 +1,7 @@
 <template>
     <div role="alert" class="el-alert" :class="[typeClass, effectClass]">
         <i class="el-alert__icon" :class="iconClass" :style="iconStyle" v-if="showIcon"></i>
-        <div class="el-alert__content">
+        <div class="el-alert__content" :class="contentClass">
             <div class="el-alert__title">
                 <slot></slot>
             </div>
@@ -26,6 +26,7 @@ export default {
             default: () => true
         },
         iconSize: [Number, String],
+        contentClass: String,
     },
     computed: {
         typeClass() {

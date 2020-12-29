@@ -42,7 +42,7 @@ a.plain:focus {
 }
 
 .w-fit-content {
-    width: fit-content;
+    width: fit-content !important;
 }
 
 .font-size-100 {

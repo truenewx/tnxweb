@@ -319,7 +319,12 @@ export default {
             }
         },
         onError: function(error, file, fileList) {
-            console.error(error.message);
+            let message = JSON.parse(error.message);
+            if (message && message.errors) {
+                rpc.handleErrors(message.errors);
+            } else {
+                console.error(error.message);
+            }
         },
         removeFile: function(file) {
             this.uploadFiles.remove(function(f) {
