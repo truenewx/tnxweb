@@ -42,7 +42,7 @@ const tnxel = Object.assign({}, tnxvue, {
     _handleZIndex(selector) {
         const util = this.util;
         setTimeout(function() {
-            const topZIndex = util.minTopZIndex(2);
+            const topZIndex = util.dom.minTopZIndex(2);
             const element = $(selector);
             const zIndex = Number(element.css('zIndex'));
             if (isNaN(zIndex) || topZIndex > zIndex) {
@@ -120,7 +120,7 @@ const tnxel = Object.assign({}, tnxvue, {
         }
         options = Object.assign({
             type: 'success', // 默认为成功主题，可更改为其它主题
-            offset: this.util.getDocHeight() * 0.4,
+            offset: this.util.dom.getDocHeight() * 0.4,
             dangerouslyUseHTMLString: true,
         }, options, {
             center: true, // 因为是竖向排列，所以必须居中

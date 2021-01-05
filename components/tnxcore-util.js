@@ -204,43 +204,6 @@ const util = {
         }
         return undefined;
     },
-    getMetaContent(name) {
-        const meta = document.querySelector('meta[name="' + name + '"]');
-        if (meta) {
-            return meta.getAttribute('content');
-        }
-        return undefined;
-    },
-    getDocWidth() {
-        return document.documentElement.clientWidth;
-    },
-    getDocHeight() {
-        return document.documentElement.clientHeight;
-    },
-    maxZIndex(elements) {
-        let result = -1;
-        elements.forEach(function(element) {
-            const zIndex = Number(element.style.zIndex);
-            if (result < zIndex) {
-                result = zIndex;
-            }
-        });
-        return result;
-    },
-    /**
-     * 获取最小的可位于界面顶层的ZIndex
-     */
-    minTopZIndex(step) {
-        step = step || 1;
-        const maxValue = 2147483584; // 允许的最大值，取各浏览器支持的最大值中的最小一个（Opera）
-        const elements = document.body.querySelectorAll('*');
-        const maxZIndex = this.maxZIndex(elements); // 可见DOM元素中的最高层级
-        if (maxZIndex > maxValue - step) {
-            return maxValue;
-        } else {
-            return maxZIndex + step;
-        }
-    },
     /**
      * 最少超时回调
      * @param beginTime 开始时间
@@ -259,32 +222,6 @@ const util = {
             setTimeout(callback, minTimeout - dTime);
         }
     },
-    isUrl(s) {
-        const regex = '^((https|http|ftp)?://)'
-            + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?' //ftp的user@
-            + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
-            + '|' // 允许IP和DOMAIN（域名）
-            + '([0-9a-z_!~*\'()-]+.)*' // 二级域名：www
-            + '([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].' // 一级域名
-            + '[a-z]{2,6})' // 域名后缀：.com
-            + '(:[0-9]{1,4})?' // 端口：80
-            + '((/?)|'
-            + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
-        return new RegExp(regex).test(s);
-    },
-    isIntranetHostname(hostname) {
-        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0:0:0:0:0:0:0:1') { // 本机
-            return true;
-        }
-        if (hostname.startsWith('192.168.') || hostname.startsWith('10.')) { // 192.168网段或10网段
-            return true;
-        } else if (hostname.startsWith('172.')) { // 172.16-172.31网段
-            let seg = hostname.substring(4, hostname.indexOf('.', 4)); // 取第二节
-            let value = parseInt(seg);
-            return 16 <= value && value <= 31;
-        }
-        return false;
-    },
     getCapacityCaption(capacity, scale) {
         if (typeof capacity === 'number') {
             scale = scale || 0;
@@ -301,15 +238,47 @@ const util = {
         }
         return undefined;
     },
-    getAnchor() {
-        const anchor = window.location.hash;
-        if (anchor) {
-            const index = anchor.indexOf('#');
-            if (index >= 0) {
-                return anchor.substr(index + 1);
+    /**
+     * 与DOM有关的工具方法
+     */
+    dom: {
+        getMetaContent(name) {
+            const meta = document.querySelector('meta[name="' + name + '"]');
+            if (meta) {
+                return meta.getAttribute('content');
             }
-        }
-        return undefined;
+            return undefined;
+        },
+        getDocWidth() {
+            return document.documentElement.clientWidth;
+        },
+        getDocHeight() {
+            return document.documentElement.clientHeight;
+        },
+        maxZIndex(elements) {
+            let result = -1;
+            elements.forEach(function(element) {
+                const zIndex = Number(element.style.zIndex);
+                if (result < zIndex) {
+                    result = zIndex;
+                }
+            });
+            return result;
+        },
+        /**
+         * 获取最小的可位于界面顶层的ZIndex
+         */
+        minTopZIndex(step) {
+            step = step || 1;
+            const maxValue = 2147483584; // 允许的最大值，取各浏览器支持的最大值中的最小一个（Opera）
+            const elements = document.body.querySelectorAll('*');
+            const maxZIndex = this.maxZIndex(elements); // 可见DOM元素中的最高层级
+            if (maxZIndex > maxValue - step) {
+                return maxValue;
+            } else {
+                return maxZIndex + step;
+            }
+        },
     },
     /**
      * 与URL有关的工具方法
@@ -340,7 +309,43 @@ const util = {
             let key = '_' + String.random(8);
             params[key] = new Date().getTime();
             return this.appendParams(url, params);
-        }
+        },
+        getAnchor() {
+            const anchor = window.location.hash;
+            if (anchor) {
+                const index = anchor.indexOf('#');
+                if (index >= 0) {
+                    return anchor.substr(index + 1);
+                }
+            }
+            return undefined;
+        },
+        isIntranetHostname(hostname) {
+            if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0:0:0:0:0:0:0:1') { // 本机
+                return true;
+            }
+            if (hostname.startsWith('192.168.') || hostname.startsWith('10.')) { // 192.168网段或10网段
+                return true;
+            } else if (hostname.startsWith('172.')) { // 172.16-172.31网段
+                let seg = hostname.substring(4, hostname.indexOf('.', 4)); // 取第二节
+                let value = parseInt(seg);
+                return 16 <= value && value <= 31;
+            }
+            return false;
+        },
+        isUrl(s) {
+            const regex = '^((https|http|ftp)?://)'
+                + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?' //ftp的user@
+                + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
+                + '|' // 允许IP和DOMAIN（域名）
+                + '([0-9a-z_!~*\'()-]+.)*' // 二级域名：www
+                + '([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].' // 一级域名
+                + '[a-z]{2,6})' // 域名后缀：.com
+                + '(:[0-9]{1,4})?' // 端口：80
+                + '((/?)|'
+                + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
+            return new RegExp(regex).test(s);
+        },
     }
 };
 

@@ -354,10 +354,10 @@ export default {
         },
         _doPreviewFile: function(file) {
             const dialogPadding = 16;
-            let top = (util.getDocHeight() - file.height) / 2 - dialogPadding;
+            let top = (util.dom.getDocHeight() - file.height) / 2 - dialogPadding;
             top = Math.max(top, 5); // 最高顶部留5px空隙
             let width = file.width;
-            width = Math.min(width, util.getDocWidth() - 10); // 最宽两边各留10px空隙
+            width = Math.min(width, util.dom.getDocWidth() - 10); // 最宽两边各留10px空隙
             this.preview = {
                 visible: true,
                 url: file.url,

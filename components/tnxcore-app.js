@@ -199,11 +199,11 @@ const app = {
     },
     init(container, callback) {
         // 初始化app环境
-        const context = util.getMetaContent('app.context');
+        const context = util.dom.getMetaContent('app.context');
         if (context) {
             this.context = context;
         }
-        this.version = util.getMetaContent('app.version');
+        this.version = util.dom.getMetaContent('app.version');
 
         if (typeof container === 'function') {
             callback = container;
