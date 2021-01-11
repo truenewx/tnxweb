@@ -362,6 +362,12 @@ export default {
                 width: width + 'px',
             });
         },
+        size: function() {
+            if (this.uploadFiles && this.uploadFiles.length) {
+                return this.uploadFiles.length;
+            }
+            return 0;
+        },
         /**
          * 获取已上传文件的存储地址集合
          * @return {Promise<已全部上传完毕的回调, 未全部上传完毕的回调>}
@@ -406,6 +412,7 @@ export default {
 .el-upload-list--picture-card .el-upload-list__item {
     width: 1rem;
     height: 1rem;
+    transition: none;
 }
 
 .el-upload-list__panel {
