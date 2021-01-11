@@ -33,7 +33,6 @@ export default {
     data() {
         return {
             visible: true,
-            top: '40vh',
             contentValue: this.content,
             options: {
                 modal: true, // 是否需要遮罩层
@@ -41,6 +40,7 @@ export default {
                 'close-on-press-escape': true, // 是否可以通过按下 ESC 关闭对话框
                 'show-close': true, // 是否显示关闭按钮
                 center: false, // 是否对头部和底部采用居中布局
+                top: '40vh',
                 width: '512px',
                 // 以上均为element的Dialog组件配置项
                 onShown: undefined, // 对话框展示后的事件回调
@@ -48,6 +48,13 @@ export default {
         };
     },
     computed: {
+        top() {
+            if (typeof this.options.top === 'function') {
+                return this.options.top();
+            } else {
+                return this.options.top;
+            }
+        },
         width() {
             if (typeof this.options.width === 'function') {
                 return this.options.width();
