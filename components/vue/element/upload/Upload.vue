@@ -25,7 +25,7 @@
                     <span class="el-upload-list__item-preview" @click="previewFile(file)">
                     <i class="el-icon-zoom-in"></i>
                     </span>
-                    <span class="el-upload-list__item-delete" @click="removeFile(file)">
+                    <span class="el-upload-list__item-delete" @click="removeFile(file)" v-if="!readOnly">
                       <i class="el-icon-delete"></i>
                     </span>
                 </span>
@@ -50,6 +50,10 @@ export default {
         },
         scope: String,
         files: [Object, Array],
+        readOnly: {
+            type: Boolean,
+            default: () => false,
+        },
     },
     data() {
         let action = rpc.apps.fss + '/upload/' + this.type;
@@ -74,17 +78,11 @@ export default {
                 'X-Requested-With': 'XMLHttpRequest'
             },
             fileList: this.getFileList(),
-            preview: {
-                visible: false,
-                url: '',
-                top: undefined,
-                width: undefined,
-            },
         };
     },
     computed: {
         tip() {
-            if (this.uploadLimit) {
+            if (!this.readOnly && this.uploadLimit) {
                 let tip = '';
                 const separator = '，';
                 if (this.uploadLimit.number > 1) {
@@ -358,15 +356,10 @@ export default {
             top = Math.max(top, 5); // 最高顶部留5px空隙
             let width = file.width;
             width = Math.min(width, util.dom.getDocWidth() - 10); // 最宽两边各留10px空隙
-            this.preview = {
-                visible: true,
-                url: file.url,
-                top: top + 'px',
-                width: width + 'px',
-            }
             const content = '<img src="' + file.url + '" style="max-width: 100%;">';
             tnx.dialog(content, '', [], {
-                width: width + 'px'
+                top: top + 'px',
+                width: width + 'px',
             });
         },
         /**
