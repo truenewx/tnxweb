@@ -319,6 +319,10 @@ el-button {
     margin: 0;
 }
 
+.dropdown-item-title {
+    line-height: 20px;
+}
+
 .text-primary {
     color: #409EFF !important;
 }
