@@ -145,7 +145,7 @@ export default {
 
                 if (vm.fileList && vm.fileList.length) {
                     vm.fileList.forEach(function(file) {
-                        vm._resizeImage(file, vm.fileList);
+                        vm._resizeImagePanel(file, vm.fileList);
                     });
                 }
             }, {
@@ -272,9 +272,9 @@ export default {
             });
         },
         onProgress: function(event, file, fileList) {
-            this._resizeImage(file, fileList);
+            this._resizeImagePanel(file, fileList);
         },
-        _resizeImage: function(file, fileList) {
+        _resizeImagePanel: function(file, fileList) {
             if (fileList.length >= this.uploadLimit.number) {
                 // 隐藏添加按钮
                 $('#' + this.id + ' .el-upload').hide();
@@ -288,27 +288,6 @@ export default {
                 height: $upload.css('height'),
             });
             $listItem.parent().css({'min-height': $upload.outerHeight(true)});
-            const $image = $('.el-upload-list__item-thumbnail', $listItem);
-            let imageWidth = $image.width();
-            let imageHeight = $image.height();
-            // 缓存图片尺寸，预览时需用到
-            file.width = imageWidth;
-            file.height = imageHeight;
-            const imageRatio = imageWidth / imageHeight; // 图片宽高比
-            const boxRatio = $upload.outerWidth() / $upload.outerHeight(); // 缩略框宽高比
-            if (boxRatio > imageRatio) {
-                // 缩略框的宽高比大于图片宽高比，说明等比缩放后，缩略框比图片更宽或更矮，此时应保持两者高度一致
-                imageHeight = $upload.height();
-                imageWidth = imageHeight * imageRatio;
-            } else {
-                // 否则，说明等比缩放后，缩略框比图片更窄或更高，此时应保持两者宽度一致。宽高比相等是满足此种情况的特例
-                imageWidth = $upload.width();
-                imageHeight = imageWidth / imageRatio;
-            }
-            $image.css({
-                width: imageWidth,
-                height: imageHeight,
-            });
         },
         onSuccess: function(uploadedFiles, file, fileList) {
             if (uploadedFiles instanceof Array) {
@@ -425,8 +404,7 @@ export default {
 }
 
 .el-upload-list--picture-card .el-upload-list__item-thumbnail {
-    width: unset;
-    height: unset;
+    object-fit: contain;
 }
 
 .el-upload-list--picture-card .el-upload-list__item-actions {
