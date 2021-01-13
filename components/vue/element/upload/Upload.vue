@@ -38,8 +38,9 @@
 <script>
 import $ from 'jquery';
 
-const util = window.tnx.util;
-const rpc = window.tnx.app.rpc;
+const tnx = window.tnx;
+const util = tnx.util;
+const rpc = tnx.app.rpc;
 
 export default {
     name: 'TnxelUpload',
