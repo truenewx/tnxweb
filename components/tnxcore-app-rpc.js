@@ -280,4 +280,27 @@ export default {
             });
         }
     },
+    _enumItemsMapping: {},
+    getEnumItems(type, subtype, callback) {
+        if (typeof subtype === 'function') {
+            callback = subtype;
+            subtype = undefined;
+        }
+        const mapping = this._enumItemsMapping;
+        const key = subtype ? (type + '-' + subtype) : type;
+        if (mapping[key]) {
+            if (typeof callback === 'function') {
+                callback(mapping[key]);
+            }
+        } else {
+            this.get('/api/meta/enums', {
+                type, subtype
+            }, function(items) {
+                mapping[key] = items;
+                if (typeof callback === 'function') {
+                    callback(items);
+                }
+            });
+        }
+    }
 };

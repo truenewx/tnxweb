@@ -12,6 +12,7 @@ import PermissionTree from './permission-tree';
 import Form from './form';
 import TagSelect from './tag-select';
 import Alert from './alert';
+import EnumSelect from './enum-select';
 
 const components = Object.assign({}, tnxvue.components, {
     Upload,
@@ -19,6 +20,7 @@ const components = Object.assign({}, tnxvue.components, {
     Form,
     TagSelect,
     Alert,
+    EnumSelect,
 });
 
 const tnxel = Object.assign({}, tnxvue, {
