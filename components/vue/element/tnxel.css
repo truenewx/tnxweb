@@ -280,8 +280,13 @@ el-button {
     margin-right: -5px;
 }
 
-.el-tabs__item {
-    padding: 0 0.5rem;
+.el-tabs--border-card {
+    box-shadow: none;
+    border-radius: 5px;
+}
+
+.el-tabs--border-card > .el-tabs__content {
+    padding: 1rem;
 }
 
 .el-tag.rounded-pill {
