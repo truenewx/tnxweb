@@ -115,6 +115,7 @@ function findItem(path, items, callback) {
 }
 
 const Menu = function Menu(config) {
+    this.caption = config.caption;
     this.items = config.items;
     this._url = config.url;
     this._grantedItems = null;
