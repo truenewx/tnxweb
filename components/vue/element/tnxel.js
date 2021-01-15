@@ -13,6 +13,7 @@ import Form from './form';
 import TagSelect from './tag-select';
 import Alert from './alert';
 import EnumSelect from './enum-select';
+import Paged from './paged';
 
 const components = Object.assign({}, tnxvue.components, {
     Upload,
@@ -21,6 +22,7 @@ const components = Object.assign({}, tnxvue.components, {
     TagSelect,
     Alert,
     EnumSelect,
+    Paged,
 });
 
 const tnxel = Object.assign({}, tnxvue, {
