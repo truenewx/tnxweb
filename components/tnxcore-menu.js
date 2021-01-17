@@ -214,16 +214,20 @@ Menu.prototype.loadGrantedItems = function(callback) {
         window.tnx.app.rpc.get(this._url, function(authorities) {
             if (authorities && authorities.length) {
                 authorities.forEach(auth => {
-                    switch (auth.kind) {
-                        case 'TYPE':
-                            _this.authority.type = auth.name;
-                            break;
-                        case 'RANK':
-                            _this.authority.rank = auth.name;
-                            break;
-                        case 'PERMISSION':
-                            _this.authority.permissions.push(auth.name);
-                            break;
+                    if (auth.kind && auth.name) {
+                        switch (auth.kind) {
+                            case 'TYPE':
+                                _this.authority.type = auth.name;
+                                break;
+                            case 'RANK':
+                                _this.authority.rank = auth.name;
+                                break;
+                            case 'PERMISSION':
+                                _this.authority.permissions.push(auth.name);
+                                break;
+                        }
+                    } else {
+                        _this.authority = auth;
                     }
                 });
             }
