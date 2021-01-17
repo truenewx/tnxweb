@@ -38,10 +38,6 @@
 <script>
 import $ from 'jquery';
 
-const tnx = window.tnx;
-const util = tnx.util;
-const rpc = tnx.app.rpc;
-
 export default {
     name: 'TnxelUpload',
     props: {
@@ -57,11 +53,14 @@ export default {
         },
     },
     data() {
+        const tnx = window.tnx;
+        const rpc = tnx.app.rpc;
         let action = rpc.apps.fss + '/upload/' + this.type;
         if (this.scope) {
             action += '/' + this.scope;
         }
         return {
+            tnx: tnx,
             id: 'upload-container-' + new Date().getTime(),
             alone: !rpc.apps.fss.startsWith(rpc.getBaseUrl()), // FSS是否独立部署的服务
             action: action,
@@ -90,7 +89,7 @@ export default {
                     tip += separator + this.tipMessages.number.format(this.uploadLimit.number);
                 }
                 if (this.uploadLimit.capacity > 0) {
-                    const capacity = util.getCapacityCaption(this.uploadLimit.capacity, 2);
+                    const capacity = this.tnx.util.getCapacityCaption(this.uploadLimit.capacity, 2);
                     tip += separator + this.tipMessages.capacity.format(capacity);
                 }
                 if (this.uploadLimit.extensions && this.uploadLimit.extensions.length) {
@@ -121,7 +120,7 @@ export default {
     mounted() {
         const vm = this;
         this.$nextTick(function() {
-            rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
+            vm.tnx.app.rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
                 vm.uploadLimit = uploadLimit;
                 // 初始化显示尺寸
                 let uploadSize = undefined;
@@ -186,10 +185,11 @@ export default {
         getFileId: function(file) {
             if (!file.id) {
                 if (file.url) { // 有URL的文件通过URL即可唯一确定
-                    file.id = util.md5(file.url);
+                    file.id = this.tnx.util.md5(file.url);
                 } else {
                     // 没有URL的文件，通过文件类型+文件名+文件大小+最后修改时间，几乎可以唯一区分一个文件，重复的概率极低，即使重复也不破坏业务一致性和完整性
-                    file.id = util.md5(file.type + '-' + file.name + '-' + file.size + '-' + file.lastModified);
+                    file.id = this.tnx.util.md5(
+                        file.type + '-' + file.name + '-' + file.size + '-' + file.lastModified);
                 }
             }
             return file.id;
@@ -207,15 +207,15 @@ export default {
             if (this.uploadLimit.number > 0 && this.uploadFiles.length > this.uploadLimit.number) {
                 let message = this.tipMessages.number.format(this.uploadLimit.number);
                 message += '，多余的文件未加入上传队列';
-                tnx.error(message);
+                this.tnx.error(message);
                 return false;
             }
             // 校验容量大小
             if (this.uploadLimit.capacity > 0 && file.size > this.uploadLimit.capacity) {
-                const capacity = util.getCapacityCaption(this.uploadLimit.capacity);
+                const capacity = this.tnx.util.getCapacityCaption(this.uploadLimit.capacity);
                 let message = this.tipMessages.capacity.format(capacity, 2);
-                message += '，文件"' + file.name + '"大小为' + util.getCapacityCaption(file.size, 2) + '，不符合要求';
-                tnx.error(message);
+                message += '，文件"' + file.name + '"大小为' + this.tnx.util.getCapacityCaption(file.size, 2) + '，不符合要求';
+                this.tnx.error(message);
                 return false;
             }
             // 校验扩展名
@@ -224,7 +224,7 @@ export default {
                 if (this.uploadLimit.extensionsRejected) { // 扩展名黑名单模式
                     if (this.uploadLimit.extensions.containsIgnoreCase(extension)) {
                         const extensions = this.uploadLimit.extensions.join('、');
-                        tnx.error(this.tipMessages.excludedExtensions.format(extensions));
+                        this.tnx.error(this.tipMessages.excludedExtensions.format(extensions));
                         return false;
                     }
                 } else { // 扩展名白名单模式
@@ -232,7 +232,7 @@ export default {
                         const extensions = this.uploadLimit.extensions.join('、');
                         let message = this.tipMessages.extensions.format(extensions);
                         message += '，文件"' + file.name + '"不符合要求';
-                        tnx.error(message);
+                        this.tnx.error(message);
                         return false;
                     }
                 }
@@ -241,6 +241,7 @@ export default {
         },
         beforeUpload: function(file) {
             const vm = this;
+            const rpc = this.tnx.app.rpc;
             return new Promise(function(resolve, reject) {
                 if (vm.validate(file)) {
                     if (vm.alone) {
@@ -299,7 +300,7 @@ export default {
         onError: function(error, file, fileList) {
             let message = JSON.parse(error.message);
             if (message && message.errors) {
-                rpc.handleErrors(message.errors);
+                this.tnx.app.rpc.handleErrors(message.errors);
             } else {
                 console.error(error.message);
             }
@@ -332,12 +333,12 @@ export default {
         },
         _doPreviewFile: function(file) {
             const dialogPadding = 16;
-            let top = (util.dom.getDocHeight() - file.height) / 2 - dialogPadding;
+            let top = (this.tnx.util.dom.getDocHeight() - file.height) / 2 - dialogPadding;
             top = Math.max(top, 5); // 最高顶部留5px空隙
             let width = file.width;
-            width = Math.min(width, util.dom.getDocWidth() - 10); // 最宽两边各留10px空隙
+            width = Math.min(width, this.tnx.util.dom.getDocWidth() - 10); // 最宽两边各留10px空隙
             const content = '<img src="' + file.url + '" style="max-width: 100%;">';
-            tnx.dialog(content, '', [], {
+            this.tnx.dialog(content, '', [], {
                 top: top + 'px',
                 width: width + 'px',
             });
