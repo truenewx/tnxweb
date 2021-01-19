@@ -35,7 +35,6 @@ export default function(VueRouter, menu, fnImportPage) {
     let items;
     if (Array.isArray(menu)) {
         items = [];
-        let _this = this;
         menu.forEach(function(m) {
             items = items.concat(m.items);
         });
