@@ -239,7 +239,7 @@ el-button {
 }
 
 .el-dialog {
-    border-radius: 4px;
+    border-radius: .25rem;
 }
 
 .el-dialog--center .el-dialog__body {
@@ -282,7 +282,7 @@ el-button {
 
 .el-tabs--border-card {
     box-shadow: none;
-    border-radius: 5px;
+    border-radius: .25rem;
 }
 
 .el-tabs--border-card > .el-tabs__content {

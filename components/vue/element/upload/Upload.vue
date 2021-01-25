@@ -378,7 +378,7 @@ export default {
 
 <style>
 .el-upload {
-    border-radius: 4px;
+    border-radius: .25rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;

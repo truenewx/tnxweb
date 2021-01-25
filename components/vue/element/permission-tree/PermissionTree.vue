@@ -9,7 +9,7 @@
         :expand-on-click-node="false"
         @check-change="onCheckChange"
         node-key="id"
-        class="px-1 py-2">
+        class="px-1 py-2" :style="{'max-height': maxHeight}">
         <div class="permission-node" slot-scope="{node,data}">
             <span v-if="node">{{ data.label }}</span>
             <span class="text-muted" :class="{'d-none': !data.remark}">({{ data.remark }})</span>
@@ -60,7 +60,7 @@ function addNodePermissionKeyTo(permissions, nodes, keys) {
 
 export default {
     name: 'TnxelPermissionTree',
-    props: ['menu', 'permissions'],
+    props: ['menu', 'permissions', 'maxHeight'],
     data() {
         return {
             nodes: getTreeNodes(this.menu),
@@ -116,7 +116,7 @@ export default {
     margin-right: 6px;
 }
 
-.el-tree.border {
-    border-radius: 4px;
+.el-tree {
+    overflow-y: auto;
 }
 </style>
