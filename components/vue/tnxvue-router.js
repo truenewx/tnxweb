@@ -53,16 +53,20 @@ export default function(VueRouter, menu, fnImportPage) {
         router.prev = from;
     });
     router.back = Function.around(router.back, function(back, path) {
-        path = path || router.app._route.meta.superiorPath;
+        let route = router.app.$route;
+        path = path || route.meta.superiorPath;
         if (path) {
-            if (router.prev && router.prev.path === path) {
-                back.call(router);
-            } else {
-                router.replace(path);
+            if (path.contains('/:') && route.params) {
+                Object.keys(route.params).forEach(key => {
+                    path = path.replaceAll('/:' + key + '/', '/' + route.params[key] + '/');
+                });
             }
-        } else {
-            back.call(router);
+            if (!path.contains('/:') && router.prev && router.prev.path !== path) {
+                router.replace(path);
+                return;
+            }
         }
+        back.call(router);
     });
     return router;
 }
