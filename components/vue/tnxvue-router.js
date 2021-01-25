@@ -1,10 +1,13 @@
 /**
  * 基于Vue的路由器构建函数
  */
-function addRoute(path, routes, fnImportPage) {
+function addRoute(routes, superiorPath, path, fnImportPage) {
     if (path) {
         routes.push({
             path: path,
+            meta: {
+                superiorPath: superiorPath,
+            },
             component: () => {
                 path = path.replace(/\/:[a-zA-Z0-9_]+/g, '');
                 return fnImportPage(path);
@@ -18,10 +21,10 @@ function addRoute(path, routes, fnImportPage) {
 function applyItemsToRoutes(items, routes, fnImportPage) {
     if (items && items.length) {
         items.forEach(item => {
-            if (addRoute(item.path, routes, fnImportPage)) {
+            if (addRoute(routes, undefined, item.path, fnImportPage)) {
                 if (item.operations && item.operations.length) {
                     item.operations.forEach(operation => {
-                        addRoute(operation.path, routes, fnImportPage);
+                        addRoute(routes, item.path, operation.path, fnImportPage);
                     });
                 }
             } else {
@@ -50,6 +53,7 @@ export default function(VueRouter, menu, fnImportPage) {
         router.prev = from;
     });
     router.back = Function.around(router.back, function(back, path) {
+        path = path || router.app._route.meta.superiorPath;
         if (path) {
             if (router.prev && router.prev.path === path) {
                 back.call(router);
