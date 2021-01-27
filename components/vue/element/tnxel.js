@@ -46,7 +46,7 @@ const tnxel = Object.assign({}, tnxvue, {
     _handleZIndex(selector) {
         const util = this.util;
         setTimeout(function() {
-            const topZIndex = util.dom.minTopZIndex(2);
+            const topZIndex = util.DomUtil.minTopZIndex(2);
             const element = $(selector);
             const zIndex = Number(element.css('zIndex'));
             if (isNaN(zIndex) || topZIndex > zIndex) {
@@ -124,7 +124,7 @@ const tnxel = Object.assign({}, tnxvue, {
         }
         options = Object.assign({
             type: 'success', // 默认为成功主题，可更改为其它主题
-            offset: this.util.dom.getDocHeight() * 0.4,
+            offset: this.util.DomUtil.getDocHeight() * 0.4,
             dangerouslyUseHTMLString: true,
         }, options, {
             center: true, // 因为是竖向排列，所以必须居中
@@ -162,7 +162,7 @@ const tnxel = Object.assign({}, tnxvue, {
 tnxel.libs.Vue.use(tnxel);
 
 const rpc = tnxel.app.rpc;
-rpc.handleErrors = Function.around(rpc.handleErrors, function(handleErrors, errors, options) {
+rpc.handleErrors = tnxel.util.FunctionUtil.around(rpc.handleErrors, function(handleErrors, errors, options) {
     if (options && options.form && options.form.disable) {
         options.form.disable(false);
     }

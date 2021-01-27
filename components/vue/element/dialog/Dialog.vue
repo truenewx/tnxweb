@@ -66,7 +66,7 @@ export default {
     mounted() {
         this.$nextTick(function() {
             const height = $('.el-dialog:last').height();
-            const docHeight = window.tnx.util.dom.getDocHeight();
+            const docHeight = window.tnx.util.DomUtil.getDocHeight();
             // 对话框高度占文档高度的比例
             const heightRatio = height / docHeight;
             // 为了获得更好的视觉舒适度，根据高度比确定对话框中线位置：从33vh->50vh

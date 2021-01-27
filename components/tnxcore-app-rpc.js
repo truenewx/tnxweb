@@ -1,5 +1,5 @@
 // tnxcore-app-rpc.js
-import util from "./tnxcore-util";
+import {util} from "./tnxcore-util";
 import axios from "axios";
 
 export default {
@@ -104,7 +104,7 @@ export default {
                 }
             });
             config.paramsSerializer = function(params) {
-                return Object.stringify(params);
+                return util.NetUtil.toParameterString(params);
             };
         }
         if (typeof options.onUploadProgress === 'function') {
@@ -135,7 +135,7 @@ export default {
                 }
                 switch (response.status) {
                     case 401: {
-                        let loginUrl = util.getHeader(response.headers, 'Login-Url');
+                        let loginUrl = util.NetUtil.getHeader(response.headers, 'Login-Url');
                         if (loginUrl) {
                             // 默认登录后跳转回当前页面
                             if (loginUrl.contains('?')) {
@@ -146,7 +146,7 @@ export default {
                             const loginSuccessRedirectUrl = encodeURIComponent(window.location.href);
                             loginUrl += _this.loginSuccessRedirectParameter + '=' + loginSuccessRedirectUrl;
                         }
-                        const originalRequest = util.getHeader(response.headers, 'Original-Request');
+                        const originalRequest = util.NetUtil.getHeader(response.headers, 'Original-Request');
                         let originalMethod;
                         let originalUrl;
                         if (originalRequest) {
@@ -199,7 +199,7 @@ export default {
         });
     },
     _redirectRequest(response, config, options) {
-        let redirectUrl = util.getHeader(response.headers, 'Redirect-To');
+        let redirectUrl = util.NetUtil.getHeader(response.headers, 'Redirect-To');
         if (redirectUrl) { // 指定了重定向地址，则执行重定向操作
             if (this._isIgnored(options, 'Redirect-To')) {
                 return true;

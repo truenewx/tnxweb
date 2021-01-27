@@ -1,6 +1,8 @@
 /**
  * 基于Vue的路由器构建函数
  */
+import {FunctionUtil} from '../tnxcore-util';
+
 function addRoute(routes, superiorPath, path, fnImportPage) {
     if (path) {
         routes.push({
@@ -52,7 +54,7 @@ export default function(VueRouter, menu, fnImportPage) {
     router.afterEach((to, from) => {
         router.prev = from;
     });
-    router.back = Function.around(router.back, function(back, path) {
+    router.back = FunctionUtil.around(router.back, function(back, path) {
         let route = router.app.$route;
         path = path || route.meta.superiorPath;
         if (path) {
