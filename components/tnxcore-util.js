@@ -372,11 +372,11 @@ export const DomUtil = {
 export const util = {
     md5: md5,
     base64: base64,
-    FunctionUtil,
-    MathUtil,
-    StringUtil,
-    NetUtil,
-    DomUtil,
+    function: FunctionUtil,
+    math: MathUtil,
+    string: StringUtil,
+    net: NetUtil,
+    dom: DomUtil,
 };
 
 export default util;

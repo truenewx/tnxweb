@@ -101,7 +101,7 @@ tnxvue.app.isProduction = function() {
 
 // 元数据到async-validator组件规则的转换处理
 tnxvue.app.validator = validator;
-tnxvue.app.rpc.getMeta = tnxvue.util.FunctionUtil.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
+tnxvue.app.rpc.getMeta = tnxvue.util.function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
     getMeta.call(tnxvue.app.rpc, url, function(meta) {
         if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
             meta.rules = validator.getRules(meta);
@@ -112,7 +112,7 @@ tnxvue.app.rpc.getMeta = tnxvue.util.FunctionUtil.around(tnxvue.app.rpc.getMeta,
     });
 });
 
-tnxvue.app.page.init = tnxvue.util.FunctionUtil.around(tnxvue.app.page.init, function(init, page, container) {
+tnxvue.app.page.init = tnxvue.util.function.around(tnxvue.app.page.init, function(init, page, container) {
     if (container.tagName === 'BODY') { // vue不推荐以body为挂载目标，故从body下获取第一个div作为容器
         for (let i = 0; i < container.children.length; i++) {
             const child = container.children[i];

@@ -89,7 +89,7 @@ export default {
                     tip += separator + this.tipMessages.number.format(this.uploadLimit.number);
                 }
                 if (this.uploadLimit.capacity > 0) {
-                    const capacity = this.tnx.util.StringUtil.getCapacityCaption(this.uploadLimit.capacity, 2);
+                    const capacity = this.tnx.util.string.getCapacityCaption(this.uploadLimit.capacity, 2);
                     tip += separator + this.tipMessages.capacity.format(capacity);
                 }
                 if (this.uploadLimit.extensions && this.uploadLimit.extensions.length) {
@@ -212,9 +212,9 @@ export default {
             }
             // 校验容量大小
             if (this.uploadLimit.capacity > 0 && file.size > this.uploadLimit.capacity) {
-                const capacity = this.tnx.util.StringUtil.getCapacityCaption(this.uploadLimit.capacity);
+                const capacity = this.tnx.util.string.getCapacityCaption(this.uploadLimit.capacity);
                 let message = this.tipMessages.capacity.format(capacity, 2);
-                message += '，文件"' + file.name + '"大小为' + this.tnx.util.StringUtil.getCapacityCaption(file.size,
+                message += '，文件"' + file.name + '"大小为' + this.tnx.util.string.getCapacityCaption(file.size,
                     2) + '，不符合要求';
                 this.tnx.error(message);
                 return false;
@@ -334,10 +334,10 @@ export default {
         },
         _doPreviewFile: function(file) {
             const dialogPadding = 16;
-            let top = (this.tnx.util.DomUtil.getDocHeight() - file.height) / 2 - dialogPadding;
+            let top = (this.tnx.util.dom.getDocHeight() - file.height) / 2 - dialogPadding;
             top = Math.max(top, 5); // 最高顶部留5px空隙
             let width = file.width;
-            width = Math.min(width, this.tnx.util.DomUtil.getDocWidth() - 10); // 最宽两边各留10px空隙
+            width = Math.min(width, this.tnx.util.dom.getDocWidth() - 10); // 最宽两边各留10px空隙
             const content = '<img src="' + file.url + '" style="max-width: 100%;">';
             this.tnx.dialog(content, '', [], {
                 top: top + 'px',
