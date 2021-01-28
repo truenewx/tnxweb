@@ -137,6 +137,26 @@ Object.assign(Array.prototype, {
     },
 });
 
+export const ObjectUtil = {
+    toKeyValueArray: function(object, valueFunction) {
+        if (object) {
+            let array = [];
+            Object.keys(object).forEach(key => {
+                let value = object[key];
+                if (typeof valueFunction === 'function') {
+                    value = valueFunction(value);
+                }
+                array.push({
+                    key: key,
+                    value: value,
+                });
+            });
+            return array;
+        }
+        return undefined;
+    }
+}
+
 export const FunctionUtil = {
     around: function(target, around) {
         const _this = this;
@@ -372,6 +392,7 @@ export const DomUtil = {
 export const util = {
     md5: md5,
     base64: base64,
+    object: ObjectUtil,
     function: FunctionUtil,
     math: MathUtil,
     string: StringUtil,
