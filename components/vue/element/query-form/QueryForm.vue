@@ -2,10 +2,10 @@
     <el-form :inline="true" :model="value" :class="theme ? ('theme-' + theme) : null">
         <slot></slot>
         <el-form-item v-if="query">
-            <el-button :type="theme || 'primary'" icon="el-icon-search" @click="query" :plain="plain">
+            <el-button :type="theme || 'primary'" icon="el-icon-search" @click="toQuery" :plain="plain">
                 {{ queryText }}
             </el-button>
-            <el-button @click="doClear" :plain="plain" v-if="clearable">{{ clearText }}</el-button>
+            <el-button @click="toClear" :plain="plain" v-if="clearable">{{ clearText }}</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -39,15 +39,18 @@ export default {
         }
     },
     methods: {
-        doClear() {
+        toQuery() { // 为了避免传递事件参数，不直接使用query()
+            if (this.query) {
+                this.query();
+            }
+        },
+        toClear() {
             if (Object.keys(this.value).length) {
                 this.$emit('input', {});
                 if (this.clear) {
                     this.clear();
                 }
-                if (this.query) {
-                    this.query();
-                }
+                this.toQuery();
             }
         }
     }
