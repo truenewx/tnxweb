@@ -174,9 +174,11 @@ el-header a img,
     font-size: 14px;
 }
 
-.el-form .el-card__body {
+.el-form .el-card__body,
+.pb-0 > .el-card__body {
     padding: 1rem 1rem 0 1rem;
 }
+
 
 .el-form--inline .el-form-item {
     margin-right: 1.5rem;
