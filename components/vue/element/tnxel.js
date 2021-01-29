@@ -15,6 +15,7 @@ import TagSelect from './tag-select';
 import Alert from './alert';
 import EnumSelect from './enum-select';
 import Paged from './paged';
+import Transfer from './transfer';
 
 const components = Object.assign({}, tnxvue.components, {
     Upload,
@@ -25,6 +26,7 @@ const components = Object.assign({}, tnxvue.components, {
     Alert,
     EnumSelect,
     Paged,
+    Transfer,
 });
 
 const tnxel = Object.assign({}, tnxvue, {
