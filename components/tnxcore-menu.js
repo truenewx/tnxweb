@@ -31,10 +31,27 @@ function prepareItem(item) {
 }
 
 function getDefaultPermission(path) {
-    let permission = path.replaceAll(/\/\{[^}]+\}\//g, '/');
-    permission = permission.replaceAll(/\//g, '.');
+    // 确保路径头尾都有/
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+    if (!path.endsWith('/')) {
+        path += '/';
+    }
+    // 移除可能包含的路径变量
+    let permission = path.replaceAll(/\/:[^\/]+\//g, '/');
+    // 去掉许可头尾的/
+    if (permission.startsWith('/')) {
+        permission = permission.substr(1);
+    }
+    if (permission.endsWith('/')) {
+        permission = permission.substr(0, permission.length - 1);
+    }
+    // 许可所有中间的/替换为_
+    permission = permission.replaceAll(/\//g, '_');
+    // 加上应用前缀
     const baseApp = window.tnx.app.rpc.baseApp;
-    return baseApp ? (baseApp + permission) : permission;
+    return baseApp ? (baseApp + '.' + permission) : permission;
 }
 
 function applyGrantedItemToItems(authority, item, items) {
