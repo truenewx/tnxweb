@@ -206,6 +206,10 @@ el-button {
     font-size: 14px;
 }
 
+.el-alert .el-alert__title a:not(.el-link) {
+    vertical-align: unset;
+}
+
 .el-message-box {
     vertical-align: unset;
 }
