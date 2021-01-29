@@ -9,8 +9,8 @@ import $ from 'jquery';
 
 import Upload from './upload';
 import PermissionTree from './permission-tree';
-import Form from './form';
 import QueryForm from './query-form';
+import SubmitForm from './submit-form';
 import TagSelect from './tag-select';
 import Alert from './alert';
 import EnumSelect from './enum-select';
@@ -19,12 +19,12 @@ import Paged from './paged';
 const components = Object.assign({}, tnxvue.components, {
     Upload,
     PermissionTree,
-    Form,
+    QueryForm,
+    SubmitForm,
     TagSelect,
     Alert,
     EnumSelect,
     Paged,
-    QueryForm,
 });
 
 const tnxel = Object.assign({}, tnxvue, {
