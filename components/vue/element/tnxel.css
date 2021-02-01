@@ -75,7 +75,7 @@ el-header a img,
     margin-bottom: 1rem;
 }
 
-.el-form-item:last-child {
+.el-form:not(.el-form--inline) .el-form-item:last-child {
     margin-bottom: 0;
 }
 

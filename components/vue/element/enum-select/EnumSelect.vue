@@ -21,7 +21,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        emptyValue: {},
+        emptyValue: [String, Boolean, Number],
         emptyText: String,
         placeholder: String,
     },
@@ -32,7 +32,7 @@ export default {
     },
     created() {
         let vm = this;
-        window.tnx.app.rpc.getEnumItems(this.type, this.subtype, function(items) {
+        window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
             vm.items = items;
         });
     },

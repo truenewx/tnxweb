@@ -1,7 +1,7 @@
-import EnumItems from './EnumSelect';
+import EnumSelect from './EnumSelect';
 
-EnumItems.install = function(Vue) {
-    Vue.component(EnumItems.name, EnumItems);
+EnumSelect.install = function(Vue) {
+    Vue.component(EnumSelect.name, EnumSelect);
 };
 
-export default EnumItems;
+export default EnumSelect;

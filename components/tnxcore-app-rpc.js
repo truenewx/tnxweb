@@ -281,7 +281,7 @@ export default {
         }
     },
     _enumItemsMapping: {},
-    getEnumItems(type, subtype, callback) {
+    loadEnumItems(type, subtype, callback) {
         if (typeof subtype === 'function') {
             callback = subtype;
             subtype = undefined;
@@ -300,6 +300,19 @@ export default {
                 if (typeof callback === 'function') {
                     callback(items);
                 }
+            });
+        }
+    },
+    _regionMapping: {},
+    loadRegion(regionCode, callback) {
+        let region = this._regionMapping[regionCode];
+        if (region) {
+            callback(region);
+        } else {
+            let _this = this;
+            this.get('/api/region/' + regionCode, function(region) {
+                _this._regionMapping[regionCode] = region;
+                callback(region);
             });
         }
     }

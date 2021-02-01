@@ -7,24 +7,26 @@ import tnxvue from '../tnxvue.js';
 import dialog from './dialog';
 import $ from 'jquery';
 
+import Alert from './alert';
 import Upload from './upload';
 import PermissionTree from './permission-tree';
 import QueryForm from './query-form';
 import SubmitForm from './submit-form';
 import TagSelect from './tag-select';
-import Alert from './alert';
 import EnumSelect from './enum-select';
+import RegionSelect from './region-select';
 import Paged from './paged';
 import Transfer from './transfer';
 
 const components = Object.assign({}, tnxvue.components, {
+    Alert,
     Upload,
     PermissionTree,
     QueryForm,
     SubmitForm,
     TagSelect,
-    Alert,
     EnumSelect,
+    RegionSelect,
     Paged,
     Transfer,
 });
