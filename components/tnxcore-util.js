@@ -67,14 +67,17 @@ Object.assign(Date.prototype, {
         }
         return pattern;
     },
-    formatLong: function() {
+    formatDateTime: function() {
         return this.format('yyyy-MM-dd HH:mm:ss');
     },
-    formatShort: function() {
+    formatDate: function() {
         return this.format('yyyy-MM-dd');
     },
     formatTime: function() {
         return this.format('HH:mm:ss');
+    },
+    formatMinute: function() {
+        return this.format('yyyy-MM-dd HH:mm');
     }
 });
 
