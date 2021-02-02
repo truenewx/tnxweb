@@ -165,6 +165,41 @@ const tnxel = Object.assign({}, tnxvue, {
     },
 });
 
+tnxel.date = {
+    formatDateTime: function(row, column, cellValue) {
+        if (typeof cellValue === 'number') {
+            cellValue = new Date(cellValue);
+        }
+        if (cellValue instanceof Date) {
+            return cellValue.formatDateTime();
+        }
+    },
+    formatDate: function(row, column, cellValue) {
+        if (typeof cellValue === 'number') {
+            cellValue = new Date(cellValue);
+        }
+        if (cellValue instanceof Date) {
+            return cellValue.formatDate();
+        }
+    },
+    formatTime: function(row, column, cellValue) {
+        if (typeof cellValue === 'number') {
+            cellValue = new Date(cellValue);
+        }
+        if (cellValue instanceof Date) {
+            return cellValue.formatTime();
+        }
+    },
+    formatMinute: function(row, column, cellValue) {
+        if (typeof cellValue === 'number') {
+            cellValue = new Date(cellValue);
+        }
+        if (cellValue instanceof Date) {
+            return cellValue.formatMinute();
+        }
+    }
+};
+
 tnxel.libs.Vue.use(tnxel);
 
 const rpc = tnxel.app.rpc;
