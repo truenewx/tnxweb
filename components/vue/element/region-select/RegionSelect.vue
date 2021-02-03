@@ -14,7 +14,11 @@ export default {
             type: String,
             default: () => 'CN',
         },
-        level: {
+        maxLevel: {
+            type: [Number, String],
+            default: 3,
+        },
+        minLevel: {
             type: [Number, String],
             default: 3,
         },
@@ -32,7 +36,8 @@ export default {
                 value: 'code',
                 label: 'caption',
                 children: 'subs',
-                leaf: 'includingSub'
+                leaf: 'includingSub',
+                checkStrictly: this.minLevel !== this.maxLevel, // 最小级别不等于最大级别，则取消父子节点选中关联，允许选择中间级别的节点
             },
             region: {},
         };
@@ -50,7 +55,7 @@ export default {
         },
         filterSubs(region) {
             if (region.subs) {
-                if (region.level === parseInt(this.level)) {
+                if (region.level >= parseInt(this.maxLevel)) {
                     delete region.subs;
                 } else {
                     for (let sub of region.subs) {
