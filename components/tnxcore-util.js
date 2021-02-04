@@ -150,7 +150,7 @@ Object.assign(Array.prototype, {
 });
 
 Object.assign(Boolean.prototype, {
-    toString: function() {
+    toText: function() {
         if (this === true) {
             return '是';
         } else if (this === false) {

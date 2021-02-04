@@ -46,10 +46,10 @@ export default {
         if (this.type.toLowerCase() === 'boolean') {
             vm.items = [{
                 key: true,
-                caption: true.toString(),
+                caption: true.toText(),
             }, {
                 key: false,
-                caption: false.toString(),
+                caption: false.toText(),
             }];
         } else {
             window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
