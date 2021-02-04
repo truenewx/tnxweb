@@ -175,6 +175,7 @@ tnxel.date = {
         if (cellValue instanceof Date) {
             return cellValue.formatDateTime();
         }
+        return cellValue;
     },
     formatDate: function(row, column, cellValue) {
         if (typeof cellValue === 'number') {
@@ -183,6 +184,7 @@ tnxel.date = {
         if (cellValue instanceof Date) {
             return cellValue.formatDate();
         }
+        return cellValue;
     },
     formatTime: function(row, column, cellValue) {
         if (typeof cellValue === 'number') {
@@ -191,6 +193,7 @@ tnxel.date = {
         if (cellValue instanceof Date) {
             return cellValue.formatTime();
         }
+        return cellValue;
     },
     formatMinute: function(row, column, cellValue) {
         if (typeof cellValue === 'number') {
@@ -199,6 +202,7 @@ tnxel.date = {
         if (cellValue instanceof Date) {
             return cellValue.formatMinute();
         }
+        return cellValue;
     }
 };
 

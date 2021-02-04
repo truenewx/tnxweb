@@ -11,7 +11,7 @@ export default {
     props: {
         value: String,
         type: {
-            type: String,
+            type: [String, Array],
             required: true,
         },
         subtype: String,
@@ -43,20 +43,23 @@ export default {
     },
     created() {
         let vm = this;
-        if (this.type.toLowerCase() === 'boolean') {
-            vm.items = [{
-                key: true,
-                caption: true.toText(),
-            }, {
-                key: false,
-                caption: false.toText(),
-            }];
-        } else {
-            window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
-                vm.items = items;
-            });
+        if (typeof this.type === 'string') {
+            if (this.type.toLowerCase() === 'boolean') {
+                vm.items = [{
+                    key: true,
+                    caption: true.toText(),
+                }, {
+                    key: false,
+                    caption: false.toText(),
+                }];
+            } else {
+                window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
+                    vm.items = items;
+                });
+            }
+        } else if (Array.isArray(this.type)) {
+            vm.items = this.type;
         }
-
     },
     methods: {}
 }
