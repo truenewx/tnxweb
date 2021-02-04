@@ -1,6 +1,6 @@
 <template>
-    <el-select :value="value" :placeholder="placeholder" @change="onChange">
-        <el-option class="text-muted" :value="emptyValue" :label="emptyText" v-if="empty"/>
+    <el-select v-model="model" :placeholder="placeholder">
+        <el-option class="text-muted" :key="emptyValue" :value="emptyValue" :label="emptyText" v-if="empty"/>
         <el-option v-for="item in items" :key="item.key" :value="item.key" :label="item.caption"/>
     </el-select>
 </template>
@@ -9,26 +9,37 @@
 export default {
     name: 'TnxelEnumSelect',
     props: {
-        value: {
-            required: true,
-        },
+        value: String,
         type: {
             type: String,
             required: true,
         },
         subtype: String,
         empty: {
-            type: Boolean,
+            type: [Boolean, String],
             default: false,
         },
-        emptyValue: [String, Boolean, Number],
-        emptyText: String,
+        emptyValue: {
+            type: [String, Boolean, Number],
+            default: () => null,
+        },
         placeholder: String,
     },
     data() {
         return {
+            model: null,
             items: null,
         };
+    },
+    computed: {
+        emptyText() {
+            return typeof this.empty === 'string' ? this.empty : '';
+        }
+    },
+    watch: {
+        model(value) {
+            this.$emit('input', value);
+        }
     },
     created() {
         let vm = this;
@@ -36,10 +47,6 @@ export default {
             vm.items = items;
         });
     },
-    methods: {
-        onChange(value) {
-            this.$emit('input', value);
-        }
-    }
+    methods: {}
 }
 </script>

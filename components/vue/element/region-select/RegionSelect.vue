@@ -1,15 +1,12 @@
 <template>
-    <el-cascader :value="value" :options="region.subs" :props="options" :placeholder="placeholder" :clearable="empty"
-        @change="onChange"/>
+    <el-cascader v-model="model" :options="region.subs" :props="options" :placeholder="placeholder" :clearable="empty"/>
 </template>
 
 <script>
 export default {
     name: 'TnxelRegionSelect',
     props: {
-        value: {
-            required: true,
-        },
+        value: String,
         scope: {
             type: String,
             default: () => 'CN',
@@ -39,8 +36,14 @@ export default {
                 leaf: 'includingSub',
                 checkStrictly: this.minLevel !== this.maxLevel, // 最小级别不等于最大级别，则取消父子节点选中关联，允许选择中间级别的节点
             },
+            model: this.value,
             region: {},
         };
+    },
+    watch: {
+        model(value) {
+            this.$emit('input', value);
+        }
     },
     created() {
         let vm = this;
@@ -50,9 +53,6 @@ export default {
         });
     },
     methods: {
-        onChange(value) {
-            this.$emit('input', value);
-        },
         filterSubs(region) {
             if (region.subs) {
                 if (region.level >= parseInt(this.maxLevel)) {
