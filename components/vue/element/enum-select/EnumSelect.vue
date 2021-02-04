@@ -1,6 +1,10 @@
 <template>
-    <el-select v-model="model" :placeholder="placeholder">
-        <el-option class="text-muted" :key="emptyValue" :value="emptyValue" :label="emptyText" v-if="empty"/>
+    <el-radio-group v-model="model" v-if="selector === 'radio-group'">
+        <el-radio-button :label="emptyValue" v-if="empty">{{ emptyText }}</el-radio-button>
+        <el-radio-button v-for="item in items" :key="item.key" :label="item.key">{{ item.caption }}</el-radio-button>
+    </el-radio-group>
+    <el-select v-model="model" :placeholder="placeholder" :filterable="filterable" v-else>
+        <el-option class="text-muted" :value="emptyValue" :label="emptyText" v-if="empty"/>
         <el-option v-for="item in items" :key="item.key" :value="item.key" :label="item.caption"/>
     </el-select>
 </template>
@@ -10,6 +14,7 @@ export default {
     name: 'TnxelEnumSelect',
     props: {
         value: String,
+        selector: String,
         type: {
             type: [String, Array],
             required: true,
@@ -24,10 +29,11 @@ export default {
             default: () => null,
         },
         placeholder: String,
+        filterable: Boolean,
     },
     data() {
         return {
-            model: null,
+            model: this.value,
             items: null,
         };
     },

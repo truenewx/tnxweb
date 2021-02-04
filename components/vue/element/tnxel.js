@@ -18,6 +18,7 @@ import RegionSelect from './region-select';
 import Paged from './paged';
 import Transfer from './transfer';
 import Avatar from './avatar';
+import InputNumber from './input-number';
 
 const components = Object.assign({}, tnxvue.components, {
     Alert,
@@ -31,6 +32,7 @@ const components = Object.assign({}, tnxvue.components, {
     Paged,
     Transfer,
     Avatar,
+    InputNumber,
 });
 
 const tnxel = Object.assign({}, tnxvue, {

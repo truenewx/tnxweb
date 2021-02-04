@@ -133,7 +133,8 @@ el-header a img,
     line-height: inherit;
 }
 
-.el-form-item__content p {
+.el-form-item__content > p,
+.el-form-item__content > .el-checkbox-group {
     margin-block-start: 10px;
     margin-block-end: 10px;
 }
@@ -528,4 +529,12 @@ el-button {
 
 .el-divider--horizontal {
     margin: 1rem 0;
+}
+
+.el-col > .el-date-editor,
+.el-col > .el-select,
+.el-col > .el-cascader,
+.el-col > .el-autocomplete,
+.el-col > .el-input-number {
+    width: 100% !important;
 }

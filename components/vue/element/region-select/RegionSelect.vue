@@ -26,6 +26,8 @@ export default {
         placeholder: String,
     },
     data() {
+        // 最小级别小于最大级别，则取消父子节点选中关联，允许选择中间级别的节点
+        let checkStrictly = parseInt(this.minLevel) < parseInt(this.maxLevel);
         return {
             options: {
                 expandTrigger: 'hover',
@@ -34,7 +36,7 @@ export default {
                 label: 'caption',
                 children: 'subs',
                 leaf: 'includingSub',
-                checkStrictly: this.minLevel !== this.maxLevel, // 最小级别不等于最大级别，则取消父子节点选中关联，允许选择中间级别的节点
+                checkStrictly: checkStrictly,
             },
             model: this.value,
             region: {},
