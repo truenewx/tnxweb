@@ -43,9 +43,20 @@ export default {
     },
     created() {
         let vm = this;
-        window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
-            vm.items = items;
-        });
+        if (this.type.toLowerCase() === 'boolean') {
+            vm.items = [{
+                key: true,
+                caption: true.toString(),
+            }, {
+                key: false,
+                caption: false.toString(),
+            }];
+        } else {
+            window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
+                vm.items = items;
+            });
+        }
+
     },
     methods: {}
 }

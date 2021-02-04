@@ -149,6 +149,17 @@ Object.assign(Array.prototype, {
     },
 });
 
+Object.assign(Boolean.prototype, {
+    toString: function() {
+        if (this === true) {
+            return '是';
+        } else if (this === false) {
+            return '否';
+        }
+        return undefined;
+    }
+});
+
 export const ObjectUtil = {
     toKeyValueArray: function(object, valueFunction) {
         if (object) {
