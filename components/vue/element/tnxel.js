@@ -17,6 +17,7 @@ import EnumSelect from './enum-select';
 import RegionSelect from './region-select';
 import Paged from './paged';
 import Transfer from './transfer';
+import Avatar from './avatar';
 
 const components = Object.assign({}, tnxvue.components, {
     Alert,
@@ -29,6 +30,7 @@ const components = Object.assign({}, tnxvue.components, {
     RegionSelect,
     Paged,
     Transfer,
+    Avatar,
 });
 
 const tnxel = Object.assign({}, tnxvue, {
