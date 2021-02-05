@@ -5,8 +5,9 @@
 
 const messages = {
     required: "{0}不能为空",
+    notNull: "{0}不能为空",
     notEmpty: "{0}不能为空",
-    notBlank: "{0}不能为空或纯空格",
+    notBlank: "{0}不能为空",
     maxLength: "{0}长度最多可以有{1}位，已超出{2}位",
     minLength: "{0}长度最少必须有{1}位，还缺少{2}位",
     number: "{0}必须为数字",
