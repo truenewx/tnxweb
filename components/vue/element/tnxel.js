@@ -19,6 +19,7 @@ import Paged from './paged';
 import Transfer from './transfer';
 import Avatar from './avatar';
 import InputNumber from './input-number';
+import StepsNav from './steps-nav';
 
 const components = Object.assign({}, tnxvue.components, {
     Alert,
@@ -33,6 +34,7 @@ const components = Object.assign({}, tnxvue.components, {
     Transfer,
     Avatar,
     InputNumber,
+    StepsNav,
 });
 
 const tnxel = Object.assign({}, tnxvue, {

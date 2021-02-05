@@ -538,3 +538,16 @@ el-button {
 .el-col > .el-input-number {
     width: 100% !important;
 }
+
+.tnxel-steps-nav {
+    position: fixed;
+}
+
+.tnxel-steps-nav .el-step__icon,
+.tnxel-steps-nav .el-step__title {
+    cursor: pointer;
+}
+
+.tnxel-steps-nav .el-step.is-active .el-step__title {
+    font-weight: bold;
+}
