@@ -11,27 +11,30 @@ import $ from 'jquery';
 export default {
     name: 'TnxelStepsNav',
     props: {
+        /**
+         * 所属滚动容器的选择器
+         */
         container: {
             type: String,
-            required: true,
+            default: () => 'main',
         },
         items: {
             type: Array,
             required: true,
         },
-        id: String,
         space: [String, Number],
-        offset: [String, Number],
     },
     data() {
         return {
+            id: window.tnx.util.string.random(32),
             activeIndex: 0,
+            topOffset: 0,
         }
     },
     mounted() {
+        this.topOffset = $('#' + this.id).offset().top - $(this.container).offset().top - 16;
         let vm = this;
-        let selector = this.id ? ('#' + this.id) : '.tnxel-steps-nav';
-        $(selector + ' .el-step').each(function(index, step) {
+        $('#' + this.id + ' .el-step').each(function(index, step) {
             $(step).click(function() {
                 vm.navTo(index);
             });
@@ -44,10 +47,7 @@ export default {
             if (index > 0) {
                 let top0 = $('#' + this.items[0].target).offset().top;
                 let $target = $('#' + this.items[index].target);
-                top = $target.offset().top - top0;
-                if (this.offset) {
-                    top += parseInt(this.offset);
-                }
+                top = $target.offset().top - top0 + this.topOffset;
             }
             $(this.container).scrollTop(top);
         },

@@ -1,5 +1,5 @@
 <template>
-    <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
+    <el-form :id="id" :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
         :rules="validationRules" :validate-on-rule-change="false" :inline-message="!vertical"
         :disabled="disabled" :class="theme ? ('theme-' + theme) : null" status-icon>
         <slot></slot>
@@ -11,12 +11,17 @@
 </template>
 
 <script>
+import $ from 'jquery';
+
 export default {
     name: 'TnxelSubmitForm',
     props: {
-        tnx: {
-            type: Object,
-            default: () => window.tnx,
+        /**
+         * 所属滚动容器的选择器
+         */
+        container: {
+            type: String,
+            default: () => 'main',
         },
         model: {
             type: Object,
@@ -42,8 +47,10 @@ export default {
     },
     data() {
         return {
+            id: window.tnx.util.string.random(32),
             validationRules: {},
             disabled: false,
+            topOffset: 0,
         };
     },
     computed: {
@@ -57,7 +64,7 @@ export default {
     created() {
         if (typeof this.rules === 'string') {
             const vm = this;
-            this.tnx.app.rpc.getMeta(this.rules, meta => {
+            window.tnx.app.rpc.getMeta(this.rules, meta => {
                 if (vm.onRulesLoaded) {
                     vm.onRulesLoaded(meta.rules);
                 } else {
@@ -71,12 +78,31 @@ export default {
             this.validationRules = this.rules;
         }
     },
+    mounted() {
+        this.topOffset = $('#' + this.id).offset().top - $(this.container).offset().top - 16;
+    },
     methods: {
         disable(disabled) {
             this.disabled = disabled !== false;
         },
+        focusError() {
+            let $form = $('#' + this.id);
+            let $item = $('.el-form-item.is-error:first', $form);
+            if ($item.length) {
+                let top = $item.offset().top - $form.offset().top + this.topOffset;
+                $(this.container).scrollTop(top);
+            }
+        },
         validate(callback) {
-            return this.$refs.form.validate(callback);
+            let _this = this;
+            return this.$refs.form.validate(function(valid, invalidFields) {
+                if (!valid) {
+                    _this.$nextTick(function() {
+                        _this.focusError.call(_this);
+                    });
+                }
+                callback(valid);
+            });
         },
         validateField(props, callback) {
             this.$refs.form.validateField(props, callback);
