@@ -36,6 +36,7 @@ function getRule(validationName, validationValue, fieldMeta) {
     let rule = undefined;
     switch (validationName) {
         case 'required':
+        case 'notNull':
         case 'notEmpty':
         case 'notBlank':
             if (validationValue === true) {
@@ -152,7 +153,9 @@ export function getRules(meta) {
                     fieldRules.push(rule);
                 }
             });
-            rules[fieldName] = fieldRules;
+            // 将可能包含的引用字段路径中的.替换为__，以符合async-validator规则名称的规范
+            let ruleName = fieldName.replace('.', '__');
+            rules[ruleName] = fieldRules;
         }
     });
     return rules;
