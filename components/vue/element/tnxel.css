@@ -120,11 +120,11 @@ el-header a img,
     margin: 10px 0 0 0;
 }
 
-.el-form-item--feedback.is-error .ignore-error .el-input__inner {
+.el-form-item--feedback .ignore-feedback .el-input__inner {
     border-color: #DCDFE6;
 }
 
-.el-form-item--feedback .ignore-error .el-input__validateIcon {
+.el-form-item--feedback .ignore-feedback .el-input__validateIcon {
     display: none;
 }
 

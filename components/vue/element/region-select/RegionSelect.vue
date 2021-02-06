@@ -1,5 +1,6 @@
 <template>
-    <el-cascader v-model="model" :options="region.subs" :props="options" :placeholder="placeholder" :clearable="empty"/>
+    <el-cascader v-model="model" class="ignore-feedback" :options="region.subs" :props="options"
+        :placeholder="placeholder" :clearable="empty"/>
 </template>
 
 <script>
