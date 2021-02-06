@@ -120,6 +120,14 @@ el-header a img,
     margin: 10px 0 0 0;
 }
 
+.el-form-item--feedback.is-error .ignore-error .el-input__inner {
+    border-color: #DCDFE6;
+}
+
+.el-form-item--feedback .ignore-error .el-input__validateIcon {
+    display: none;
+}
+
 .el-form-item__error {
     position: unset;
     margin-top: 4px;
