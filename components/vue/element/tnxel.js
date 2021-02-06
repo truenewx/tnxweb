@@ -16,6 +16,7 @@ import Select from './select';
 import TagSelect from './tag-select';
 import EnumSelect from './enum-select';
 import RegionSelect from './region-select';
+import FetchSelect from './fetch-select';
 import Paged from './paged';
 import Transfer from './transfer';
 import Avatar from './avatar';
@@ -32,6 +33,7 @@ const components = Object.assign({}, tnxvue.components, {
     TagSelect,
     EnumSelect,
     RegionSelect,
+    FetchSelect,
     Paged,
     Transfer,
     Avatar,

@@ -5,11 +5,9 @@
             {{ item[textName] }}
         </el-radio-button>
     </el-radio-group>
-    <el-select v-model="model" class="ignore-feedback" :placeholder="placeholder" :filterable="filterable"
-        v-else>
+    <el-select v-model="model" class="ignore-feedback" :placeholder="placeholder" v-else>
         <el-option class="text-muted" :value="emptyValue" :label="emptyText" v-if="empty"/>
-        <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]"
-            :label="item[textName]"/>
+        <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]" :label="item[textName]"/>
     </el-select>
 </template>
 
@@ -41,7 +39,6 @@ export default {
             default: () => null,
         },
         placeholder: String,
-        filterable: Boolean,
     },
     data() {
         return {
