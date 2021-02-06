@@ -1,14 +1,14 @@
 <template>
     <el-radio-group v-model="model" :class="{'ignore-error': !empty}" v-if="selector === 'radio-group'">
         <el-radio-button :label="emptyValue" v-if="empty">{{ emptyText }}</el-radio-button>
-        <el-radio-button v-for="item in selectableItems" :key="item[valueName]" :label="item[valueName]">
+        <el-radio-button v-for="item in items" :key="item[valueName]" :label="item[valueName]">
             {{ item[textName] }}
         </el-radio-button>
     </el-radio-group>
     <el-select v-model="model" :class="{'ignore-error': !empty}" :placeholder="placeholder" :filterable="filterable"
         v-else>
         <el-option class="text-muted" :value="emptyValue" :label="emptyText" v-if="empty"/>
-        <el-option v-for="item in selectableItems" :key="item[valueName]" :value="item[valueName]"
+        <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]"
             :label="item[textName]"/>
     </el-select>
 </template>
@@ -45,7 +45,6 @@ export default {
     },
     data() {
         return {
-            selectableItems: this.items,
             model: this.value || this.getDefaultValue(this.items),
         };
     },
@@ -59,7 +58,6 @@ export default {
             this.$emit('input', value);
         },
         items(items) {
-            this.selectableItems = items;
             if (!this.model) {
                 this.model = this.getDefaultValue(items);
             }
