@@ -12,6 +12,7 @@ import Upload from './upload';
 import PermissionTree from './permission-tree';
 import QueryForm from './query-form';
 import SubmitForm from './submit-form';
+import Select from './select';
 import TagSelect from './tag-select';
 import EnumSelect from './enum-select';
 import RegionSelect from './region-select';
@@ -27,6 +28,7 @@ const components = Object.assign({}, tnxvue.components, {
     PermissionTree,
     QueryForm,
     SubmitForm,
+    Select,
     TagSelect,
     EnumSelect,
     RegionSelect,
