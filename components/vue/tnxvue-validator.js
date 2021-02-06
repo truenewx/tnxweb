@@ -9,8 +9,6 @@ const regExps = {
     number: /^-?([1-9]\d{0,2}((,?\d{3})*|\d*)(\.\d*)?|0?\.\d*|0)$/,
     integer: /^(-?[1-9]\d{0,2}(,?\d{3}))|0*$/,
     email: /^[a-zA-Z0-9_\-]([a-zA-Z0-9_\-\.]{0,62})@[a-zA-Z0-9_\-]([a-zA-Z0-9_\-\.]{0,62})$/,
-    cellphone: /^1[34578]\d{9}$/,
-    idCardNo: /(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/,
     url: /^https?:\/\/[A-Za-z0-9]+(\.?[A-Za-z0-9_-]+)*(:[0-9]+)?(\/\S*)?$/
 }
 
@@ -46,32 +44,6 @@ function getRule(validationName, validationValue, fieldMeta) {
                     message: validator.getErrorMessage(validationName, fieldMeta.caption),
                 }
             }
-            break;
-        case 'cellphone':
-            rule = {
-                validator(r, fieldValue, callback, source, options) {
-                    if (validationValue && fieldValue) {
-                        if (!regExps.cellphone.test(fieldValue)) {
-                            const message = validator.getErrorMessage(validationName, fieldMeta.caption);
-                            return callback(new Error(message));
-                        }
-                    }
-                    return callback();
-                }
-            };
-            break;
-        case 'idCardNo':
-            rule = {
-                validator(r, fieldValue, callback, source, options) {
-                    if (validationValue && fieldValue) {
-                        if (!regExps.idCardNo.test(fieldValue)) {
-                            const message = validator.getErrorMessage(validationName, fieldMeta.caption);
-                            return callback(new Error(message));
-                        }
-                    }
-                    return callback();
-                }
-            };
             break;
         case 'maxLength':
             rule = {
@@ -117,11 +89,24 @@ function getRule(validationName, validationValue, fieldMeta) {
                 }
             }
             break;
+        case 'url':
+            rule = {
+                validator(r, fieldValue, callback, source, options) {
+                    if (validationValue && fieldValue) {
+                        if (!regExps.url.test(fieldValue)) {
+                            const message = validator.getErrorMessage(validationName, fieldMeta.caption);
+                            return callback(new Error(message));
+                        }
+                    }
+                    return callback();
+                }
+            };
+            break;
         case 'regex':
             rule = {
                 validator(r, fieldValue, callback, source, options) {
                     if (fieldValue) {
-                        let pattern = '^' + validationValue[0] + '$';
+                        let pattern = validationValue[0];
                         let regexp = new RegExp(pattern, 'gi');
                         if (!regexp.test(fieldValue)) {
                             let message = validationValue[1];
