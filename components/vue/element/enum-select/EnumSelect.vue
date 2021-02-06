@@ -1,6 +1,7 @@
 <template>
     <tnxel-select v-model="model" :selector="selector" :items="items" value-name="key" text-name="caption"
-        :empty="empty" :empty-value="emptyValue" :placeholder="placeholder" :filterable="filterable"/>
+        :default-value="defaultValue" :empty="empty" :empty-value="emptyValue" :placeholder="placeholder"
+        :filterable="filterable"/>
 </template>
 
 <script>
@@ -19,6 +20,7 @@ export default {
             required: true,
         },
         subtype: String,
+        defaultValue: String,
         empty: {
             type: [Boolean, String],
             default: false,

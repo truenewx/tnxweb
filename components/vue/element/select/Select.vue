@@ -45,7 +45,7 @@ export default {
     },
     data() {
         return {
-            model: this.value || this.getDefaultValue(this.items),
+            model: this.getDefaultValue(this.items),
         };
     },
     computed: {
@@ -58,14 +58,12 @@ export default {
             this.$emit('input', value);
         },
         items(items) {
-            if (!this.model) {
-                this.model = this.getDefaultValue(items);
-            }
+            this.model = this.getDefaultValue(items);
         }
     },
     methods: {
         getDefaultValue(items) {
-            let defaultValue = this.defaultValue;
+            let defaultValue = this.value || this.defaultValue;
             if (!defaultValue && !this.empty && items && items.length) {
                 let firstItem = items[0];
                 if (firstItem) {
