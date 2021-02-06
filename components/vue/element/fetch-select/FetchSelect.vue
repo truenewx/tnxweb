@@ -1,6 +1,6 @@
 <template>
-    <el-select v-model="model" :remote-method="load" :loading="loading" :placeholder="placeholder" :clearable="empty"
-        default-first-option filterable remote @clear="clear">
+    <el-select v-model="model" :loading="loading" :filterable="filterable" remote :remote-method="load"
+        :placeholder="placeholder || defaultPlaceholder" :clearable="empty" default-first-option @clear="clear">
         <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]" :label="item[textName]"/>
         <el-option label="还有更多结果..." disabled v-if="more"/>
     </el-select>
@@ -35,14 +35,9 @@ export default {
             type: String,
             default: () => 'name',
         },
-        empty: {
-            type: Boolean,
-            default: () => false,
-        },
-        placeholder: {
-            type: String,
-            default: '输入关键字进行检索',
-        },
+        empty: Boolean,
+        filterable: Boolean,
+        placeholder: String,
     },
     data() {
         return {
@@ -51,6 +46,11 @@ export default {
             items: null,
             more: false,
         };
+    },
+    computed: {
+        defaultPlaceholder() {
+            return this.filterable ? '输入关键字进行检索' : '请选择';
+        }
     },
     watch: {
         model(value) {

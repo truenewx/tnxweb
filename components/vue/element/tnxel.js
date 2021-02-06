@@ -15,8 +15,9 @@ import SubmitForm from './submit-form';
 import Select from './select';
 import TagSelect from './tag-select';
 import EnumSelect from './enum-select';
-import RegionSelect from './region-select';
 import FetchSelect from './fetch-select';
+import FetchCascader from './fetch-cascader';
+import RegionCascader from './region-cascader';
 import Paged from './paged';
 import Transfer from './transfer';
 import Avatar from './avatar';
@@ -32,8 +33,9 @@ const components = Object.assign({}, tnxvue.components, {
     Select,
     TagSelect,
     EnumSelect,
-    RegionSelect,
     FetchSelect,
+    FetchCascader,
+    RegionCascader,
     Paged,
     Transfer,
     Avatar,

@@ -1,7 +1,7 @@
 <template>
     <el-steps class="w-fit-content tnxel-steps-nav" :id="id" direction="vertical" :space="space">
-        <el-step :class="{'is-active': activeIndex === index}" status="finish"
-            v-for="(item, index) in items" :key="item.target" :data-target="item.target" :title="item.title"/>
+        <el-step status="finish" v-for="item in items" :key="item.target" :data-target="item.target"
+            :title="item.title"/>
     </el-steps>
 </template>
 
