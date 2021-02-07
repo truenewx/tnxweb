@@ -28,7 +28,7 @@ export default {
             required: true,
         },
         rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
-        onRulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
+        rulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: Function,
         submitText: String,
         theme: String,
@@ -65,8 +65,8 @@ export default {
         if (typeof this.rules === 'string') {
             const vm = this;
             window.tnx.app.rpc.getMeta(this.rules, meta => {
-                if (vm.onRulesLoaded) {
-                    vm.onRulesLoaded(meta.rules);
+                if (vm.rulesLoaded) {
+                    vm.rulesLoaded(meta.rules);
                 } else {
                     vm.$emit('rules-loaded', meta.rules);
                 }

@@ -33,6 +33,7 @@ function getRuleType(metaType) {
 
 function getRule(validationName, validationValue, fieldMeta) {
     let rule = undefined;
+    let fieldCaption = fieldMeta ? fieldMeta.caption : '';
     switch (validationName) {
         case 'required':
         case 'notNull':
@@ -58,7 +59,7 @@ function getRule(validationName, validationValue, fieldMeta) {
                                 blank = fieldValue === undefined || fieldValue === null;
                             }
                             if (blank) {
-                                let message = validator.getErrorMessage(validationName, fieldMeta.caption);
+                                let message = validator.getErrorMessage(validationName, fieldCaption);
                                 return callback(new Error(message));
                             }
                         }
@@ -75,7 +76,7 @@ function getRule(validationName, validationValue, fieldMeta) {
                         const enterLength = fieldValue.indexOf('\n') < 0 ? 0 : fieldValue.match(/\n/g).length;
                         const fieldLength = fieldValue.length + enterLength;
                         if (fieldLength > validationValue) {
-                            const message = validator.getErrorMessage(validationName, fieldMeta.caption,
+                            const message = validator.getErrorMessage(validationName, fieldCaption,
                                 validationValue, fieldLength - validationValue);
                             return callback(new Error(message));
                         }
@@ -93,7 +94,7 @@ function getRule(validationName, validationValue, fieldMeta) {
                             for (let i = 0; i < limitedValues.length; i++) {
                                 if (fieldValue.indexOf(limitedValues[i]) >= 0) {
                                     const s = limitedValues.join(' ');
-                                    const message = validator.getErrorMessage('notContains', fieldMeta.caption, s);
+                                    const message = validator.getErrorMessage('notContains', fieldCaption, s);
                                     return callback(new Error(message));
                                 }
                             }
@@ -107,7 +108,7 @@ function getRule(validationName, validationValue, fieldMeta) {
             if (validationValue === true) {
                 rule = {
                     type: validationName,
-                    message: validator.getErrorMessage(validationName, fieldMeta.caption),
+                    message: validator.getErrorMessage(validationName, fieldCaption),
                 }
             }
             break;
@@ -116,7 +117,7 @@ function getRule(validationName, validationValue, fieldMeta) {
                 validator(r, fieldValue, callback, source, options) {
                     if (validationValue && fieldValue) {
                         if (!regExps.url.test(fieldValue)) {
-                            const message = validator.getErrorMessage(validationName, fieldMeta.caption);
+                            const message = validator.getErrorMessage(validationName, fieldCaption);
                             return callback(new Error(message));
                         }
                     }
@@ -133,9 +134,9 @@ function getRule(validationName, validationValue, fieldMeta) {
                         if (!regexp.test(fieldValue)) {
                             let message = validationValue[1];
                             if (message) {
-                                message = (fieldMeta.caption || '') + message;
+                                message = fieldCaption + message;
                             } else {
-                                message = validator.getErrorMessage('regex', fieldMeta.caption, '');
+                                message = validator.getErrorMessage('regex', fieldCaption, '');
                             }
                             return callback(new Error(message));
                         }
@@ -147,7 +148,7 @@ function getRule(validationName, validationValue, fieldMeta) {
     }
     if (rule) {
         let metaType = 'text';
-        if (fieldMeta.type) {
+        if (fieldMeta && fieldMeta.type) {
             metaType = fieldMeta.type.toLowerCase();
         }
         rule.type = rule.type || getRuleType(metaType);
@@ -182,4 +183,4 @@ export function getRules(meta) {
     return rules;
 }
 
-export default {getRules}
+export default {getRule, getRules}
