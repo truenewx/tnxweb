@@ -48,7 +48,7 @@ function getRule(validationName, validationValue, fieldMeta) {
         case 'maxLength':
             rule = {
                 validator(r, fieldValue, callback, source, options) {
-                    if (typeof validationValue === 'number' && fieldValue) {
+                    if (typeof validationValue === 'number' && typeof fieldValue === 'string') {
                         // 回车符计入长度
                         const enterLength = fieldValue.indexOf('\n') < 0 ? 0 : fieldValue.match(/\n/g).length;
                         const fieldLength = fieldValue.length + enterLength;

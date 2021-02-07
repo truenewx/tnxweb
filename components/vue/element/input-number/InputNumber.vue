@@ -1,10 +1,9 @@
 <template>
-    <div class="d-flex">
-        <el-col :span="span">
-            <el-input-number v-model="model" :min="min" :max="max" :placeholder="placeholder"/>
-        </el-col>
-        <p class="ml-2 text-muted" v-if="suffix">{{ suffix }}</p>
-    </div>
+    <el-col class="d-flex" :span="span">
+        <el-input-number ref="input" class="flex-grow-1" v-model="model" :min="min" :max="max" controls-position="right"
+            :placeholder="placeholder" @change="onChange"/>
+        <div class="static-text ml-2 text-muted" v-if="suffix">{{ suffix }}</div>
+    </el-col>
 </template>
 
 <script>
@@ -29,6 +28,13 @@ export default {
     watch: {
         model(value) {
             this.$emit('input', value);
+        }
+    },
+    methods: {
+        onChange(currentValue, oldValue) {
+            if (oldValue === undefined && currentValue !== undefined) {
+                this.$refs.input.focus();
+            }
         }
     }
 }
