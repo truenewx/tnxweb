@@ -44,6 +44,7 @@ export default {
             default: () => null,
         },
         placeholder: String,
+        change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {
         return {
@@ -58,12 +59,39 @@ export default {
     watch: {
         model(value) {
             this.$emit('input', value);
+            this.triggerChange(value);
         },
         items(items) {
             this.model = this.getDefaultValue(items);
         }
     },
     methods: {
+        triggerChange(value) {
+            if (this.change) {
+                let item = undefined;
+                if (this.selector === 'checkbox') {
+                    item = [];
+                    if (Array.isArray(value)) {
+                        for (let v of value) {
+                            item.push(this.getItem(v));
+                        }
+                    }
+                } else {
+                    item = this.getItem(value);
+                }
+                this.change.call(this, item);
+            }
+        },
+        getItem(value) {
+            if (value !== undefined) {
+                for (let item of this.items) {
+                    if (item[this.valueName] === value) {
+                        return item;
+                    }
+                }
+            }
+            return undefined;
+        },
         getDefaultValue(items) {
             let defaultValue = this.value || this.defaultValue;
             if (this.selector === 'checkbox') { // 多选时需确保值为数组
