@@ -36,6 +36,7 @@ export default {
         empty: Boolean,
         filterable: Boolean,
         placeholder: String,
+        change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {
         return {
@@ -53,6 +54,7 @@ export default {
     watch: {
         model(value) {
             this.$emit('input', value);
+            this.triggerChange(value);
         }
     },
     created() {
@@ -61,6 +63,22 @@ export default {
         }
     },
     methods: {
+        triggerChange(value) {
+            if (this.change) {
+                let item = this.getItem(value);
+                this.change(item);
+            }
+        },
+        getItem(value) {
+            if (value !== undefined) {
+                for (let item of this.items) {
+                    if (item[this.valueName] === value) {
+                        return item;
+                    }
+                }
+            }
+            return undefined;
+        },
         fetch(keyword) {
             if (keyword) {
                 this.load(keyword);

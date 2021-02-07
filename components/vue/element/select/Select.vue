@@ -79,7 +79,7 @@ export default {
                 } else {
                     item = this.getItem(value);
                 }
-                this.change.call(this, item);
+                this.change(item);
             }
         },
         getItem(value) {

@@ -25,6 +25,7 @@ export default {
             default: false,
         },
         placeholder: String,
+        change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {
         // 最小级别小于最大级别，则取消父子节点选中关联，允许选择中间级别的节点
@@ -46,6 +47,7 @@ export default {
     watch: {
         model(value) {
             this.$emit('input', value);
+            this.triggerChange(value);
         }
     },
     created() {
@@ -56,6 +58,26 @@ export default {
         });
     },
     methods: {
+        triggerChange(value) {
+            if (this.change) {
+                let item = this.getItem(this.region.subs, value);
+                this.change(item);
+            }
+        },
+        getItem(items, value) {
+            if (items && value !== undefined) {
+                for (let item of items) {
+                    if (item.code === value) {
+                        return item;
+                    }
+                    let sub = this.getItem(item.subs, value);
+                    if (sub) {
+                        return sub;
+                    }
+                }
+            }
+            return undefined;
+        },
         filterSubs(region) {
             if (region.subs) {
                 if (region.level >= parseInt(this.maxLevel)) {
