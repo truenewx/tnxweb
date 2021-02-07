@@ -41,7 +41,29 @@ function getRule(validationName, validationValue, fieldMeta) {
             if (validationValue === true) {
                 rule = {
                     required: true,
-                    message: validator.getErrorMessage(validationName, fieldMeta.caption),
+                    validator(r, fieldValue, callback, source, options) {
+                        if (validationValue) {
+                            let blank = false;
+                            if (Array.isArray(fieldValue)) {
+                                blank == fieldValue.length === 0; // 数组长度为0视为空
+                            } else if (fieldValue instanceof Date) {
+                                blank = fieldValue === undefined || fieldValue === null; // 日期类型同时也是对象，仅当undefined或null时视为空
+                            } else if (typeof fieldValue === 'string') {
+                                blank == fieldValue.trim().length === 0; // 字符串去掉两端空格后长度为0视为空
+                            } else if (typeof fieldValue === 'number') {
+                                blank = isNaN(fieldValue); // 非法的数字视为空
+                            } else if (typeof fieldValue === 'object') {
+                                blank = Object.keys(fieldValue).length === 0; // 没有字段的空对象视为空
+                            } else {
+                                blank = fieldValue === undefined || fieldValue === null;
+                            }
+                            if (blank) {
+                                let message = validator.getErrorMessage(validationName, fieldMeta.caption);
+                                return callback(new Error(message));
+                            }
+                        }
+                        return callback();
+                    }
                 }
             }
             break;

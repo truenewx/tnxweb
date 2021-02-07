@@ -1,5 +1,10 @@
 <template>
-    <el-radio-group v-model="model" class="ignore-feedback" v-if="selector === 'radio-group'">
+    <el-checkbox-group v-model="model" v-if="selector === 'checkbox'">
+        <el-checkbox v-for="item in items" :key="item[valueName]" :label="item[valueName]">
+            {{ item[textName] }}
+        </el-checkbox>
+    </el-checkbox-group>
+    <el-radio-group v-model="model" class="ignore-feedback" v-else-if="selector === 'radio-group'">
         <el-radio-button :label="emptyValue" v-if="empty">{{ emptyText }}</el-radio-button>
         <el-radio-button v-for="item in items" :key="item[valueName]" :label="item[valueName]">
             {{ item[textName] }}
@@ -61,7 +66,15 @@ export default {
     methods: {
         getDefaultValue(items) {
             let defaultValue = this.value || this.defaultValue;
-            if (!defaultValue && !this.empty && items && items.length) {
+            if (this.selector === 'checkbox') { // 多选时需确保值为数组
+                if (defaultValue) {
+                    if (!Array.isArray(defaultValue)) {
+                        defaultValue = [defaultValue];
+                    }
+                } else {
+                    defaultValue = [];
+                }
+            } else if (!defaultValue && !this.empty && items && items.length) {
                 let firstItem = items[0];
                 if (firstItem) {
                     defaultValue = firstItem[this.valueName];
