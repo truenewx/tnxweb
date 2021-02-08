@@ -55,6 +55,11 @@ export default {
         model(value) {
             this.$emit('input', value);
             this.triggerChange(value);
+        },
+        params(params) {
+            if (!this.filterable) {
+                this.load();
+            }
         }
     },
     created() {
@@ -87,24 +92,26 @@ export default {
             }
         },
         load(keyword) {
-            this.loading = true;
-            let params = this.params(keyword);
-            let vm = this;
-            window.tnx.app.rpc.get(this.url, params, function(result) {
-                vm.loading = false;
-                if (Array.isArray(result)) {
-                    vm.items = result;
-                } else if (typeof result === 'object') {
-                    vm.items = result[vm.resultName];
-                    if (result.paged) {
-                        vm.more = result.paged.morePage;
+            if (this.params) { // 当参数函数被设置为null时，不进行取数操作，用于参数条件初始不满足的情况
+                this.loading = true;
+                let params = this.params(keyword);
+                let vm = this;
+                window.tnx.app.rpc.get(this.url, params, function(result) {
+                    vm.loading = false;
+                    if (Array.isArray(result)) {
+                        vm.items = result;
+                    } else if (typeof result === 'object') {
+                        vm.items = result[vm.resultName];
+                        if (result.paged) {
+                            vm.more = result.paged.morePage;
+                        }
                     }
-                }
-                // 如果不可检索且不能为空，则默认选中第一个选项
-                if (!vm.filterable && !vm.empty && vm.items && vm.items.length) {
-                    vm.model = vm.items[0][vm.valueName];
-                }
-            });
+                    // 如果不可检索且不能为空，则默认选中第一个选项
+                    if (!vm.filterable && !vm.empty && vm.items && vm.items.length) {
+                        vm.model = vm.items[0][vm.valueName];
+                    }
+                });
+            }
         },
         clear() {
             this.items = null;
