@@ -1,6 +1,6 @@
 <template>
     <el-select v-model="model" :loading="loading" :filterable="filterable" remote :remote-method="fetch"
-        :placeholder="placeholder || defaultPlaceholder" :clearable="empty" default-first-option @clear="clear">
+        :placeholder="finalPlaceholder" :title="title" :clearable="empty" default-first-option @clear="clear">
         <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]" :label="item[textName]"/>
         <el-option label="还有更多结果..." disabled v-if="more"/>
     </el-select>
@@ -35,7 +35,7 @@ export default {
         },
         empty: Boolean,
         filterable: Boolean,
-        placeholder: String,
+        placeholder: [String, Array],
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {
@@ -47,8 +47,26 @@ export default {
         };
     },
     computed: {
-        defaultPlaceholder() {
+        finalPlaceholder() {
+            let defaultPlaceholder;
+            let noItemsPlaceholder;
+            if (Array.isArray(this.placeholder)) {
+                defaultPlaceholder = this.placeholder[0];
+                noItemsPlaceholder = this.placeholder[1];
+            } else {
+                defaultPlaceholder = this.placeholder;
+                noItemsPlaceholder = '没有可选项';
+            }
+            if (this.items && this.items.length === 0) {
+                return noItemsPlaceholder;
+            }
+            if (defaultPlaceholder) {
+                return defaultPlaceholder;
+            }
             return this.filterable ? '输入关键字进行检索' : '请选择';
+        },
+        title() {
+            return this.model ? undefined : this.finalPlaceholder;
         }
     },
     watch: {
@@ -109,6 +127,8 @@ export default {
                     // 如果不可检索且不能为空，则默认选中第一个选项
                     if (!vm.filterable && !vm.empty && vm.items && vm.items.length) {
                         vm.model = vm.items[0][vm.valueName];
+                    } else {
+                        vm.model = undefined;
                     }
                 });
             }
