@@ -124,6 +124,7 @@ export default {
                             vm.more = result.paged.morePage;
                         }
                     }
+                    vm.$emit('items', vm.items, vm.more);
                     // 如果不可检索且不能为空，则默认选中第一个选项
                     if (!vm.filterable && !vm.empty && vm.items && vm.items.length) {
                         vm.model = vm.items[0][vm.valueName];
