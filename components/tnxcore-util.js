@@ -260,6 +260,31 @@ export const StringUtil = {
         }
         return undefined;
     },
+    getPixelString(value, containerValue) {
+        if (typeof value === 'number') {
+            return value + 'px';
+        } else if (typeof value === 'string') {
+            if (value.endsWith('%')) {
+                let percent = parseFloat(value.substr(0, value.length - 1));
+                let containerNumber = this.getPixelNumber(containerValue);
+                if (!isNaN(percent) && !isNaN(containerNumber)) {
+                    return (containerNumber * percent / 100) + 'px';
+                }
+            }
+        }
+        return value;
+    },
+    getPixelNumber(value) {
+        if (typeof value === 'number') {
+            return value;
+        }
+        if (typeof value === 'string') {
+            if (value.toLowerCase().endsWith('px')) {
+                return parseInt(value.substr(0, value.length - 2));
+            }
+        }
+        return NaN;
+    }
 }
 
 export const NetUtil = {

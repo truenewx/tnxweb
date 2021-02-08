@@ -1,38 +1,39 @@
 <template>
-    <div>
-        <el-upload ref="upload" class="d-none"
-            :id="id"
-            :action="action"
-            :before-upload="beforeUpload"
-            :on-progress="onProgress"
-            :on-success="onSuccess"
-            :on-error="onError"
-            :with-credentials="true"
-            list-type="picture-card"
-            name="files"
-            :file-list="fileList"
-            :data="uploadParams"
-            :headers="uploadHeaders"
-            :multiple="uploadLimit.number > 1"
-            :accept="uploadAccept">
-            <i slot="default" class="el-icon-plus"></i>
-            <div slot="file" slot-scope="{file}" class="el-upload-list__panel" :data-file-id="getFileId(file)">
-                <img class="el-upload-list__item-thumbnail" :src="file.url">
-                <label class="el-upload-list__item-status-label">
-                    <i class="el-icon-upload-success el-icon-check"></i>
-                </label>
-                <span class="el-upload-list__item-actions">
-                    <span class="el-upload-list__item-preview" @click="previewFile(file)">
-                    <i class="el-icon-zoom-in"></i>
-                    </span>
-                    <span class="el-upload-list__item-delete" @click="removeFile(file)" v-if="!readOnly">
-                      <i class="el-icon-delete"></i>
-                    </span>
-                </span>
+    <el-upload ref="upload" class="d-none"
+        :id="id"
+        :action="action"
+        :before-upload="beforeUpload"
+        :on-progress="onProgress"
+        :on-success="onSuccess"
+        :on-error="onError"
+        :with-credentials="true"
+        list-type="picture-card"
+        name="files"
+        :file-list="fileList"
+        :data="uploadParams"
+        :headers="uploadHeaders"
+        :multiple="uploadLimit.number > 1"
+        :accept="uploadAccept">
+        <i slot="default" class="el-icon-plus"></i>
+        <div slot="file" slot-scope="{file}" class="el-upload-list__panel" :data-file-id="getFileId(file)">
+            <img class="el-upload-list__item-thumbnail" :src="file.url" v-if="uploadLimit.imageable">
+            <div v-else>
+                <i class="el-icon-document"></i> {{ file.name }}
             </div>
-            <div slot="tip" class="el-upload__tip" v-if="tip" v-text="tip"></div>
-        </el-upload>
-    </div>
+            <label class="el-upload-list__item-status-label">
+                <i class="el-icon-upload-success el-icon-check"></i>
+            </label>
+            <span class="el-upload-list__item-actions">
+                <span class="el-upload-list__item-preview" @click="previewFile(file)" v-if="uploadLimit.imageable">
+                    <i class="el-icon-zoom-in"></i>
+                </span>
+                <span class="el-upload-list__item-delete" @click="removeFile(file)" v-if="!readOnly">
+                    <i class="el-icon-delete"></i>
+                </span>
+            </span>
+        </div>
+        <div slot="tip" class="el-upload__tip" v-if="tip" v-text="tip"></div>
+    </el-upload>
 </template>
 
 <script>
@@ -51,6 +52,12 @@ export default {
             type: Boolean,
             default: () => false,
         },
+        width: {
+            type: [Number, String],
+        },
+        height: {
+            type: [Number, String],
+        },
     },
     data() {
         const tnx = window.tnx;
@@ -61,7 +68,7 @@ export default {
         }
         return {
             tnx: tnx,
-            id: 'upload-container-' + new Date().getTime(),
+            id: 'upload-container-' + tnx.util.string.random(32),
             alone: !rpc.apps.fss.startsWith(rpc.getBaseUrl()), // FSS是否独立部署的服务
             action: action,
             uploadLimit: {},
@@ -122,30 +129,36 @@ export default {
         this.$nextTick(function() {
             vm.tnx.app.rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
                 vm.uploadLimit = uploadLimit;
+                const $container = $('#' + vm.id);
                 // 初始化显示尺寸
                 let uploadSize = undefined;
                 if (uploadLimit.sizes && uploadLimit.sizes.length) {
                     uploadSize = uploadLimit.sizes[0];
                 }
-                const $container = $('#' + vm.id);
-                if (uploadSize) {
-                    const $upload = $('.el-upload', $container);
-                    $upload.css({
-                        width: uploadSize.width + 'px',
-                        height: uploadSize.height + 'px',
-                    });
-
-                    let plusSize = Math.min(uploadSize.width, uploadSize.height) / 4;
-                    plusSize = Math.max(16, Math.min(plusSize, 32));
-                    $('.el-icon-plus', $upload).css({
-                        fontSize: plusSize + 'px'
-                    });
+                if (!uploadSize) {
+                    uploadSize = {
+                        width: vm.width || 128,
+                        height: vm.height || (uploadLimit.imageable ? 128 : 40),
+                    }
                 }
+                let width = window.tnx.util.string.getPixelString(uploadSize.width);
+                let height = window.tnx.util.string.getPixelString(uploadSize.height);
+                const $upload = $('.el-upload', $container);
+                $upload.css({
+                    width: width,
+                    height: height,
+                });
+
+                let plusSize = Math.min($upload.width(), uploadSize.height) / 4;
+                plusSize = Math.max(16, Math.min(plusSize, 32));
+                $('.el-icon-plus', $upload).css({
+                    fontSize: plusSize + 'px'
+                });
                 $container.removeClass('d-none');
 
                 if (vm.fileList && vm.fileList.length) {
                     vm.fileList.forEach(function(file) {
-                        vm._resizeImagePanel(file, vm.fileList);
+                        vm._resizeFilePanel(file, vm.fileList);
                     });
                 }
             }, {
@@ -275,22 +288,23 @@ export default {
             });
         },
         onProgress: function(event, file, fileList) {
-            this._resizeImagePanel(file, fileList);
+            this._resizeFilePanel(file, fileList);
         },
-        _resizeImagePanel: function(file, fileList) {
-            if (fileList.length >= this.uploadLimit.number) {
-                // 隐藏添加按钮
-                $('#' + this.id + ' .el-upload').hide();
-            }
+        _resizeFilePanel: function(file, fileList) {
             const $container = $('#' + this.id);
             const $upload = $('.el-upload', $container);
+            let uploadStyle = $upload.attr('style'); // 隐藏之前取出样式
+            if (fileList.length >= this.uploadLimit.number) {
+                // 隐藏添加按钮
+                $upload.hide();
+            }
             const fileId = this.getFileId(file);
             const $listItem = $('.el-upload-list__panel[data-file-id="' + fileId + '"]', $container).parent();
-            $listItem.css({
-                width: $upload.css('width'),
-                height: $upload.css('height'),
+            $listItem.attr('style', uploadStyle);
+            $listItem.parent().css({
+                width: '100%',
+                'min-height': $upload.outerHeight(true)
             });
-            $listItem.parent().css({'min-height': $upload.outerHeight(true)});
         },
         onSuccess: function(uploadedFiles, file, fileList) {
             if (uploadedFiles instanceof Array) {
@@ -311,11 +325,13 @@ export default {
                 return file.uid === f.uid;
             });
             if (this.uploadFiles.length < this.uploadLimit.number) {
+                let container = $('#' + this.id);
+                // 去掉文件列表的宽度，以免其占高度
+                $('.el-upload-list', container).css({
+                    width: 'unset'
+                });
                 // 显示添加按钮
-                const $upload = $('#' + this.id + ' .el-upload');
-                setTimeout(function() {
-                    $upload.show();
-                }, 500);
+                $('.el-upload', container).show();
             }
         },
         previewFile: function(file) {
@@ -389,12 +405,14 @@ export default {
 .el-upload-list--picture-card {
     display: inline-flex;
     align-items: center;
+    max-width: 100%;
 }
 
 .el-upload-list--picture-card .el-upload-list__item {
     width: 1rem;
     height: 1rem;
     transition: none;
+    border-radius: 4px;
 }
 
 .el-upload-list__panel {
