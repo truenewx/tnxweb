@@ -301,10 +301,10 @@ export default {
             const fileId = this.getFileId(file);
             const $listItem = $('.el-upload-list__panel[data-file-id="' + fileId + '"]', $container).parent();
             $listItem.attr('style', uploadStyle);
-            $listItem.parent().css({
-                width: '100%',
-                'min-height': $upload.outerHeight(true)
-            });
+            if (typeof this.width === 'string' && this.width.endsWith('%')) {
+                $listItem.parent().css({width: '100%'});
+            }
+            $listItem.parent().css({'min-height': $upload.outerHeight(true)});
         },
         onSuccess: function(uploadedFiles, file, fileList) {
             if (uploadedFiles instanceof Array) {
