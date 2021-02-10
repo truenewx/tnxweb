@@ -42,6 +42,7 @@ import $ from 'jquery';
 export default {
     name: 'TnxelUpload',
     props: {
+        value: [String, Array],
         type: {
             type: String,
             required: true,
@@ -288,6 +289,7 @@ export default {
             });
         },
         onProgress: function(event, file, fileList) {
+            this.$emit('input', false); // 将监听模型值置为false，以表示上传未完成
             this._resizeFilePanel(file, fileList);
         },
         _resizeFilePanel: function(file, fileList) {
@@ -308,8 +310,21 @@ export default {
         },
         onSuccess: function(uploadedFiles, file, fileList) {
             if (uploadedFiles instanceof Array) {
-                const uploadedFile = uploadedFiles[0]; // 该组件为单文件上传模式
+                const uploadedFile = uploadedFiles[0]; // 该组件为一次只上传一个文件的上传模式
                 file.storageUrl = uploadedFile.storageUrl;
+
+                let storageUrls = [];
+                for (let f of fileList) {
+                    if (f.storageUrl) {
+                        storageUrls.push(f.storageUrl);
+                    } else { // 存在一个未完成上传，则退出
+                        return;
+                    }
+                }
+                if (this.uploadLimit.number === 1) {
+                    storageUrls = storageUrls[0];
+                }
+                this.$emit('input', storageUrls);
             }
         },
         onError: function(error, file, fileList) {

@@ -44,20 +44,23 @@ export default {
         }
     },
     created() {
-        let vm = this;
-        if (this.type.toLowerCase() === 'boolean') {
-            vm.items = [{
-                key: true,
-                caption: true.toText(),
-            }, {
-                key: false,
-                caption: false.toText(),
-            }];
-        } else {
-            window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
-                vm.items = items;
-            });
+        if (typeof this.type === 'string') {
+            let vm = this;
+            if (this.type.toLowerCase() === 'boolean') {
+                vm.items = [{
+                    key: true,
+                    caption: true.toText(),
+                }, {
+                    key: false,
+                    caption: false.toText(),
+                }];
+            } else {
+                window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
+                    vm.items = items;
+                });
+            }
         }
+
     },
     methods: {}
 }
