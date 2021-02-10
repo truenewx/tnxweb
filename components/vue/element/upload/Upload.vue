@@ -8,7 +8,6 @@
         :on-error="onError"
         :with-credentials="true"
         list-type="picture-card"
-        name="files"
         :file-list="fileList"
         :data="uploadParams"
         :headers="uploadHeaders"
@@ -48,7 +47,6 @@ export default {
             required: true,
         },
         scope: String,
-        files: [Object, Array],
         readOnly: {
             type: Boolean,
             default: () => false,
@@ -85,7 +83,7 @@ export default {
             uploadHeaders: {
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            fileList: this.getFileList(),
+            fileList: [],
         };
     },
     computed: {
@@ -127,7 +125,39 @@ export default {
     },
     mounted() {
         const vm = this;
-        this.$nextTick(function() {
+        vm.tnx.app.rpc.ensureLogined(function() {
+            if (vm.value) {
+                let storageUrls = Array.isArray(vm.value) ? vm.value : [vm.value];
+                vm.tnx.app.rpc.get('/metas', {storageUrls: storageUrls}, function(metas) {
+                    metas.forEach(meta => {
+                        vm.fileList.push({
+                            name: meta.name,
+                            url: vm._getFullReadUrl(meta.thumbnailReadUrl || meta.readUrl),
+                            previewUrl: vm._getFullReadUrl(meta.readUrl),
+                            storageUrl: meta.storageUrl,
+                        });
+                    });
+                    vm.$nextTick(function() {
+                        vm._loadUploadLimit();
+                    });
+                }, {
+                    app: 'fss'
+                });
+            } else {
+                vm.$nextTick(function() {
+                    vm._loadUploadLimit();
+                });
+            }
+        }, {
+            app: 'fss',
+            toLogin: function(loginFormUrl, originalUrl, originalMethod) {
+                return true;
+            }
+        });
+    },
+    methods: {
+        _loadUploadLimit: function() {
+            let vm = this;
             vm.tnx.app.rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
                 vm.uploadLimit = uploadLimit;
                 const $container = $('#' + vm.id);
@@ -165,30 +195,6 @@ export default {
             }, {
                 app: 'fss'
             });
-        });
-    },
-    methods: {
-        getFileList: function() {
-            let initialFiles = this.files;
-            if (initialFiles) {
-                if (typeof initialFiles === 'object') {
-                    initialFiles = [initialFiles];
-                }
-                if (initialFiles instanceof Array) {
-                    const fileList = [];
-                    const _this = this;
-                    initialFiles.forEach(initialFile => {
-                        fileList.push({
-                            name: initialFile.name,
-                            url: _this._getFullReadUrl(initialFile.thumbnailReadUrl || initialFile.readUrl),
-                            previewUrl: _this._getFullReadUrl(initialFile.readUrl),
-                            storageUrl: initialFile.storageUrl,
-                        });
-                    });
-                    return fileList;
-                }
-            }
-            return [];
         },
         _getFullReadUrl: function(readUrl) {
             if (readUrl && readUrl.startsWith('//')) {
@@ -312,20 +318,22 @@ export default {
             if (uploadedFiles instanceof Array) {
                 const uploadedFile = uploadedFiles[0]; // 该组件为一次只上传一个文件的上传模式
                 file.storageUrl = uploadedFile.storageUrl;
-
-                let storageUrls = [];
-                for (let f of fileList) {
-                    if (f.storageUrl) {
-                        storageUrls.push(f.storageUrl);
-                    } else { // 存在一个未完成上传，则退出
-                        return;
-                    }
-                }
-                if (this.uploadLimit.number === 1) {
-                    storageUrls = storageUrls[0];
-                }
-                this.$emit('input', storageUrls);
+                this.emitInput();
             }
+        },
+        emitInput: function() {
+            let storageUrls = [];
+            for (let file of this.uploadFiles) {
+                if (file.storageUrl) {
+                    storageUrls.push(file.storageUrl);
+                } else { // 存在一个未完成上传，则退出
+                    return;
+                }
+            }
+            if (this.uploadLimit.number === 1) {
+                storageUrls = storageUrls[0];
+            }
+            this.$emit('input', storageUrls);
         },
         onError: function(error, file, fileList) {
             let message = JSON.parse(error.message);
@@ -348,6 +356,7 @@ export default {
                 // 显示添加按钮
                 $('.el-upload', container).show();
             }
+            this.emitInput();
         },
         previewFile: function(file) {
             if (!file.width || !file.height) {
