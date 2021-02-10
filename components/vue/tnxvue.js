@@ -78,7 +78,7 @@ const tnxvue = Object.assign({}, tnxcore, {
         delete options.type;
         delete options.click;
         this.dialog(component, title, buttons, options, props);
-    },
+    }
 });
 
 Object.assign(tnxvue.util, {
@@ -87,7 +87,7 @@ Object.assign(tnxvue.util, {
      * @param obj 对象
      * @returns {boolean} 是否组件实例
      */
-    isComponent: obj => {
+    isComponent: function(obj) {
         return (typeof obj === 'object') && (typeof obj.data === 'function') && (typeof obj.render === 'function');
     }
 });
@@ -123,6 +123,56 @@ tnxvue.app.page.init = tnxvue.util.function.around(tnxvue.app.page.init, functio
         }
     }
     init.call(this, page, container);
+});
+
+Object.assign(tnxvue.app.page, {
+    startCache: function(model, intervalMillis) {
+        if (intervalMillis && intervalMillis > 1000) { // 缓存间隔必须超过1秒
+            let anchor = tnxvue.util.net.getAnchor() || '/';
+            let cache = localStorage ? localStorage[anchor] : undefined;
+            if (cache) {
+                cache = window.tnx.util.string.parseJson(cache);
+                Object.assign(model, cache);
+            }
+
+            setInterval(function() {
+                if (localStorage) {
+                    localStorage[anchor] = tnxvue.util.string.toJson(model);
+                }
+            }, intervalMillis);
+        }
+        return model;
+    },
+    clearCache: function() {
+        let anchor = tnxvue.util.net.getAnchor() || '/';
+        if (localStorage) {
+            delete localStorage[anchor];
+        }
+    },
+    /**
+     * 清理前端数据模型，检查文件上传是否完成，转换多层嵌入字段数据使其符合服务端的基本要求
+     * @param model 前端数据模型
+     * @param refs 页面中的组件引用集
+     */
+    cleanModel: function(vm, model) {
+        if (model) {
+            if (vm.$refs) {
+                let refKeys = Object.keys(vm.$refs);
+                for (let refKey of refKeys) {
+                    let ref = vm.$refs[refKey];
+                    console.info(ref.name);
+                }
+            }
+            let fieldNames = Object.keys(model);
+            for (let fieldName of fieldNames) {
+                if (fieldName.contains('__')) {
+                    let path = fieldName.replaceAll('__', '.');
+                    console.info(path);
+                }
+            }
+        }
+        return false;
+    }
 });
 
 Vue.use(tnxvue);

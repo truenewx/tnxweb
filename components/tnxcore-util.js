@@ -233,6 +233,8 @@ export const MathUtil = {
 }
 
 export const StringUtil = {
+    toJson: JSON.stringify,
+    parseJson: JSON.parse,
     random: function(length, chars) {
         if (length >= 0) {
             chars = chars || 'abcdefghijklmnopqrstuvwxyz'; // 默认取值范围为所有小写字母
