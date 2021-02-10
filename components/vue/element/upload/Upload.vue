@@ -1,6 +1,7 @@
 <template>
     <el-upload ref="upload" class="d-none"
         :id="id"
+        name="files"
         :action="action"
         :before-upload="beforeUpload"
         :on-progress="onProgress"
@@ -315,7 +316,7 @@ export default {
             $listItem.parent().css({'min-height': $upload.outerHeight(true)});
         },
         onSuccess: function(uploadedFiles, file, fileList) {
-            if (uploadedFiles instanceof Array) {
+            if (Array.isArray(uploadedFiles) && uploadedFiles.length) {
                 const uploadedFile = uploadedFiles[0]; // 该组件为一次只上传一个文件的上传模式
                 file.storageUrl = uploadedFile.storageUrl;
                 this.emitInput();
