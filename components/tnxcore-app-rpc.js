@@ -99,8 +99,11 @@ export default {
         };
         if (config.params) {
             Object.keys(config.params).forEach(key => {
-                if (config.params[key] === undefined || config.params[key] === null) {
+                let value = config.params[key];
+                if (value === undefined || value === null) {
                     delete config.params[key];
+                } else {
+                    config.params[key] = value + ''; // 参数值都转换为字符串，以避免参数传递错误
                 }
             });
             config.paramsSerializer = function(params) {
