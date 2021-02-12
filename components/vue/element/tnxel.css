@@ -143,6 +143,7 @@ el-header a img,
 
 .el-form-item__content p,
 .el-form-item__content .static-text,
+.el-form-item__content > .el-radio-group > .el-radio,
 .el-form-item__content > .el-checkbox-group {
     margin-block-start: 10px;
     margin-block-end: 10px;

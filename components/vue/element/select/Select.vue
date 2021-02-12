@@ -4,7 +4,13 @@
             {{ item[textName] }}
         </el-checkbox>
     </el-checkbox-group>
-    <el-radio-group v-model="model" class="ignore-feedback" v-else-if="selector === 'radio-group'">
+    <el-radio-group v-model="model" class="ignore-feedback" v-else-if="selector === 'radio'">
+        <el-radio :label="emptyValue" v-if="empty">{{ emptyText }}</el-radio>
+        <el-radio v-for="item in items" :key="item[valueName]" :label="item[valueName]">
+            {{ item[textName] }}
+        </el-radio>
+    </el-radio-group>
+    <el-radio-group v-model="model" class="ignore-feedback" v-else-if="selector === 'radio-button'">
         <el-radio-button :label="emptyValue" v-if="empty">{{ emptyText }}</el-radio-button>
         <el-radio-button v-for="item in items" :key="item[valueName]" :label="item[valueName]">
             {{ item[textName] }}
