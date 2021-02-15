@@ -127,25 +127,38 @@ tnxvue.app.page.init = tnxvue.util.function.around(tnxvue.app.page.init, functio
 
 Object.assign(tnxvue.app.page, {
     startCache: function(model, intervalMillis) {
-        if (intervalMillis && intervalMillis > 1000) { // 缓存间隔必须超过1秒
-            let anchor = tnxvue.util.net.getAnchor() || '/';
-            let cache = localStorage ? localStorage[anchor] : undefined;
-            if (cache) {
-                cache = window.tnx.util.string.parseJson(cache);
-                Object.assign(model, cache);
-            }
+        if (localStorage && intervalMillis && intervalMillis > 1000) { // 缓存间隔必须超过1秒
+            let anchor = this._readCache(undefined, function(cache) {
+                Object.assign(model, cache.model);
+            });
 
-            setInterval(function() {
-                if (localStorage) {
-                    localStorage[anchor] = tnxvue.util.string.toJson(model);
-                }
-            }, intervalMillis);
+            if (anchor) {
+                let intervalId = setInterval(function() {
+                    localStorage[anchor] = tnxvue.util.string.toJson({
+                        intervalId: intervalId,
+                        model: model,
+                    });
+                }, intervalMillis);
+            }
         }
         return model;
     },
-    clearCache: function() {
-        let anchor = tnxvue.util.net.getAnchor() || '/';
+    _readCache: function(anchor, callback) {
         if (localStorage) {
+            anchor = anchor || tnxvue.util.net.getAnchor() || '/';
+            let cache = localStorage[anchor];
+            if (cache) {
+                cache = window.tnx.util.string.parseJson(cache);
+                callback.call(this, cache);
+            }
+            return anchor;
+        }
+    },
+    clearCache: function(anchor) {
+        anchor = this._readCache(anchor, function(cache) {
+            clearInterval(cache.intervalId);
+        });
+        if (anchor) {
             delete localStorage[anchor];
         }
     },

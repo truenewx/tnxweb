@@ -40,9 +40,9 @@ export default {
     },
     data() {
         return {
-            model: this.value,
-            loading: false,
             items: null,
+            model: null, // 初始情况下，items为空，model必然为空
+            loading: false,
             more: false,
         };
     },
@@ -93,7 +93,7 @@ export default {
             }
         },
         getItem(value) {
-            if (value !== undefined) {
+            if (value !== undefined && value !== null && this.items) {
                 for (let item of this.items) {
                     if (item[this.valueName] === value) {
                         return item;
@@ -125,9 +125,16 @@ export default {
                         }
                     }
                     vm.$emit('items', vm.items, vm.more);
-                    // 如果不可检索且不能为空，则默认选中第一个选项
-                    if (!vm.filterable && !vm.empty && vm.items && vm.items.length) {
-                        vm.model = vm.items[0][vm.valueName];
+
+                    if (vm.items && vm.items.length) {
+                        let item = vm.getItem(vm.model);
+                        if (!item) { // 如果当前值找不到匹配的选项，则需要考虑是设置为空还是默认选项
+                            if (!vm.filterable && !vm.empty) { // 如果不可检索且不能为空，则默认选中第一个选项
+                                vm.model = vm.items[0][vm.valueName];
+                            } else { // 否则设置为空
+                                vm.model = undefined;
+                            }
+                        }
                     } else {
                         vm.model = undefined;
                     }
