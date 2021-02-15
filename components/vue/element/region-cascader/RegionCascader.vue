@@ -40,7 +40,7 @@ export default {
                 leaf: 'includingSub',
                 checkStrictly: checkStrictly,
             },
-            model: this.value,
+            model: null,
             region: {},
         };
     },
@@ -48,6 +48,9 @@ export default {
         model(value) {
             this.$emit('input', value);
             this.triggerChange(value);
+        },
+        value(value) {
+            this.model = this.getModel();
         }
     },
     created() {
@@ -55,6 +58,7 @@ export default {
         window.tnx.app.rpc.loadRegion(this.scope, function(region) {
             vm.filterSubs(region);
             vm.region = region;
+            vm.model = vm.getModel();
         });
     },
     methods: {
@@ -77,6 +81,26 @@ export default {
                 }
             }
             return undefined;
+        },
+        getModel() {
+            if (this.region) {
+                let items = this.region.subs;
+                if (items && items.length) {
+                    let item = this.getItem(items, this.value);
+                    if (item) {
+                        return this.value;
+                    } else { // 如果当前值找不到匹配的选项，则需要考虑是设置为空还是默认选项
+                        if (!this.empty) { // 如果不能为空，则默认选中第一个叶子节点选项
+                            let firstItem = items[0];
+                            while (firstItem.subs && firstItem.subs.length) {
+                                firstItem = firstItem.subs[0];
+                            }
+                            return firstItem ? firstItem[this.valueName] : null;
+                        }
+                    }
+                }
+            }
+            return null;
         },
         filterSubs(region) {
             if (region.subs) {

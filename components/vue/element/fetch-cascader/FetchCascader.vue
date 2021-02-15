@@ -96,14 +96,14 @@ export default {
                 } else { // 如果当前值找不到匹配的选项，则需要考虑是设置为空还是默认选项
                     if (!this.empty) { // 如果不能为空，则默认选中第一个选项
                         let firstItem = this.items[0];
+                        while (firstItem[this.childrenName] && firstItem[this.childrenName].length) {
+                            firstItem = firstItem[this.childrenName][0];
+                        }
                         return firstItem ? firstItem[this.valueName] : null;
-                    } else { // 否则设置为空
-                        return null;
                     }
                 }
-            } else {
-                return null;
             }
+            return null;
         },
         load() {
             let vm = this;
