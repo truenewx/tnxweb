@@ -404,11 +404,7 @@ export default {
                     if (file.storageUrl) {
                         storageUrls.push(file.storageUrl);
                     } else {
-                        if (typeof reject === 'function') {
-                            reject(file);
-                        } else {
-                            this.tnx.alert('文件"' + file.name + '"还未上传完毕，请稍候');
-                        }
+                        this._doValidateUploadedReject(reject, file);
                         return null;
                     }
                 }
@@ -419,15 +415,22 @@ export default {
                     if (file.storageUrl) {
                         return file.storageUrl;
                     } else {
-                        if (typeof reject === 'function') {
-                            reject(file);
-                        } else {
-                            this.tnx.alert('文件"' + file.name + '"还未上传完毕，请稍候');
-                        }
+                        this._doValidateUploadedReject(reject, file);
                     }
                 }
             }
             return null;
+        },
+        _doValidateUploadedReject: function(reject, file) {
+            if (typeof reject === 'function') {
+                reject(file);
+            } else {
+                this.tnx.alert('文件"' + file.name + '"还未上传完毕，请稍候', function() {
+                    if (reject && typeof reject.disable === 'function') {
+                        reject.disable(false);
+                    }
+                });
+            }
         }
     }
 }

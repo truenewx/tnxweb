@@ -224,7 +224,7 @@ tnxel.libs.Vue.use(tnxel);
 
 const rpc = tnxel.app.rpc;
 rpc.handleErrors = tnxel.util.function.around(rpc.handleErrors, function(handleErrors, errors, options) {
-    if (options && options.form && options.form.disable) {
+    if (options && options.form && typeof options.form.disable === 'function') {
         options.form.disable(false);
     }
     handleErrors.call(rpc, errors, options);
