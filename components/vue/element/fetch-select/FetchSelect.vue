@@ -74,6 +74,9 @@ export default {
             this.$emit('input', value);
             this.triggerChange(value);
         },
+        value(value) {
+            this.model = this.getModel();
+        },
         params(params) {
             if (!this.filterable) {
                 this.load();
@@ -125,20 +128,25 @@ export default {
                         }
                     }
                     vm.$emit('items', vm.items, vm.more);
-
-                    if (vm.items && vm.items.length) {
-                        let item = vm.getItem(vm.model);
-                        if (!item) { // 如果当前值找不到匹配的选项，则需要考虑是设置为空还是默认选项
-                            if (!vm.filterable && !vm.empty) { // 如果不可检索且不能为空，则默认选中第一个选项
-                                vm.model = vm.items[0][vm.valueName];
-                            } else { // 否则设置为空
-                                vm.model = undefined;
-                            }
-                        }
-                    } else {
-                        vm.model = undefined;
-                    }
+                    vm.model = vm.getModel();
                 });
+            }
+        },
+        getModel() {
+            if (this.items && this.items.length) {
+                let item = this.getItem(this.value);
+                if (item) {
+                    return this.value;
+                } else { // 如果当前值找不到匹配的选项，则需要考虑是设置为空还是默认选项
+                    if (!this.filterable && !this.empty) { // 如果不可检索且不能为空，则默认选中第一个选项
+                        let firstItem = this.items[0];
+                        return firstItem ? firstItem[this.valueName] : undefined;
+                    } else { // 否则设置为空
+                        return undefined;
+                    }
+                }
+            } else {
+                return undefined;
             }
         },
         clear() {

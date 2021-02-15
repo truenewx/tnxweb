@@ -50,14 +50,17 @@ export default {
                 children: this.childrenName,
                 leaf: this.leafName,
             },
-            model: this.value,
             items: null,
+            model: null,
         };
     },
     watch: {
         model(value) {
             this.$emit('input', value);
             this.triggerChange(value);
+        },
+        value(value) {
+            this.model = this.getModel();
         }
     },
     created() {
@@ -85,10 +88,29 @@ export default {
             }
             return undefined;
         },
+        getModel() {
+            if (this.items && this.items.length) {
+                let item = this.getItem(this.items, this.value);
+                if (item) {
+                    return this.value;
+                } else { // 如果当前值找不到匹配的选项，则需要考虑是设置为空还是默认选项
+                    if (!this.empty) { // 如果不能为空，则默认选中第一个选项
+                        let firstItem = this.items[0];
+                        return firstItem ? firstItem[this.valueName] : undefined;
+                    } else { // 否则设置为空
+                        return undefined;
+                    }
+                }
+            } else {
+                return undefined;
+            }
+        },
         load() {
             let vm = this;
             window.tnx.app.rpc.get(this.url, this.params, function(result) {
                 vm.items = result;
+
+                vm.model = vm.getModel();
             });
         },
     }

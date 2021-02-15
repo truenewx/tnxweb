@@ -54,7 +54,7 @@ export default {
     },
     data() {
         return {
-            model: this.getDefaultValue(this.items),
+            model: this.getModel(this.items),
         };
     },
     computed: {
@@ -67,9 +67,12 @@ export default {
             this.$emit('input', value);
             this.triggerChange(value);
         },
+        value(value) {
+            this.model = this.getModel(this.items);
+        },
         items(items) {
-            this.model = this.getDefaultValue(items);
-        }
+            this.model = this.getModel(items);
+        },
     },
     methods: {
         triggerChange(value) {
@@ -89,7 +92,7 @@ export default {
             }
         },
         getItem(value) {
-            if (value !== undefined) {
+            if (value !== undefined && value !== null && this.items) {
                 for (let item of this.items) {
                     if (item[this.valueName] === value) {
                         return item;
@@ -98,23 +101,30 @@ export default {
             }
             return undefined;
         },
-        getDefaultValue(items) {
-            let defaultValue = this.value || this.defaultValue;
+        getModel(items) {
+            let model = this.value || this.defaultValue;
             if (this.selector === 'checkbox') { // 多选时需确保值为数组
-                if (defaultValue) {
-                    if (!Array.isArray(defaultValue)) {
-                        defaultValue = [defaultValue];
+                if (model) {
+                    if (!Array.isArray(model)) {
+                        model = [model];
                     }
                 } else {
-                    defaultValue = [];
+                    model = [];
                 }
-            } else if (!defaultValue && !this.empty && items && items.length) {
-                let firstItem = items[0];
-                if (firstItem) {
-                    defaultValue = firstItem[this.valueName];
+                return model;
+            } else if (items && items.length) {
+                let item = this.getItem(this.value);
+                if (item) {
+                    return this.value;
+                } else { // 如果当前值找不到匹配的选项，则需要考虑是设置为空还是默认选项
+                    if (!this.empty) { // 如果不能为空，则默认选中第一个选项
+                        let firstItem = items[0];
+                        return firstItem ? firstItem[this.valueName] : undefined;
+                    } else { // 否则设置为空
+                        return undefined;
+                    }
                 }
             }
-            return defaultValue;
         }
     }
 }
