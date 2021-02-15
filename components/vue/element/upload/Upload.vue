@@ -391,28 +391,37 @@ export default {
             }
             return 0;
         },
-        /**
-         * 获取已上传文件的存储地址集合
-         * @return {Promise<已全部上传完毕的回调, 未全部上传完毕的回调>}
-         */
-        getStorageUrls: function() {
-            const vm = this;
-            return new Promise(function(resolve, reject) {
+        getStorageUrl: function(reject) {
+            if (this.uploadLimit.number > 1) {
                 const storageUrls = [];
-                for (let file of vm.uploadFiles) {
+                for (let file of this.uploadFiles) {
                     if (file.storageUrl) {
                         storageUrls.push(file.storageUrl);
                     } else {
-                        reject(file);
-                        return;
+                        if (typeof reject === 'function') {
+                            reject(file);
+                        } else {
+                            this.tnx.alert('文件"' + file.name + '"还未上传完毕，请稍候');
+                        }
+                        return null;
                     }
                 }
-                try {
-                    resolve(storageUrls);
-                } catch (error) {
-                    console.error(error);
+                return storageUrls;
+            } else if (this.uploadFiles.length) {
+                let file = this.uploadFiles[0];
+                if (file) {
+                    if (file.storageUrl) {
+                        return file.storageUrl;
+                    } else {
+                        if (typeof reject === 'function') {
+                            reject(file);
+                        } else {
+                            this.tnx.alert('文件"' + file.name + '"还未上传完毕，请稍候');
+                        }
+                    }
                 }
-            });
+            }
+            return null;
         }
     }
 }

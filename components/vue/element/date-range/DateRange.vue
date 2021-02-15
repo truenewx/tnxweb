@@ -22,13 +22,8 @@ export default {
         },
     },
     data() {
-        let model = [];
-        if (this.value) {
-            model.push(this.value.begin instanceof Date ? this.value.begin.formatDate() : this.value.begin);
-            model.push(this.value.end instanceof Date ? this.value.end.formatDate() : this.value.end);
-        }
         return {
-            model: model,
+            model: this.getModel(),
         };
     },
     watch: {
@@ -44,6 +39,25 @@ export default {
             }
             this.$emit('input', value);
         },
+        value(value) {
+            let model = this.getModel();
+            if (model.length) {
+                this.model[0] = model[0];
+                this.model[1] = model[1];
+            } else {
+                this.model = null;
+            }
+        }
     },
+    methods: {
+        getModel() {
+            let model = [];
+            if (this.value) {
+                model.push(this.value.begin instanceof Date ? this.value.begin.formatDate() : this.value.begin);
+                model.push(this.value.end instanceof Date ? this.value.end.formatDate() : this.value.end);
+            }
+            return model;
+        }
+    }
 }
 </script>

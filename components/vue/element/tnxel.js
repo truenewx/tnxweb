@@ -23,6 +23,7 @@ import Transfer from './transfer';
 import Avatar from './avatar';
 import InputNumber from './input-number';
 import StepsNav from './steps-nav';
+import DatePicker from './date-picker';
 import DateRange from './date-range';
 
 const components = Object.assign({}, tnxvue.components, {
@@ -42,6 +43,7 @@ const components = Object.assign({}, tnxvue.components, {
     Avatar,
     InputNumber,
     StepsNav,
+    DatePicker,
     DateRange,
 });
 

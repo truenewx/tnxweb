@@ -205,14 +205,20 @@ Object.assign(tnxvue.app.page, {
                 let refKeys = Object.keys(vm.$refs);
                 for (let refKey of refKeys) {
                     let ref = vm.$refs[refKey];
-                    console.info(ref.name);
+                    if (typeof ref.getStorageUrl === 'function') {
+                        if (!ref.getStorageUrl()) {
+                            return null;
+                        }
+                    }
                 }
             }
             let fieldNames = Object.keys(model);
             for (let fieldName of fieldNames) {
                 if (fieldName.contains('__')) {
                     let path = fieldName.replaceAll('__', '.');
-                    console.info(path);
+                    tnxvue.util.object.setValue(result, path, model[fieldName]);
+                } else {
+                    result[fieldName] = model[fieldName];
                 }
             }
         }

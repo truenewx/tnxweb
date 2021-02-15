@@ -68,16 +68,16 @@ Object.assign(Date.prototype, {
         return pattern;
     },
     formatDateTime: function() {
-        return this.format('yyyy-MM-dd HH:mm:ss');
+        return this.format(DateUtil.patterns.dateTime);
     },
     formatDate: function() {
-        return this.format('yyyy-MM-dd');
+        return this.format(DateUtil.patterns.date);
     },
     formatTime: function() {
-        return this.format('HH:mm:ss');
+        return this.format(DateUtil.patterns.time);
     },
     formatMinute: function() {
-        return this.format('yyyy-MM-dd HH:mm');
+        return this.format(DateUtil.patterns.minute);
     }
 });
 
@@ -177,6 +177,17 @@ export const ObjectUtil = {
             return array;
         }
         return undefined;
+    },
+    setValue: function(obj, fieldPath, value) {
+        var names = fieldPath.split('.');
+        for (let i = 0; i < names.length - 1; i++) {
+            let name = names[i];
+            obj[name] = obj[name] || {};
+            obj = obj[name];
+        }
+        let lastName = names[names.length - 1];
+        obj[lastName] = value;
+        return obj;
     }
 }
 
@@ -286,6 +297,15 @@ export const StringUtil = {
             }
         }
         return NaN;
+    }
+}
+
+export const DateUtil = {
+    patterns: {
+        dateTime: 'yyyy-MM-dd HH:mm:ss',
+        date: 'yyyy-MM-dd',
+        time: 'HH:mm:ss',
+        minute: 'yyyy-MM-dd HH:mm',
     }
 }
 
@@ -446,6 +466,7 @@ export const util = {
     function: FunctionUtil,
     math: MathUtil,
     string: StringUtil,
+    date: DateUtil,
     net: NetUtil,
     dom: DomUtil,
 };
