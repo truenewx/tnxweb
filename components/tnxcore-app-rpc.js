@@ -266,17 +266,17 @@ export default {
         this.get(this._ensureLoginedUrl, callback, options);
     },
     _metas: {},
-    getMeta(url, callback) {
+    getMeta(urlOrType, callback) {
         const metas = this._metas;
-        if (metas[url]) {
+        if (metas[urlOrType]) {
             if (typeof callback === 'function') {
-                callback(metas[url]);
+                callback(metas[urlOrType]);
             }
         } else {
-            this.get('/api/meta/method', {
-                url: url
-            }, function(meta) {
-                metas[url] = meta;
+            let url = '/api/meta/' + (urlOrType.contains('/') ? 'method' : 'model');
+            let params = urlOrType.contains('/') ? {url: urlOrType} : {type: urlOrType};
+            this.get(url, params, function(meta) {
+                metas[urlOrType] = meta;
                 if (typeof callback === 'function') {
                     callback(meta);
                 }
