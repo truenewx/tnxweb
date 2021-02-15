@@ -206,7 +206,7 @@ Object.assign(tnxvue.app.page, {
                 for (let refKey of refKeys) {
                     let ref = vm.$refs[refKey];
                     if (typeof ref.getStorageUrl === 'function') {
-                        if (!ref.getStorageUrl()) {
+                        if (!ref.validateUploaded()) {
                             return null;
                         }
                     }

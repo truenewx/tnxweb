@@ -131,12 +131,14 @@ export default {
                 let storageUrls = Array.isArray(vm.value) ? vm.value : [vm.value];
                 vm.tnx.app.rpc.get('/metas', {storageUrls: storageUrls}, function(metas) {
                     metas.forEach(meta => {
-                        vm.fileList.push({
-                            name: meta.name,
-                            url: vm._getFullReadUrl(meta.thumbnailReadUrl || meta.readUrl),
-                            previewUrl: vm._getFullReadUrl(meta.readUrl),
-                            storageUrl: meta.storageUrl,
-                        });
+                        if (meta) {
+                            vm.fileList.push({
+                                name: meta.name,
+                                url: vm._getFullReadUrl(meta.thumbnailReadUrl || meta.readUrl),
+                                previewUrl: vm._getFullReadUrl(meta.readUrl),
+                                storageUrl: meta.storageUrl,
+                            });
+                        }
                     });
                     vm.$nextTick(function() {
                         vm._loadUploadLimit();
@@ -296,7 +298,6 @@ export default {
             });
         },
         onProgress: function(event, file, fileList) {
-            this.$emit('input', false); // 将监听模型值置为false，以表示上传未完成
             this._resizeFilePanel(file, fileList);
         },
         _resizeFilePanel: function(file, fileList) {
@@ -391,7 +392,12 @@ export default {
             }
             return 0;
         },
-        getStorageUrl: function(reject) {
+        /**
+         * 校验上传是否已经全部完成
+         * @param reject 没有完成上传时的处理函数，传入文件对象参数
+         * @returns 文件存储路径或其数组
+         */
+        validateUploaded: function(reject) {
             if (this.uploadLimit.number > 1) {
                 const storageUrls = [];
                 for (let file of this.uploadFiles) {
