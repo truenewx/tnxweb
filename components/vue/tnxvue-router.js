@@ -52,7 +52,7 @@ export default function(VueRouter, menu, fnImportPage) {
 
     const router = new VueRouter({routes});
     router.beforeEach((to, from, next) => {
-        window.tnx.app.page.clearCache(from.path);
+        window.tnx.app.page.stopCache(from.path);
         next();
     });
     router.afterEach((to, from) => {

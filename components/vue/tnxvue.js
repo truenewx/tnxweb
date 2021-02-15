@@ -126,18 +126,16 @@ tnxvue.app.page.init = tnxvue.util.function.around(tnxvue.app.page.init, functio
 });
 
 Object.assign(tnxvue.app.page, {
-    startCache: function(model, intervalMillis) {
+    startCache: function(model, intervalMillis, ignoredFields) {
         if (localStorage && intervalMillis && intervalMillis > 1000) { // 缓存间隔必须超过1秒
             let anchor = this._readCache(undefined, function(cache) {
                 Object.assign(model, cache.model);
             });
 
             if (anchor) {
+                let _this = this;
                 let intervalId = setInterval(function() {
-                    localStorage[anchor] = tnxvue.util.string.toJson({
-                        intervalId: intervalId,
-                        model: model,
-                    });
+                    _this._storeCache(anchor, intervalId, model, ignoredFields);
                 }, intervalMillis);
             }
         }
@@ -149,15 +147,48 @@ Object.assign(tnxvue.app.page, {
             let cache = localStorage[anchor];
             if (cache) {
                 cache = window.tnx.util.string.parseJson(cache);
-                callback.call(this, cache);
+                if (typeof callback === 'function') {
+                    callback.call(this, cache);
+                }
             }
             return anchor;
         }
     },
-    clearCache: function(anchor) {
-        anchor = this._readCache(anchor, function(cache) {
+    _storeCache: function(anchor, intervalId, model, ignoredFields) {
+        if (anchor && intervalId) {
+            let data = {};
+            if (Array.isArray(ignoredFields) && ignoredFields.length) {
+                Object.keys(model).forEach(key => {
+                    if (!ignoredFields.contains(key)) {
+                        data[key] = model[key];
+                    }
+                });
+            } else {
+                data = model;
+            }
+            localStorage[anchor] = tnxvue.util.string.toJson({
+                intervalId: intervalId,
+                model: data,
+                ignored: ignoredFields,
+            });
+        }
+    },
+    saveCache: function(model) {
+        let intervalId;
+        let ignoredFields;
+        let anchor = this._readCache(undefined, function(cache) {
+            intervalId = cache.intervalId;
+            ignoredFields = cache.ignored;
+        });
+        this._storeCache(anchor, intervalId, model, ignoredFields);
+    },
+    stopCache: function(anchor) {
+        return this._readCache(anchor, function(cache) {
             clearInterval(cache.intervalId);
         });
+    },
+    clearCache: function() {
+        let anchor = this.stopCache();
         if (anchor) {
             delete localStorage[anchor];
         }
@@ -168,6 +199,7 @@ Object.assign(tnxvue.app.page, {
      * @param refs 页面中的组件引用集
      */
     cleanModel: function(vm, model) {
+        let result = {};
         if (model) {
             if (vm.$refs) {
                 let refKeys = Object.keys(vm.$refs);
@@ -184,7 +216,7 @@ Object.assign(tnxvue.app.page, {
                 }
             }
         }
-        return false;
+        return result;
     }
 });
 
