@@ -22,7 +22,7 @@ a.plain:focus {
 .flex-center {
     display: flex !important;
     justify-content: center !important;
-    align-items: center !important;;
+    align-items: center !important;
 }
 
 /**
@@ -30,7 +30,7 @@ a.plain:focus {
  */
 .flex-v-center {
     display: flex !important;
-    align-items: center !important;;
+    align-items: center !important;
 }
 
 /**
