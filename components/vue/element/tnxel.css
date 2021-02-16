@@ -144,6 +144,11 @@ el-header a img,
     align-items: center;
 }
 
+.el-form-item__content > p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 .form-item-tip {
     font-size: 12px;
     line-height: 1;
