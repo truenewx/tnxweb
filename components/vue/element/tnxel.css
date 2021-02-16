@@ -139,6 +139,7 @@ el-header a img,
 }
 
 .el-form-item__content {
+    min-height: 40px;
     display: flex;
     align-items: center;
 }
