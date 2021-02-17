@@ -227,7 +227,7 @@ rpc.handleErrors = tnxel.util.function.around(rpc.handleErrors, function(handleE
     if (options && options.form && typeof options.form.disable === 'function') {
         options.form.disable(false);
     }
-    handleErrors.call(rpc, errors, options);
+    return handleErrors.call(rpc, errors, options);
 });
 
 window.tnx = tnxel;
