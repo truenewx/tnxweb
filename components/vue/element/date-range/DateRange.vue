@@ -45,7 +45,10 @@ export default {
         },
         value(value) {
             let model = this.getModel();
-            if (model.length) {
+            if (model) {
+                if (this.model === null) {
+                    this.model = [];
+                }
                 this.model[0] = model[0];
                 this.model[1] = model[1];
             } else {
@@ -55,8 +58,9 @@ export default {
     },
     methods: {
         getModel() {
-            let model = [];
-            if (this.value) {
+            let model = null;
+            if (this.value && this.value.begin && this.value.end) {
+                model = [];
                 model.push(this.value.begin instanceof Date ? this.value.begin.formatDate() : this.value.begin);
                 model.push(this.value.end instanceof Date ? this.value.end.formatDate() : this.value.end);
             }
