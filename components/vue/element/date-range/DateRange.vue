@@ -1,5 +1,5 @@
 <template>
-    <el-date-picker type="daterange" v-model="model" :editable="false" value-format="yyyy-MM-dd"
+    <el-date-picker type="daterange" v-model="model" :editable="false" value-format="yyyy-MM-dd" :clearable="empty"
         :range-separator="separator" :start-placeholder="beginPlaceholder" :end-placeholder="endPlaceholder"/>
 </template>
 
@@ -20,6 +20,10 @@ export default {
             type: String,
             default: '结束日期',
         },
+        empty: {
+            type: Boolean,
+            default: false,
+        }
     },
     data() {
         return {
