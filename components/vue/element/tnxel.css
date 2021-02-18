@@ -1,4 +1,4 @@
-/*!
+/**
  * tnxel.css
  * 对Element UI CSS的通用调整
  */
@@ -345,162 +345,6 @@ el-button {
     line-height: 20px;
 }
 
-.text-primary {
-    color: #409EFF !important;
-}
-
-.bg-primary {
-    background-color: #409EFF !important;
-    color: #ffffff;
-}
-
-.bg-primary a,
-.bg-primary a:hover,
-.bg-primary .el-link--default,
-.bg-primary .el-link--default:hover,
-.bg-primary .el-dropdown {
-    color: #ffffff;
-}
-
-.bg-primary .el-menu {
-    background-color: #409EFF !important;
-}
-
-.bg-primary .el-menu-item a {
-    color: #ffffff;
-}
-
-.bg-primary .el-menu-item:hover a,
-.bg-primary .el-menu-item.is-active a,
-.bg-primary .el-menu-item a:hover {
-    color: #409EFF;
-}
-
-.border-primary {
-    border-color: #409EFF !important;
-}
-
-.text-success,
-.theme-success .el-checkbox__input.is-checked + .el-checkbox__label {
-    color: #67C23A !important;
-}
-
-.bg-success {
-    background-color: #67C23A !important;
-    color: #ffffff;
-}
-
-.border-success,
-.theme-success .el-checkbox__input.is-focus .el-checkbox__inner,
-.theme-success .el-input__inner:focus {
-    border-color: #67C23A !important;
-}
-
-.theme-success .el-checkbox__input.is-checked .el-checkbox__inner,
-.theme-success .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-    background-color: #67C23A !important;
-    border-color: #67C23A !important;
-}
-
-.theme-success .el-button--default:hover,
-.theme-success .el-button--default:active,
-.theme-success .el-button--default:focus {
-    color: #67C23A;
-    background: #F0F9EB;
-    border-color: #C2E7B0;
-}
-
-.text-warning,
-.theme-warning .el-checkbox__input.is-checked + .el-checkbox__label {
-    color: #E6A23C !important;
-}
-
-.bg-warning {
-    background-color: #E6A23C !important;
-    color: #ffffff;
-}
-
-.border-warning,
-.theme-warning .el-checkbox__input.is-focus .el-checkbox__inner,
-.theme-warning .el-input__inner:focus {
-    border-color: #E6A23C !important;
-}
-
-.theme-warning .el-checkbox__input.is-checked .el-checkbox__inner,
-.theme-warning .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-    background-color: #E6A23C !important;
-    border-color: #E6A23C !important;
-}
-
-.theme-warning .el-button--default:hover,
-.theme-warning .el-button--default:active,
-.theme-warning .el-button--default:focus {
-    color: #E6A23C;
-    background: #FDF6EC;
-    border-color: #F5DAB1;
-}
-
-.text-danger,
-.theme-danger .el-checkbox__input.is-checked + .el-checkbox__label {
-    color: #F56C6C !important;
-}
-
-.bg-danger {
-    background-color: #F56C6C !important;
-    color: #ffffff;
-}
-
-.border-danger,
-.theme-danger .el-checkbox__input.is-focus .el-checkbox__inner,
-.theme-danger .el-input__inner:focus,
-.theme-success .is-error .el-input__inner:focus,
-.theme-warning .is-error .el-input__inner:focus {
-    border-color: #F56C6C !important;
-}
-
-.theme-danger .el-checkbox__input.is-checked .el-checkbox__inner,
-.theme-danger .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-    background-color: #F56C6C !important;
-    border-color: #F56C6C !important;
-}
-
-.theme-danger .el-button--default:hover,
-.theme-danger .el-button--default:active,
-.theme-danger .el-button--default:focus {
-    color: #F56C6C;
-    background: #FEF0F0;
-    border-color: #FBC4C4;
-}
-
-.text-info {
-    color: #606266 !important;
-}
-
-.bg-info {
-    background-color: #909399 !important;
-    color: #ffffff;
-}
-
-.text-muted {
-    color: #909399 !important;
-}
-
-.bg-muted {
-    background-color: #fafafa !important;
-}
-
-.text-white {
-    color: #ffffff !important;
-}
-
-.bg-white {
-    background-color: #fff !important;
-}
-
-.border-white {
-    border-color: #fff !important;
-}
-
 .el-avatar img {
     width: 100%;
 }
@@ -549,6 +393,10 @@ el-button {
     width: 100% !important;
 }
 
+.el-steps.el-steps--vertical .el-step:last-of-type .el-step__description {
+    padding-right: 10%;
+}
+
 .tnxel-steps-nav {
     position: fixed;
 }
@@ -566,6 +414,6 @@ el-button {
     margin-bottom: 0;
 }
 
-.tnxel-detail-form .el-form-item:last-child {
+.tnxel-detail-form .el-form-item:last-child button {
     margin-top: 0.75rem;
 }
