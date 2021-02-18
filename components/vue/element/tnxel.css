@@ -561,3 +561,11 @@ el-button {
 .tnxel-steps-nav .el-step.is-active .el-step__title {
     font-weight: bold;
 }
+
+.tnxel-detail-form .el-form-item {
+    margin-bottom: 0;
+}
+
+.tnxel-detail-form .el-form-item:last-child {
+    margin-top: 0.75rem;
+}
