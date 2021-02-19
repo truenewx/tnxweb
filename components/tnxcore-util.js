@@ -306,6 +306,27 @@ export const DateUtil = {
         date: 'yyyy-MM-dd',
         time: 'HH:mm:ss',
         minute: 'yyyy-MM-dd HH:mm',
+    },
+    format(date, pattern) {
+        if (typeof date === 'number') {
+            date = new Date(date);
+        }
+        if (date instanceof Date) {
+            return date.format(pattern);
+        }
+        return undefined;
+    },
+    formatDate(date) {
+        return this.format(date, this.patterns.date);
+    },
+    formatTime(date) {
+        return this.format(date, this.patterns.time);
+    },
+    formatDateTime(date) {
+        return this.format(date, this.patterns.dateTime);
+    },
+    formatMinute(date) {
+        return this.format(date, this.patterns.minute);
     }
 }
 
