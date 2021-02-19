@@ -78,15 +78,11 @@ export default {
             this.model = this.getModel();
         },
         params(params) {
-            if (!this.filterable) {
-                this.load();
-            }
+            this.load();
         }
     },
     created() {
-        if (!this.filterable) {
-            this.load();
-        }
+        this.load();
     },
     methods: {
         triggerChange(value) {
@@ -127,7 +123,7 @@ export default {
                             vm.more = result.paged.morePage;
                         }
                     }
-                    vm.$emit('items', vm.items, vm.more);
+                    vm.$emit('items', params, vm.items, vm.more);
                     vm.model = vm.getModel();
                 });
             }
