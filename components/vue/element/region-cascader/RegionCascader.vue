@@ -55,8 +55,7 @@ export default {
     },
     created() {
         let vm = this;
-        window.tnx.app.rpc.loadRegion(this.scope, function(region) {
-            vm.filterSubs(region);
+        window.tnx.app.rpc.loadRegion(this.scope, parseInt(this.maxLevel), function(region) {
             vm.region = region;
             vm.model = vm.getModel();
         });
@@ -101,17 +100,6 @@ export default {
                 }
             }
             return null;
-        },
-        filterSubs(region) {
-            if (region.subs) {
-                if (region.level >= parseInt(this.maxLevel)) {
-                    delete region.subs;
-                } else {
-                    for (let sub of region.subs) {
-                        this.filterSubs(sub);
-                    }
-                }
-            }
         }
     }
 }

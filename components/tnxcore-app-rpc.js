@@ -307,16 +307,34 @@ export default {
         }
     },
     _regionMapping: {},
-    loadRegion(regionCode, callback) {
-        let region = this._regionMapping[regionCode];
+    loadRegion(regionCode, level, callback) {
+        if (typeof level === 'function') {
+            callback = level;
+            level = undefined;
+        }
+        level = Math.min(level || 3, 3);
+        let cacheKey = regionCode + '.' + level;
+        let region = this._regionMapping[cacheKey];
         if (region) {
             callback(region);
         } else {
             let _this = this;
             this.get('/api/region/' + regionCode, function(region) {
-                _this._regionMapping[regionCode] = region;
+                _this._filterRegionSubs(region, level);
+                _this._regionMapping[cacheKey] = region;
                 callback(region);
             });
+        }
+    },
+    _filterRegionSubs(region, level) {
+        if (region.subs) {
+            if (region.level >= level) {
+                delete region.subs;
+            } else {
+                for (let sub of region.subs) {
+                    this._filterRegionSubs(sub, level);
+                }
+            }
         }
     }
 };
