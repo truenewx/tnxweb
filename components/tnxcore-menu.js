@@ -18,7 +18,7 @@ function isGranted(authority, item) {
                 return false;
             }
         }
-    } else if ((item.subs && item.subs.length) || (item.operations && item.operations.length)) {
+    } else if (item.subs && item.subs.length) {
         return undefined;
     }
     return true;
@@ -74,19 +74,6 @@ function applyGrantedItemToItems(authority, item, items) {
                 }));
             }
         }
-        if (item.operations && item.operations.length) {
-            const operations = [];
-            for (let operation of item.operations) {
-                if (isGranted(authority, operation)) {
-                    operations.push(Object.assign({}, operation));
-                }
-            }
-            if (operations.length) {
-                items.push(Object.assign({}, item, {
-                    operations: operations
-                }));
-            }
-        }
     }
 }
 
@@ -99,31 +86,23 @@ function findItem(path, items, callback) {
                 path = path.substr(index);
             }
             // 检查直接路径是否匹配
-            if (item.path && item.path === path) {
-                return callback(item);
-            }
-            // 直接路径不匹配，则尝试在包含的操作中查找
-            if (item.operations && item.operations.length) {
-                for (let operation of item.operations) {
-                    if (operation.path) {
-                        let pattern = operation.path.replace(/\/:[a-zA-Z0-9_]+/g, '/[a-zA-Z0-9_\\*]+');
-                        if (pattern === operation.path) { // 无路径参数
-                            if (operation.path === path) {
-                                return callback(item, operation);
-                            }
-                        } else { // 有路径参数
-                            if (new RegExp(pattern, 'g').test(path)) {
-                                return callback(item, operation);
-                            }
-                        }
+            if (item.path) {
+                let pattern = item.path.replace(/\/:[a-zA-Z0-9_]+/g, '/[a-zA-Z0-9_\\*]+');
+                if (pattern === item.path) { // 无路径参数
+                    if (item.path === path) {
+                        return callback(item);
+                    }
+                } else { // 有路径参数
+                    if (new RegExp(pattern, 'g').test(path)) {
+                        return callback(item);
                     }
                 }
             }
-            // 最后尝试在子菜单中查找
+            // 直接路径不匹配，则尝试在子菜单中查找
             if (item.subs) {
                 let result = findItem(path, item.subs, callback);
                 if (result) {
-                    return callback(item, undefined, result);
+                    return callback(item, result);
                 }
             }
         }
@@ -144,7 +123,7 @@ const Menu = function Menu(config) {
 }
 
 Menu.prototype.getItemByPath = function(path) {
-    return findItem(path, this.items, (item, operation, sub) => {
+    return findItem(path, this.items, (item, sub) => {
         return sub ? sub : item;
     });
 };
@@ -161,12 +140,6 @@ function findItemByPermission(items, permission) {
                 return sub;
             }
         }
-        if (item.operations) {
-            const operation = findItemByPermission(item.operations, permission);
-            if (operation) {
-                return operation;
-            }
-        }
     }
     return undefined;
 }
@@ -180,17 +153,13 @@ function findAssignableItems(items) {
     items.forEach(item => {
         let assignableItem = {
             subs: [],
-            operations: [],
         };
         prepareItem(item);
         if (item.subs && item.subs.length) {
             assignableItem.subs = findAssignableItems(item.subs);
         }
-        if (item.operations && item.operations.length) {
-            assignableItem.operations = findAssignableItems(item.operations);
-        }
         // 当前菜单有许可限定，或有可分配的子级或操作，则当前菜单项为可分配项
-        if (item.permission || assignableItem.subs.length || assignableItem.operations.length) {
+        if (item.permission || assignableItem.subs.length) {
             assignableItem = Object.assign({}, item, assignableItem);
             assignableItems.push(assignableItem);
         }
@@ -203,12 +172,10 @@ Menu.prototype.getAssignableItems = function() {
 }
 
 Menu.prototype.getBreadcrumbItems = function(path) {
-    let breadcrumbItems = findItem(path, this.items, (item, operation, breadcrumbItems) => {
+    let breadcrumbItems = findItem(path, this.items, (item, breadcrumbItems) => {
         if (breadcrumbItems && breadcrumbItems.length) {
             breadcrumbItems.unshift(item);
             return breadcrumbItems;
-        } else if (operation) {
-            return [item, operation];
         } else {
             return [item];
         }
@@ -218,8 +185,8 @@ Menu.prototype.getBreadcrumbItems = function(path) {
 
 Menu.prototype.isGranted = function(path) {
     const _this = this;
-    return findItem(path, this.items, (item, operation, sub) => {
-        return isGranted(_this.authority, sub || operation || item);
+    return findItem(path, this.items, (item, sub) => {
+        return isGranted(_this.authority, sub || item);
     });
 };
 

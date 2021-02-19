@@ -15,23 +15,14 @@ function addRoute(routes, superiorPath, path, fnImportPage) {
                 return fnImportPage(path);
             },
         });
-        return true;
     }
-    return false;
 }
 
 function applyItemsToRoutes(items, routes, fnImportPage) {
     if (items && items.length) {
         items.forEach(item => {
-            if (addRoute(routes, undefined, item.path, fnImportPage)) {
-                if (item.operations && item.operations.length) {
-                    item.operations.forEach(operation => {
-                        addRoute(routes, item.path, operation.path, fnImportPage);
-                    });
-                }
-            } else {
-                applyItemsToRoutes(item.subs, routes, fnImportPage);
-            }
+            addRoute(routes, undefined, item.path, fnImportPage);
+            applyItemsToRoutes(item.subs, routes, fnImportPage);
         });
     }
 }

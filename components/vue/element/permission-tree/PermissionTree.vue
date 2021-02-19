@@ -36,10 +36,6 @@ function addMenuItemToTreeNodes(parentId, menuItems, treeNodes, permissions) {
             node.children = node.children || [];
             addMenuItemToTreeNodes(node.id, item.subs, node.children, permissions);
         }
-        if (item.operations && item.operations.length) {
-            node.children = node.children || [];
-            addMenuItemToTreeNodes(node.id, item.operations, node.children, permissions);
-        }
         treeNodes.push(node);
     }
 }
