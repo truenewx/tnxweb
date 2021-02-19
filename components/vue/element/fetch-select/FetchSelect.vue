@@ -1,5 +1,5 @@
 <template>
-    <el-select v-model="model" :loading="loading" :filterable="filterable" remote :remote-method="fetch"
+    <el-select v-model="model" :loading="loading" :filterable="filterable" remote :remote-method="load"
         :placeholder="finalPlaceholder" :title="title" :clearable="empty" default-first-option @clear="clear">
         <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]" :label="item[textName]"/>
         <el-option label="还有更多结果..." disabled v-if="more"/>
@@ -101,13 +101,6 @@ export default {
             }
             return undefined;
         },
-        fetch(keyword) {
-            if (keyword) {
-                this.load(keyword);
-            } else {
-                this.clear();
-            }
-        },
         load(keyword) {
             if (this.params) { // 当参数函数被设置为null时，不进行取数操作，用于参数条件初始不满足的情况
                 this.loading = true;
@@ -146,8 +139,8 @@ export default {
             }
         },
         clear() {
-            this.items = null;
-            this.model = this.getModel();
+            this.model = null;
+            this.load();
         }
     }
 }
