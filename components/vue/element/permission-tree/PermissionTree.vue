@@ -1,105 +1,120 @@
 <template>
-    <el-tree ref="tree"
+    <el-tree
+        ref="tree"
         :data="nodes"
-        :default-checked-keys="checkedKeys"
-        :show-checkbox="true"
         :default-expand-all="true"
-        :check-strictly="true"
-        :check-on-click-node="true"
         :expand-on-click-node="false"
-        @check-change="onCheckChange"
         node-key="id"
-        class="px-1 py-2" :style="{'max-height': maxHeight}">
-        <div class="permission-node" slot-scope="{node,data}">
-            <span v-if="node">{{ data.label }}</span>
+        class="px-1 py-2"
+        :style="{'max-height': maxHeight}"
+    >
+        <div class="permission-node" slot-scope="{node, data}">
+            <el-checkbox v-model="data.checked" v-if="data.path" @change="()=>{
+                onCheckChange(data);
+            }">{{ data.label }}
+            </el-checkbox>
+            <span v-else-if="node">{{ data.label }}</span>
             <span class="text-muted" :class="{'d-none': !data.remark}">({{ data.remark }})</span>
         </div>
     </el-tree>
 </template>
 
 <script>
-function addMenuItemToTreeNodes(parentId, menuItems, treeNodes) {
+function addMenuItemToTreeNodes(parentId, menuItems, treeNodes, permissions) {
     for (let i = 0; i < menuItems.length; i++) {
         const item = menuItems[i];
         let node = {
             id: (parentId || 'node') + '-' + i,
             parentId: parentId,
             label: item.caption,
-            remark: item.desc,
+            path: item.path,
             permission: item.permission,
+            checked: item.permission && permissions && permissions.contains(item.permission),
+            remark: item.desc,
         };
         if (item.subs && item.subs.length) {
             node.children = node.children || [];
-            addMenuItemToTreeNodes(node.id, item.subs, node.children);
+            addMenuItemToTreeNodes(node.id, item.subs, node.children, permissions);
         }
         if (item.operations && item.operations.length) {
             node.children = node.children || [];
-            addMenuItemToTreeNodes(node.id, item.operations, node.children);
+            addMenuItemToTreeNodes(node.id, item.operations, node.children, permissions);
         }
         treeNodes.push(node);
     }
 }
 
-function getTreeNodes(menu) {
+function getTreeNodes(menu, permissions) {
     let items = menu.getAssignableItems();
     const nodes = [];
-    addMenuItemToTreeNodes(undefined, items, nodes);
+    addMenuItemToTreeNodes(undefined, items, nodes, permissions);
     return nodes;
 }
 
-function addNodePermissionKeyTo(permissions, nodes, keys) {
-    nodes.forEach(node => {
-        if (node.permission && permissions.contains(node.permission)) {
-            keys.push(node.id);
+function addCheckedNodePermissionTo(nodes, permissions) {
+    for (let node of nodes) {
+        if (node.checked && node.permission) {
+            permissions.push(node.permission);
         }
         if (node.children) {
-            addNodePermissionKeyTo(permissions, node.children, keys);
+            addCheckedNodePermissionTo(node.children, permissions);
         }
-    });
+    }
 }
 
 export default {
     name: 'TnxelPermissionTree',
-    props: ['menu', 'permissions', 'maxHeight'],
+    props: {
+        menu: {
+            type: Object,
+            required: true,
+        },
+        permissions: Array,
+        maxHeight: String,
+    },
     data() {
-        return {
-            nodes: getTreeNodes(this.menu),
-        };
+        return {};
     },
     computed: {
-        checkedKeys() {
-            const keys = [];
-            if (this.nodes && this.permissions) {
-                addNodePermissionKeyTo(this.permissions, this.nodes, keys);
-            }
-            return keys;
+        nodes() {
+            return getTreeNodes(this.menu, this.permissions);
         }
     },
     methods: {
-        onCheckChange(node, checked) {
-            if (checked) { // 节点被选中，则上级节点必须选中
-                if (node.parentId) {
-                    this.$refs.tree.setChecked(node.parentId, true);
+        getNode(nodeId, nodes) {
+            if (nodeId) {
+                nodes = nodes || this.nodes;
+                for (let node of nodes) {
+                    if (node.id === nodeId) {
+                        return node;
+                    }
+                    if (node.children) {
+                        let child = this.getNode(nodeId, node.children);
+                        if (child) {
+                            return child;
+                        }
+                    }
+                }
+            }
+            return undefined;
+        },
+        onCheckChange(node) {
+            if (node.checked) { // 节点被选中，则上级节点必须选中
+                let parentNode = this.getNode(node.parentId);
+                if (parentNode) {
+                    parentNode.checked = true;
                 }
             } else { // 节点未选中，则下级节点必须全部未选中
                 if (node.children) {
-                    const tree = this.$refs.tree;
                     node.children.forEach(child => {
-                        tree.setChecked(child.id, false);
+                        child.checked = false;
                     });
                 }
             }
         },
         getPermissions() {
             const permissions = [];
-            const nodes = this.$refs.tree.getCheckedNodes();
-            if (nodes) {
-                nodes.forEach(node => {
-                    if (node.permission) {
-                        permissions.push(node.permission);
-                    }
-                });
-            }
+            addCheckedNodePermissionTo(this.nodes, permissions);
             return permissions;
         }
     }
