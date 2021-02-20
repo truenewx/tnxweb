@@ -1,6 +1,6 @@
 <template>
     <el-image :class="shape === 'square' ? 'rounded' : 'rounded-circle'" :style="style" :src="src"
-        :preview-src-list="previewSrcList" fit="contain" v-if="preview">
+        :preview-src-list="previewSrcList" fit="contain" v-if="preview && src">
         <div slot="error" class="text-muted h-100 flex-center">
             <i class="el-icon-picture-outline"/>
         </div>
@@ -31,7 +31,7 @@ export default {
     },
     computed: {
         style() {
-            if (this.preview) {
+            if (this.preview && this.src) {
                 return {
                     width: this.size + 'px',
                     height: this.size + 'px',
