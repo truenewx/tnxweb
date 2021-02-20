@@ -1,6 +1,7 @@
 <template>
-    <el-pagination layout="total, prev, pager, next" :background="background" @current-change="change"
-        :page-size="value.pageSize" :current-page="value.pageNo" :total="value.total"/>
+    <el-pagination layout="total, sizes, prev, pager, next" :background="background" @current-change="change"
+        :page-size="value.pageSize" :page-sizes="[value.pageSize]" popper-class="d-none"
+        :current-page="value.pageNo" :total="value.total"/>
 </template>
 
 <script>
@@ -21,3 +22,20 @@ export default {
     },
 }
 </script>
+
+<style>
+.el-pagination .el-pagination__sizes .el-input__suffix {
+    display: none;
+}
+
+.el-pagination .el-pagination__sizes .el-select .el-input {
+    width: 66px;
+    margin: 0;
+}
+
+.el-pagination .el-pagination__sizes .el-select .el-input .el-input__inner {
+    border: none;
+    cursor: default;
+    padding: 0;
+}
+</style>
