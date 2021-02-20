@@ -149,6 +149,10 @@ el-header a img,
     margin-bottom: 0;
 }
 
+.el-form-item__content tr {
+    line-height: 1;
+}
+
 .form-item-tip {
     font-size: 12px;
     line-height: 1;

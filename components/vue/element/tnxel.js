@@ -26,6 +26,7 @@ import InputNumber from './input-number';
 import StepsNav from './steps-nav';
 import DatePicker from './date-picker';
 import DateRange from './date-range';
+import FssView from './fss-view';
 
 const components = Object.assign({}, tnxvue.components, {
     Alert,
@@ -47,6 +48,7 @@ const components = Object.assign({}, tnxvue.components, {
     StepsNav,
     DatePicker,
     DateRange,
+    FssView,
 });
 
 const tnxel = Object.assign({}, tnxvue, {
@@ -221,6 +223,15 @@ tnxel.date = {
         return cellValue;
     }
 };
+
+tnxel.boolean = {
+    format: function(row, column, cellValue) {
+        if (typeof cellValue === 'boolean') {
+            cellValue = cellValue.toText();
+        }
+        return cellValue;
+    }
+}
 
 tnxel.libs.Vue.use(tnxel);
 

@@ -43,6 +43,10 @@ export default {
         vertical: {
             type: Boolean,
             default: () => false
+        },
+        errorFocus: {
+            type: Boolean,
+            default: false,
         }
     },
     data() {
@@ -96,7 +100,7 @@ export default {
         validate(callback) {
             let _this = this;
             return this.$refs.form.validate(function(valid, invalidFields) {
-                if (!valid) {
+                if (!valid && _this.errorFocus) {
                     _this.$nextTick(function() {
                         _this.focusError.call(_this);
                     });
