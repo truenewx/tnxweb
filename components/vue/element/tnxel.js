@@ -227,9 +227,35 @@ tnxel.date = {
 };
 
 tnxel.boolean = {
+    items: {
+        getText(type, value) {
+            let items = this[type];
+            if (Array.isArray(items)) {
+                for (let item of items) {
+                    if (item.value === value) {
+                        return item.text;
+                    }
+                }
+            }
+            return undefined;
+        },
+        has: [{
+            value: true,
+            text: '有',
+        }, {
+            value: false,
+            text: '无',
+        }]
+    },
     format: function(row, column, cellValue) {
         if (typeof cellValue === 'boolean') {
             cellValue = cellValue.toText();
+        }
+        return cellValue;
+    },
+    formatHas: function(row, column, cellValue) {
+        if (typeof cellValue === 'boolean') {
+            cellValue = tnxel.boolean.items.getText('has', cellValue);
         }
         return cellValue;
     }

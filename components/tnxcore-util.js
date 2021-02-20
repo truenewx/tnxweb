@@ -78,6 +78,9 @@ Object.assign(Date.prototype, {
     },
     formatMinute: function() {
         return this.format(DateUtil.patterns.minute);
+    },
+    formatMonth: function() {
+        return this.format(DateUtil.patterns.month);
     }
 });
 
@@ -306,6 +309,7 @@ export const DateUtil = {
         date: 'yyyy-MM-dd',
         time: 'HH:mm:ss',
         minute: 'yyyy-MM-dd HH:mm',
+        month: 'yyyy-MM',
     },
     format(date, pattern) {
         if (typeof date === 'number') {
@@ -327,6 +331,17 @@ export const DateUtil = {
     },
     formatMinute(date) {
         return this.format(date, this.patterns.minute);
+    },
+    /**
+     * 将指定yyyy-MM-dd型的日期转换为yyyy-MM的月份格式
+     * @param date 日期
+     * @returns 月份
+     */
+    dateToMonth(date) {
+        if (date instanceof Date) {
+            return this.format(date, this.pattern.month);
+        }
+        return date.substr(0, date.lastIndexOf('-'));
     }
 }
 

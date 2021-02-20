@@ -306,6 +306,28 @@ export default {
             });
         }
     },
+    resolveEnumCaption(type, key, callback) {
+        let items = this._enumItemsMapping[type];
+        let caption = this._getEnumCaption(items, key);
+        if (caption) {
+            callback(caption);
+        } else {
+            let _this = this;
+            this.loadEnumItems(type, function(items) {
+                callback(_this._getEnumCaption(items, key));
+            });
+        }
+    },
+    _getEnumCaption(items, key) {
+        if (Array.isArray(items)) {
+            for (let item of items) {
+                if (item.key === key) {
+                    return item.caption;
+                }
+            }
+        }
+        return undefined;
+    },
     _regionMapping: {},
     loadRegion(regionCode, level, callback) {
         if (typeof level === 'function') {

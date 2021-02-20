@@ -1,9 +1,10 @@
 <template>
     <el-col :span="span">
-        <el-button :type="btnType" :icon="btnIcon" @click="toAdd">{{ addText }}</el-button>
-        <el-table :data="list" border stripe v-if="list && list.length">
+        <el-button :type="btnType" :icon="btnIcon" @click="toAdd" v-if="addable">{{ addText }}</el-button>
+        <el-table :data="data" border stripe v-if="list && list.length">
             <slot></slot>
-            <el-table-column label="操作" header-align="center" align="center" v-if="updatable || removeable">
+            <el-table-column label="操作" header-align="center" align="center" width="100px"
+                v-if="updatable || removeable">
                 <template slot-scope="scope">
                     <el-button type="text" class="p-0" @click="toUpdate(scope.$index)" v-if="updatable">
                         {{ updateText }}
@@ -32,6 +33,10 @@ export default {
             default: 'primary',
         },
         btnIcon: String,
+        addable: {
+            type: Boolean,
+            default: true,
+        },
         addText: {
             type: String,
             default: '新增',
@@ -51,11 +56,25 @@ export default {
         removeText: {
             type: String,
             default: '移除',
-        }
+        },
+        formatter: Function,
+        order: [String, Function],
     },
     data() {
         return {
             list: this.value,
+        }
+    },
+    computed: {
+        data() {
+            if (this.formatter && this.list && this.list.length) {
+                let data = [];
+                for (let model of this.list) {
+                    data.push(this.formatter(model));
+                }
+                return data;
+            }
+            return this.list;
         }
     },
     watch: {
@@ -74,18 +93,43 @@ export default {
                     if (yes) {
                         if (typeof this.validateForm === 'function') {
                             this.validateForm(function(model) {
-                                vm.list = vm.list || [];
-                                vm.list.push(model);
+                                vm._doAdd(model);
                                 close();
                             });
                             return false;
                         } else { // 没有定义表单校验函数，则不进行表单校验
-                            vm.list = vm.list || [];
-                            vm.list.push(model);
+                            vm._doAdd(model);
                         }
                     }
                 }
             });
+        },
+        _doAdd(model) {
+            this.list = this.list || [];
+            this.list.push(model);
+            this._sort();
+        },
+        _sort() {
+            let sort = this.order;
+            if (typeof sort === 'string') {
+                let array = sort.split(' ');
+                let orderBy = array[0].trim();
+                let desc = array[1] === 'desc';
+                sort = function(o1, o2) {
+                    let v1 = o1[orderBy];
+                    let v2 = o2[orderBy];
+                    if (v1 < v2) {
+                        return desc ? 1 : -1;
+                    } else if (v1 === v2) {
+                        return 0;
+                    } else {
+                        return desc ? -1 : 1;
+                    }
+                }
+            }
+            if (typeof sort === 'function') {
+                this.list.sort(sort);
+            }
         },
         toUpdate(index) {
             let model = this.list[index];
@@ -98,18 +142,22 @@ export default {
                         if (yes) {
                             if (typeof this.validateForm === 'function') {
                                 this.validateForm(function(model) {
-                                    vm.list[index] = model;
+                                    vm._doUpdate(model);
                                     close();
                                 });
                                 return false;
                             } else { // 没有定义表单校验函数，则不进行表单校验
-                                vm.list[index] = model;
+                                vm._doUpdate(model);
                             }
                             return false;
                         }
                     }
                 });
             }
+        },
+        _doUpdate(model) {
+            this.list[index] = model;
+            this._sort();
         },
         toRemove(index) {
             this.list.splice(index, 1);

@@ -40,19 +40,21 @@ export default {
                 'close-on-press-escape': true, // 是否可以通过按下 ESC 关闭对话框
                 'show-close': true, // 是否显示关闭按钮
                 center: false, // 是否对头部和底部采用居中布局
-                top: '40vh',
                 width: '512px',
                 // 以上均为element的Dialog组件配置项
                 onShown: undefined, // 对话框展示后的事件回调
             },
+            middleTop: '40vh',
         };
     },
     computed: {
         top() {
             if (typeof this.options.top === 'function') {
                 return this.options.top();
-            } else {
+            } else if (this.options.top) {
                 return this.options.top;
+            } else {
+                return this.middleTop;
             }
         },
         width() {
@@ -74,7 +76,7 @@ export default {
             const baseTop = docHeight * baseline / 100;
             let top = (baseTop - height / 2);
             top = Math.max(top, 5); // 至少顶部留5px空隙
-            this.top = top + 'px';
+            this.middleTop = top + 'px';
 
             if (typeof this.options.onShown === 'function') {
                 this.options.onShown.call(this);
