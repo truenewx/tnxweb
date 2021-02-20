@@ -27,6 +27,7 @@ import StepsNav from './steps-nav';
 import DatePicker from './date-picker';
 import DateRange from './date-range';
 import FssView from './fss-view';
+import Curd from './curd';
 
 const components = Object.assign({}, tnxvue.components, {
     Alert,
@@ -49,6 +50,7 @@ const components = Object.assign({}, tnxvue.components, {
     DatePicker,
     DateRange,
     FssView,
+    Curd,
 });
 
 const tnxel = Object.assign({}, tnxvue, {

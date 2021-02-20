@@ -90,7 +90,7 @@ function getRule(validationName, validationValue, fieldMeta) {
                 rule = {
                     validator(r, fieldValue, callback, source, options) {
                         if (validationValue && fieldValue) {
-                            const limitedValues = ['<', '>', '\'', '"', '/', '\\'];
+                            const limitedValues = ['<', '>', '\'', '"', '\\'];
                             for (let i = 0; i < limitedValues.length; i++) {
                                 if (fieldValue.indexOf(limitedValues[i]) >= 0) {
                                     const s = limitedValues.join(' ');
