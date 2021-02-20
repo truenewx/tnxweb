@@ -342,6 +342,28 @@ export const DateUtil = {
             return this.format(date, this.pattern.month);
         }
         return date.substr(0, date.lastIndexOf('-'));
+    },
+    createDate(year, month, day, hour, minute, second, millis) {
+        let date = new Date();
+        date.setFullYear(year, (month || 1) - 1, day || 1);
+        date.setHours(hour || 0, minute || 0, second || 0, millis || 0);
+        return date;
+    },
+    /**
+     * 解析指定yyyy-MM-dd格式的日期字符串为Date对象
+     * @param s
+     */
+    parseDate(s) {
+        if (s) {
+            let array = s.split('-');
+            if (array.length > 2) {
+                let year = parseInt(array[0]);
+                let month = parseInt(array[1]);
+                let day = parseInt(array[2]);
+                return this.createDate(year, month, day);
+            }
+        }
+        return undefined;
     }
 }
 

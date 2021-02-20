@@ -26,6 +26,7 @@ export default {
             type: Object,
             required: true,
         },
+        pageProps: Object,
         value: Array,
         span: Number,
         btnType: {
@@ -88,7 +89,7 @@ export default {
     methods: {
         toAdd() {
             let vm = this;
-            tnx.open(this.page, undefined, {
+            tnx.open(this.page, this.pageProps, {
                 click: function(yes, close) {
                     if (yes) {
                         if (typeof this.validateForm === 'function') {

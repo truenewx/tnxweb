@@ -1,6 +1,6 @@
 <template>
     <el-date-picker :type="type" v-model="model" :value-format="format" :editable="false" :placeholder="placeholder"
-        :clearable="empty"/>
+        :clearable="empty" :default-value="defaultDate"/>
 </template>
 
 <script>
@@ -20,7 +20,8 @@ export default {
         empty: {
             type: Boolean,
             default: false,
-        }
+        },
+        defaultValue: [Date, Number, String],
     },
     data() {
         return {
@@ -33,6 +34,18 @@ export default {
                 return this.valueFormat;
             }
             return this.type === 'datetime' ? window.tnx.util.date.patterns.dateTime : window.tnx.util.date.patterns.date;
+        },
+        defaultDate() {
+            if (this.defaultValue instanceof Date) {
+                return this.defaultValue;
+            }
+            if (typeof this.defaultValue === 'number') {
+                return new Date(this.defaultValue);
+            }
+            if (typeof this.defaultValue === 'string') {
+                return tnx.util.date.parseDate(this.defaultValue);
+            }
+            return undefined;
         }
     },
     watch: {
