@@ -28,6 +28,7 @@ export default {
         },
         pageProps: Object,
         value: Array,
+        modelName: String,
         span: Number,
         btnType: {
             type: String,
@@ -90,6 +91,7 @@ export default {
         toAdd() {
             let vm = this;
             tnx.open(this.page, this.pageProps, {
+                title: vm.addText + (vm.modelName || ''),
                 click: function(yes, close) {
                     if (yes) {
                         if (typeof this.validateForm === 'function') {
@@ -139,6 +141,7 @@ export default {
                 tnx.open(this.page, {
                     value: model
                 }, {
+                    title: vm.updateText + (vm.modelName || ''),
                     click: function(yes, close) {
                         if (yes) {
                             if (typeof this.validateForm === 'function') {
@@ -157,7 +160,7 @@ export default {
             }
         },
         _doUpdate(index, model) {
-            this.list[index] = model;
+            Object.assign(this.list[index], model);
             this._sort();
         },
         toRemove(index) {
