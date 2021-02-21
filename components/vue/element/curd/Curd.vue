@@ -90,27 +90,22 @@ export default {
     methods: {
         toAdd() {
             let vm = this;
-            tnx.open(this.page, this.pageProps, {
+            window.tnx.open(this.page, this.pageProps, {
                 title: vm.addText + (vm.modelName || ''),
                 click: function(yes, close) {
                     if (yes) {
                         if (typeof this.validateForm === 'function') {
                             this.validateForm(function(model) {
-                                vm._doAdd(model);
+                                vm.list = vm.list || [];
+                                vm.list.push(model);
+                                vm._sort();
                                 close();
                             });
                             return false;
-                        } else { // 没有定义表单校验函数，则不进行表单校验
-                            vm._doAdd(model);
                         }
                     }
                 }
             });
-        },
-        _doAdd(model) {
-            this.list = this.list || [];
-            this.list.push(model);
-            this._sort();
         },
         _sort() {
             let sort = this.order;
@@ -138,7 +133,7 @@ export default {
             let model = this.list[index];
             if (model) {
                 let vm = this;
-                tnx.open(this.page, {
+                window.tnx.open(this.page, {
                     value: model
                 }, {
                     title: vm.updateText + (vm.modelName || ''),
@@ -146,22 +141,16 @@ export default {
                         if (yes) {
                             if (typeof this.validateForm === 'function') {
                                 this.validateForm(function(model) {
-                                    vm._doUpdate(index, model);
+                                    Object.assign(vm.list[index], model);
+                                    vm._sort();
                                     close();
                                 });
                                 return false;
-                            } else { // 没有定义表单校验函数，则不进行表单校验
-                                vm._doUpdate(index, model);
                             }
-                            return false;
                         }
                     }
                 });
             }
-        },
-        _doUpdate(index, model) {
-            Object.assign(this.list[index], model);
-            this._sort();
         },
         toRemove(index) {
             this.list.splice(index, 1);
