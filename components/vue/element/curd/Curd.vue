@@ -143,12 +143,12 @@ export default {
                         if (yes) {
                             if (typeof this.validateForm === 'function') {
                                 this.validateForm(function(model) {
-                                    vm._doUpdate(model);
+                                    vm._doUpdate(index, model);
                                     close();
                                 });
                                 return false;
                             } else { // 没有定义表单校验函数，则不进行表单校验
-                                vm._doUpdate(model);
+                                vm._doUpdate(index, model);
                             }
                             return false;
                         }
@@ -156,7 +156,7 @@ export default {
                 });
             }
         },
-        _doUpdate(model) {
+        _doUpdate(index, model) {
             this.list[index] = model;
             this._sort();
         },
