@@ -97,19 +97,34 @@ export default {
                 $(this.container).scrollTop(top);
             }
         },
-        validate(callback) {
+        validate(callback, errorFocus) {
             let _this = this;
             return this.$refs.form.validate(function(valid, invalidFields) {
-                if (!valid && _this.errorFocus) {
+                if (!valid && _this.errorFocus && errorFocus !== false) {
                     _this.$nextTick(function() {
                         _this.focusError.call(_this);
                     });
                 }
-                callback(valid);
+                if (typeof callback === 'function') {
+                    callback(valid);
+                }
             });
         },
-        validateField(props, callback) {
-            this.$refs.form.validateField(props, callback);
+        validateField(props, callback, errorFocus) {
+            let _this = this;
+            this.$refs.form.validateField(props, function(errorMessage) {
+                if (errorMessage && _this.errorFocus && errorFocus !== false) {
+                    _this.$nextTick(function() {
+                        _this.focusError.call(_this);
+                    });
+                }
+                if (typeof callback === 'function') {
+                    callback(errorMessage);
+                }
+            });
+        },
+        clearValidate(props) {
+            this.$refs.form.clearValidate(props);
         },
         toSubmit(callback, disabled) {
             const vm = this;
