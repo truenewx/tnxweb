@@ -33,7 +33,10 @@ function getRuleType(metaType) {
 
 function getRule(validationName, validationValue, fieldMeta) {
     let rule = undefined;
-    let fieldCaption = fieldMeta ? fieldMeta.caption : '';
+    let fieldCaption = '';
+    if (fieldMeta && fieldMeta.caption) {
+        fieldCaption = fieldMeta.caption;
+    }
     switch (validationName) {
         case 'required':
         case 'notNull':
