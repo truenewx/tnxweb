@@ -1,6 +1,6 @@
 <template>
     <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
-        class="tnxel-detail-form" :class="theme ? ('theme-' + theme) : null">
+        class="tnxel-detail-form" :class="formClass">
         <slot></slot>
         <el-form-item v-if="back !== false">
             <el-button :type="theme || 'default'" @click="toBack">{{ backText }}</el-button>
@@ -30,10 +30,26 @@ export default {
         vertical: {
             type: Boolean,
             default: () => false
+        },
+        columns: {
+            type: Number,
+            default: 1,
         }
     },
     data() {
         return {};
+    },
+    computed: {
+        formClass() {
+            let formClass = '';
+            if (this.theme) {
+                formClass += ' theme-' + this.theme;
+            }
+            if (this.columns > 1 && this.columns < 5) {
+                formClass += ' form-columns-' + this.columns;
+            }
+            return formClass.trim();
+        }
     },
     methods: {
         toBack() {
