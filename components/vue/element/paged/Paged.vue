@@ -1,7 +1,7 @@
 <template>
     <el-pagination layout="total, sizes, prev, pager, next" :background="background" @current-change="change"
         :page-size="value.pageSize" :page-sizes="[value.pageSize]" popper-class="d-none"
-        :current-page="value.pageNo" :total="value.total"/>
+        :current-page="value.pageNo" :total="value.total || 0" v-if="value"/>
 </template>
 
 <script>
