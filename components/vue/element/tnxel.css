@@ -139,6 +139,12 @@ el-header a img,
     margin: 10px 0 0 0;
 }
 
+.el-form-item .el-table__empty-block,
+.el-form-item .el-table__empty-text {
+    min-height: 48px;
+    line-height: 48px;
+}
+
 .el-form-item--feedback .ignore-feedback .el-input__inner {
     border-color: #DCDFE6;
 }

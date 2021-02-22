@@ -1,7 +1,7 @@
 <template>
     <el-col :span="span">
         <el-button :type="btnType" :icon="btnIcon" @click="toAdd" v-if="addable">{{ addText }}</el-button>
-        <el-table :data="data" border stripe v-if="list && list.length">
+        <el-table :data="data" border stripe v-if="showEmpty || (list && list.length)">
             <slot></slot>
             <el-table-column label="操作" header-align="center" align="center" width="100px"
                 v-if="updatable || removeable">
@@ -43,6 +43,7 @@ export default {
             type: String,
             default: '新增',
         },
+        add: Function,
         updatable: {
             type: Boolean,
             default: true,
@@ -51,6 +52,7 @@ export default {
             type: String,
             default: '修改',
         },
+        update: Function,
         removeable: {
             type: Boolean,
             default: true,
@@ -59,8 +61,13 @@ export default {
             type: String,
             default: '移除',
         },
+        remove: Function,
         formatter: Function,
         order: [String, Function],
+        showEmpty: {
+            type: Boolean,
+            default: false,
+        }
     },
     data() {
         return {
@@ -96,16 +103,25 @@ export default {
                     if (yes) {
                         if (typeof this.validateForm === 'function') {
                             this.validateForm(function(model) {
-                                vm.list = vm.list || [];
-                                vm.list.push(model);
-                                vm._sort();
-                                close();
+                                if (vm.add) {
+                                    vm.add(model, function() {
+                                        vm._onAdded(model, close);
+                                    });
+                                } else {
+                                    vm._onAdded(model, close);
+                                }
                             });
                             return false;
                         }
                     }
                 }
             });
+        },
+        _onAdded(model, close) {
+            this.list = this.list || [];
+            this.list.push(model);
+            this._sort();
+            close();
         },
         _sort() {
             let sort = this.order;
@@ -141,9 +157,13 @@ export default {
                         if (yes) {
                             if (typeof this.validateForm === 'function') {
                                 this.validateForm(function(model) {
-                                    Object.assign(vm.list[index], model);
-                                    vm._sort();
-                                    close();
+                                    if (vm.update) {
+                                        vm.update(index, model, function() {
+                                            vm._onUpdated(index, model, close);
+                                        });
+                                    } else {
+                                        vm._onUpdated(index, model, close);
+                                    }
                                 });
                                 return false;
                             }
@@ -152,7 +172,22 @@ export default {
                 });
             }
         },
+        _onUpdated(index, model, close) {
+            Object.assign(this.list[index], model);
+            this._sort();
+            close();
+        },
         toRemove(index) {
+            if (this.remove) {
+                let vm = this;
+                this.remove(index, function() {
+                    vm._onRemoved(index);
+                });
+            } else {
+                this._onRemoved(index);
+            }
+        },
+        _onRemoved(index) {
             this.list.splice(index, 1);
         }
     }
