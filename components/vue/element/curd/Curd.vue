@@ -130,7 +130,7 @@ export default {
             }
         },
         toUpdate(index) {
-            let model = this.list[index];
+            let model = Object.assign({}, this.list[index]);
             if (model) {
                 let vm = this;
                 window.tnx.open(this.page, {
