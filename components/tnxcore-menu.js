@@ -80,23 +80,8 @@ function applyGrantedItemToItems(authority, item, items) {
 function findItem(path, items, callback) {
     if (path && items && items.length && typeof callback === 'function') {
         for (let item of items) {
-            // 去掉可能的请求参数部分
-            const index = path.indexOf('?');
-            if (index >= 0) {
-                path = path.substr(index);
-            }
-            // 检查直接路径是否匹配
-            if (item.path) {
-                let pattern = item.path.replace(/\/:[a-zA-Z0-9_]+/g, '/[a-zA-Z0-9_\\*]+');
-                if (pattern === item.path) { // 无路径参数
-                    if (item.path === path) {
-                        return callback(item);
-                    }
-                } else { // 有路径参数
-                    if (new RegExp(pattern, 'g').test(path)) {
-                        return callback(item);
-                    }
-                }
+            if (matches(item, path)) {
+                return callback(item);
             }
             // 直接路径不匹配，则尝试在子菜单中查找
             if (item.subs) {
@@ -110,9 +95,41 @@ function findItem(path, items, callback) {
     return undefined;
 }
 
+function matches(item, path) {
+    // 去掉可能的请求参数部分
+    const index = path.indexOf('?');
+    if (index >= 0) {
+        path = path.substr(index);
+    }
+    if (item.path) {
+        let pattern = item.path.replace(/\/:[a-zA-Z0-9_]+/g, '/[a-zA-Z0-9_\\*]+');
+        if (pattern === item.path) { // 无路径参数
+            if (item.path === path) {
+                return true;
+            }
+        } else { // 有路径参数
+            if (new RegExp(pattern, 'g').test(path)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function buildLevel(items, parentLevel) {
+    if (items) {
+        let level = parentLevel ? (parentLevel + 1) : 1;
+        for (let item of items) {
+            item.level = level;
+            buildLevel(item.subs, level);
+        }
+    }
+    return items;
+}
+
 const Menu = function Menu(config) {
     this.caption = config.caption;
-    this.items = config.items;
+    this.items = buildLevel(config.items);
     this._url = config.url;
     this._grantedItems = null;
     this.authority = {
@@ -124,9 +141,39 @@ const Menu = function Menu(config) {
 
 Menu.prototype.getItemByPath = function(path) {
     return findItem(path, this.items, (item, sub) => {
-        return sub ? sub : item;
+        return sub || item;
     });
 };
+
+function addMatchedItemTo(items, path, targetItems) {
+    if (items) {
+        for (let item of items) {
+            if (matches(item, path)) { // 找到匹配的菜单项，则加入目标项目清单，直接返回
+                targetItems.push(item);
+                return;
+            }
+            // 不匹配则尝试比较下级菜单项
+            addMatchedItemTo(item.subs, path, targetItems);
+            if (targetItems.length > 0) { // 如果在下级菜单中找到匹配，则当前级别需要插入到目标清单的首位
+                targetItems.unshift(item);
+            }
+        }
+    }
+}
+
+Menu.prototype.findBelongingItem = function(path, level) {
+    level = level || 2;
+    let items = [];
+    addMatchedItemTo(this.items, path, items);
+    // 从后往前遍历结果清单，以便于取到级别不高于目标级别的菜单项
+    for (let i = items.length - 1; i >= 0; i--) {
+        let item = items[i];
+        if (item.level <= level) {
+            return item;
+        }
+    }
+    return undefined;
+}
 
 function findItemByPermission(items, permission) {
     for (let item of items) {
