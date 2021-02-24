@@ -117,16 +117,18 @@ el-header a img,
 }
 
 .el-form-item.form-title:not(:first-child) {
-    margin-top: 0.5rem;
+    padding-top: 0.5rem;
 }
 
 .el-form-item.form-title .el-form-item__label-wrap {
     margin-left: 0 !important;
 }
 
-.el-form-item.form-title .el-form-item__label {
-    font-size: 1rem;
+.el-form-item.form-title .el-form-item__label,
+.el-form-item.form-title .el-form-item__content {
     color: inherit;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .tnxel-detail-form.form-columns-2,
