@@ -112,6 +112,23 @@ el-header a img,
     margin-left: 4px;
 }
 
+.el-form-item.form-title {
+    width: 100%;
+}
+
+.el-form-item.form-title:not(:first-child) {
+    margin-top: 0.5rem;
+}
+
+.el-form-item.form-title .el-form-item__label-wrap {
+    margin-left: 0 !important;
+}
+
+.el-form-item.form-title .el-form-item__label {
+    font-size: 1rem;
+    color: inherit;
+}
+
 .tnxel-detail-form.form-columns-2,
 .tnxel-detail-form.form-columns-3,
 .tnxel-detail-form.form-columns-4 {
@@ -119,15 +136,15 @@ el-header a img,
     flex-wrap: wrap;
 }
 
-.tnxel-detail-form.form-columns-2 .el-form-item {
+.tnxel-detail-form.form-columns-2 .el-form-item:not(.form-title) {
     width: 50%;
 }
 
-.tnxel-detail-form.form-columns-3 .el-form-item {
+.tnxel-detail-form.form-columns-3 .el-form-item:not(.form-title) {
     width: 33.33%;
 }
 
-.tnxel-detail-form.form-columns-4 .el-form-item {
+.tnxel-detail-form.form-columns-4 .el-form-item:not(.form-title) {
     width: 25%;
 }
 

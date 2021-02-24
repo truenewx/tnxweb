@@ -337,7 +337,10 @@ export const DateUtil = {
         if (date instanceof Date) {
             return this.format(date, this.pattern.month);
         }
-        return date.substr(0, date.lastIndexOf('-'));
+        if (date) {
+            return date.substr(0, date.lastIndexOf('-'));
+        }
+        return date;
     },
     createDate(year, month, day, hour, minute, second, millis) {
         let date = new Date();
