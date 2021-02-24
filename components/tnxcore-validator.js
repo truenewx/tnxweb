@@ -29,9 +29,9 @@ export function getErrorMessage(validationName, fieldCaption) {
     let message = messages[validationName];
     if (message) {
         fieldCaption = fieldCaption || '';
-        message = message.replaceAll('\\{0\\}', fieldCaption);
+        message = message.replaceAll('{0}', fieldCaption);
         for (let i = 2; i < arguments.length; i++) {
-            message = message.replaceAll("\\{" + (i - 1) + "\\}", arguments[i]);
+            message = message.replaceAll('{' + (i - 1) + '}', arguments[i]);
         }
     }
     return message;
