@@ -26,10 +26,6 @@ Object.assign(String.prototype, {
     firstToUpperCase() {
         return this.substring(0, 1).toUpperCase() + this.substring(1);
     },
-    replaceAll(findText, replaceText) {
-        const regex = new RegExp(findText, 'g');
-        return this.replace(regex, replaceText);
-    },
     format(args) {
         if (!(args instanceof Array)) {
             args = arguments;

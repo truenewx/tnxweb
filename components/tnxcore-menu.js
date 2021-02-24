@@ -270,4 +270,27 @@ Menu.prototype.loadGrantedItems = function(callback) {
     }
 }
 
+Menu.prototype.resolveItemPathParams = function(vm, item) {
+    if (item && item.path) {
+        let path = item.path;
+        if (path.contains('/:')) { // 包含路径参数
+            // 确保路径头尾都有/
+            if (!path.startsWith('/')) {
+                path = '/' + path;
+            }
+            if (!path.endsWith('/')) {
+                path += '/';
+            }
+            // 替换路径参数
+            let params = vm.$route.params;
+            Object.keys(params).forEach(key => {
+                path = path.replaceAll('/:' + key + '/', '/' + params[key] + '/');
+            });
+            path = path.substr(0, path.length - 1); // 去掉末尾的/
+        }
+        return path;
+    }
+    return undefined;
+}
+
 export default Menu;
