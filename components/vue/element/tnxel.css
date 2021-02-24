@@ -443,10 +443,11 @@ el-button {
     font-weight: bold;
 }
 
-.tnxel-detail-form .el-form-item {
-    margin-bottom: 0;
+.tnxel-detail-form .el-form-item,
+.tnxel-detail-form .el-form-item .el-table {
+    margin-bottom: 0.5rem;
 }
 
-.tnxel-detail-form .el-form-item:last-child button {
-    margin-top: 0.75rem;
+.el-input-number.is-controls-right .el-input__inner {
+    padding-left: 8px;
 }

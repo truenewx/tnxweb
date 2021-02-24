@@ -2,7 +2,7 @@
     <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
         class="tnxel-detail-form" :class="formClass">
         <slot></slot>
-        <el-form-item v-if="back !== false">
+        <el-form-item class="w-100" v-if="back !== false">
             <el-button :type="theme || 'default'" @click="toBack">{{ backText }}</el-button>
         </el-form-item>
     </el-form>
