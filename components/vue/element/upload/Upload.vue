@@ -395,7 +395,7 @@ export default {
         /**
          * 校验上传是否已经全部完成
          * @param reject 没有完成上传时的处理函数，传入文件对象参数
-         * @returns 文件存储路径或其数组
+         * @returns 文件存储路径或其数组，有上传未完成时返回false
          */
         validateUploaded: function(reject) {
             if (this.uploadLimit.number > 1) {
@@ -405,7 +405,7 @@ export default {
                         storageUrls.push(file.storageUrl);
                     } else {
                         this._doValidateUploadedReject(reject, file);
-                        return null;
+                        return false;
                     }
                 }
                 return storageUrls;
@@ -416,6 +416,7 @@ export default {
                         return file.storageUrl;
                     } else {
                         this._doValidateUploadedReject(reject, file);
+                        return false;
                     }
                 }
             }

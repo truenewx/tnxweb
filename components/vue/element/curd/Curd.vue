@@ -178,14 +178,19 @@ export default {
             close();
         },
         toRemove(index) {
-            if (this.remove) {
-                let vm = this;
-                this.remove(index, function() {
-                    vm._onRemoved(index);
-                });
-            } else {
-                this._onRemoved(index);
-            }
+            let vm = this;
+            let modelName = this.modelName ? ('该' + this.modelName) : '';
+            window.tnx.confirm('确定要移除' + modelName + '吗？', function(yes) {
+                if (yes) {
+                    if (vm.remove) {
+                        vm.remove(index, function() {
+                            vm._onRemoved(index);
+                        });
+                    } else {
+                        vm._onRemoved(index);
+                    }
+                }
+            });
         },
         _onRemoved(index) {
             this.list.splice(index, 1);

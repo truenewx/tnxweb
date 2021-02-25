@@ -36,16 +36,10 @@ export default {
             return this.type === 'datetime' ? window.tnx.util.date.patterns.dateTime : window.tnx.util.date.patterns.date;
         },
         defaultDate() {
-            if (this.defaultValue instanceof Date) {
-                return this.defaultValue;
-            }
-            if (typeof this.defaultValue === 'number') {
+            if (this.defaultValue) {
                 return new Date(this.defaultValue);
             }
-            if (typeof this.defaultValue === 'string') {
-                return tnx.util.date.parseDate(this.defaultValue);
-            }
-            return undefined;
+            return null;
         }
     },
     watch: {

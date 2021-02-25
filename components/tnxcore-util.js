@@ -77,6 +77,11 @@ Object.assign(Date.prototype, {
     },
     formatMonth: function() {
         return this.format(DateUtil.patterns.month);
+    },
+    plusDays: function(days) {
+        let millis = this.getTime();
+        millis += days * 24 * 60 * 60 * 1000;
+        return new Date(millis);
     }
 });
 
@@ -348,21 +353,68 @@ export const DateUtil = {
         date.setHours(hour || 0, minute || 0, second || 0, millis || 0);
         return date;
     },
-    /**
-     * 解析指定yyyy-MM-dd格式的日期字符串为Date对象
-     * @param s
-     */
-    parseDate(s) {
-        if (s) {
-            let array = s.split('-');
-            if (array.length > 2) {
-                let year = parseInt(array[0]);
-                let month = parseInt(array[1]);
-                let day = parseInt(array[2]);
-                return this.createDate(year, month, day);
+    getDaysOfMonth(year, month) {
+        // 闰月
+        if (month === 2 && ((year % 400 === 0) || (year % 4 === 0 && year % 100 !== 0))) {
+            return 29;
+        }
+        return [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+    },
+    betweenDate(earlierDate, laterDate) {
+        earlierDate = new Date(earlierDate);
+        let year1 = earlierDate.getFullYear();
+        let month1 = earlierDate.getMonth() + 1;
+        let day1 = earlierDate.getDate();
+
+        laterDate = new Date(laterDate);
+        let year2 = laterDate.getFullYear();
+        let month2 = laterDate.getMonth() + 1;
+        let day2 = laterDate.getDate();
+
+        let revisedMonths = 0; //修订月数
+        let revisedYears = 0; // 修订年数
+
+        // 计算日，不足时向月份借
+        let days;
+        if (day2 >= day1) {
+            days = day2 - day1;
+        } else {
+            revisedMonths = -1;
+            days = this.getDaysOfMonth(year1, month1) + day2 - day1;
+        }
+
+        // 计算月，不足时向年份借
+        let months;
+        if (month2 + revisedMonths >= month1) {
+            months = month2 + revisedMonths - month1;
+        } else {
+            revisedYears = -1;
+            months = 12 + month2 + revisedMonths - month1;
+        }
+
+        // 计算年
+        let years = year2 + revisedYears - year1;
+
+        return {
+            years,
+            months,
+            days,
+            toString: function() {
+                let s = '';
+                if (this.years > 0) {
+                    s += this.years + '年';
+                }
+                if (this.months > 0) {
+                    s += this.months + '月';
+                } else if (this.years > 0) {
+                    s += '零';
+                }
+                if (this.days > 0) {
+                    s += this.days + '天';
+                }
+                return s;
             }
         }
-        return undefined;
     }
 }
 
