@@ -165,25 +165,28 @@ export default {
                 vm.uploadLimit = uploadLimit;
                 const $container = $('#' + vm.id);
                 // 初始化显示尺寸
+                let width = vm.width;
+                let height = vm.height;
                 let uploadSize = undefined;
                 if (uploadLimit.sizes && uploadLimit.sizes.length) {
                     uploadSize = uploadLimit.sizes[0];
                 }
-                if (!uploadSize) {
-                    uploadSize = {
-                        width: vm.width || 128,
-                        height: vm.height || (uploadLimit.imageable ? 128 : 40),
-                    }
+                if (uploadSize) {
+                    width = width || uploadSize.width;
+                    height = height || uploadSize.height;
                 }
-                let width = window.tnx.util.string.getPixelString(uploadSize.width);
-                let height = window.tnx.util.string.getPixelString(uploadSize.height);
+                width = width || 128;
+                height = height || (uploadLimit.imageable ? 128 : 40);
+
+                width = window.tnx.util.string.getPixelString(width);
+                height = window.tnx.util.string.getPixelString(height);
                 const $upload = $('.el-upload', $container);
                 $upload.css({
                     width: width,
                     height: height,
                 });
 
-                let plusSize = Math.min($upload.width(), uploadSize.height) / 4;
+                let plusSize = Math.min($upload.width(), height) / 4;
                 plusSize = Math.max(16, Math.min(plusSize, 32));
                 $('.el-icon-plus', $upload).css({
                     fontSize: plusSize + 'px'
