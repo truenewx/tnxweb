@@ -11,10 +11,7 @@ export default {
     name: 'TnxelFetchSelect',
     props: {
         value: String,
-        url: {
-            type: String,
-            required: true,
-        },
+        url: String,
         params: { // 构建远程检索请求参数集的函数
             type: Function,
             default: function(keyword) {
@@ -77,7 +74,10 @@ export default {
         value(value) {
             this.model = this.getModel();
         },
-        params(params) {
+        url() {
+            this.load();
+        },
+        params() {
             this.load();
         }
     },
@@ -102,7 +102,7 @@ export default {
             return undefined;
         },
         load(keyword) {
-            if (this.params) { // 当参数函数被设置为null时，不进行取数操作，用于参数条件初始不满足的情况
+            if (this.url && this.params) { // 当url或参数函数被设置为null时，不进行取数操作，用于初始条件不满足的情况
                 this.loading = true;
                 let params = this.params(keyword);
                 let vm = this;
