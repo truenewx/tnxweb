@@ -187,7 +187,7 @@ export default {
                 });
 
                 let plusSize = Math.min($upload.width(), height) / 4;
-                plusSize = Math.max(16, Math.min(plusSize, 32));
+                plusSize = Math.max(16, Math.min(plusSize, 32)) || 16;
                 $('.el-icon-plus', $upload).css({
                     fontSize: plusSize + 'px'
                 });
