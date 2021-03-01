@@ -3,7 +3,7 @@
         :rules="validationRules" :validate-on-rule-change="false" :inline-message="!vertical"
         :disabled="disabled" :class="theme ? ('theme-' + theme) : null" status-icon>
         <slot></slot>
-        <el-form-item v-if="submit">
+        <el-form-item class="w-100" v-if="submit">
             <el-button :type="theme || 'primary'" @click="toSubmit">{{ _submitText }}</el-button>
             <el-button type="default" @click="toCancel" v-if="cancel !== false">{{ cancelText }}</el-button>
         </el-form-item>

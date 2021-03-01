@@ -194,11 +194,11 @@ Object.assign(tnxvue.app.page, {
         }
     },
     /**
-     * 清理前端数据模型，检查文件上传是否完成，转换多层嵌入字段数据使其符合服务端的基本要求
+     * 清理前端数据模型，检查文件上传是否完成，转换多层嵌入字段数据使其符合服务端命令模型的基本要求
      * @param model 前端数据模型
      * @param refs 页面中的组件引用集
      */
-    cleanModel: function(vm, model) {
+    toCommandModel: function(vm, model) {
         let result = {};
         if (model) {
             if (vm.$refs) {
@@ -223,6 +223,31 @@ Object.assign(tnxvue.app.page, {
             }
         }
         return result;
+    },
+    /**
+     * 转换多层嵌入字段数据使其符合前端页面模型的基本要求
+     * @param model 服务端视图模型
+     */
+    toPageModel: function(model) {
+        let expanded = this._expandRefFields(model);
+        while (expanded) {
+            expanded = this._expandRefFields(model);
+        }
+        return model;
+    },
+    _expandRefFields: function(model) {
+        let expanded = false;
+        Object.keys(model).forEach(key => {
+            let value = model[key];
+            if (value && typeof value === 'object') {
+                Object.keys(value).forEach(refKey => {
+                    model[key + '__' + refKey] = value[refKey];
+                });
+                delete model[key];
+                expanded = true;
+            }
+        });
+        return expanded;
     }
 });
 
