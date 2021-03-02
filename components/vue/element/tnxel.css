@@ -473,3 +473,7 @@ el-button {
 .el-input-number.is-controls-right .el-input__inner {
     padding-left: 8px;
 }
+
+.el-step__title.is-process {
+    font-weight: unset;
+}
