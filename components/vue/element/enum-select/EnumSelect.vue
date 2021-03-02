@@ -1,16 +1,24 @@
 <template>
+    <tnxel-fetch-cascader v-model="model" url="/api/meta/enums" value-name="key" text-name="caption"
+        :params="{
+            type: type,
+            subtype:subtype,
+            grouped: true,
+        }" v-if="grouped"/>
     <tnxel-select v-model="model" :selector="selector" :items="items" value-name="key" text-name="caption"
         :default-value="defaultValue" :empty="empty" :empty-value="emptyValue" :placeholder="placeholder"
-        :change="change"/>
+        :change="change" v-else/>
 </template>
 
 <script>
 import Select from '../select';
+import FetchCascader from '../fetch-cascader';
 
 export default {
     name: 'TnxelEnumSelect',
     components: {
         'tnxel-select': Select,
+        'tnxel-fetch-cascader': FetchCascader,
     },
     props: {
         value: String,
@@ -31,6 +39,10 @@ export default {
         },
         placeholder: String,
         change: Function,
+        grouped: {
+            type: Boolean,
+            default: false,
+        }
     },
     data() {
         return {
