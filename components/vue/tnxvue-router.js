@@ -3,15 +3,15 @@
  */
 import {FunctionUtil} from '../tnxcore-util';
 
-function addRoute(routes, superiorPath, path, fnImportPage) {
-    if (path) {
+function addRoute(routes, superiorPath, item, fnImportPage) {
+    if (item && item.path) {
         routes.push({
-            path: path,
+            path: item.path,
             meta: {
                 superiorPath: superiorPath,
             },
             component: () => {
-                path = path.replace(/\/:[a-zA-Z0-9_]+/g, '');
+                let path = item.page || item.path.replace(/\/:[a-zA-Z0-9_]+/g, '');
                 return fnImportPage(path);
             },
         });
@@ -21,7 +21,7 @@ function addRoute(routes, superiorPath, path, fnImportPage) {
 function applyItemsToRoutes(items, routes, fnImportPage) {
     if (items && items.length) {
         items.forEach(item => {
-            addRoute(routes, undefined, item.path, fnImportPage);
+            addRoute(routes, undefined, item, fnImportPage);
             applyItemsToRoutes(item.subs, routes, fnImportPage);
         });
     }
