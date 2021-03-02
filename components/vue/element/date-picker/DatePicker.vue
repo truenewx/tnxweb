@@ -1,6 +1,6 @@
 <template>
     <el-date-picker :type="type" v-model="model" :value-format="format" :editable="false" :placeholder="placeholder"
-        :clearable="empty" :default-value="defaultDate"/>
+        :clearable="empty" :default-value="defaultDate" :picker-options="pickerOptions"/>
 </template>
 
 <script>
@@ -22,10 +22,33 @@ export default {
             default: false,
         },
         defaultValue: [Date, Number, String],
+        earliest: [Date, Number, String],
+        latest: [Date, Number, String],
     },
     data() {
+        let vm = this;
         return {
             model: this.getModel(),
+            pickerOptions: {
+                disabledDate(date) {
+                    if (vm.earliest || vm.latest) {
+                        date = new Date(date);
+                        if (vm.earliest) {
+                            let earliest = new Date(vm.earliest);
+                            if (date.getTime() < earliest.getTime()) {
+                                return true;
+                            }
+                        }
+                        if (vm.latest) {
+                            let latest = new Date(vm.latest);
+                            if (date.getTime() > latest.getTime()) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
         };
     },
     computed: {

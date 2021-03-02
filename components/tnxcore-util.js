@@ -415,6 +415,11 @@ export const DateUtil = {
                 return s;
             }
         }
+    },
+    today() {
+        let date = new Date();
+        date.setHours(0, 0, 0, 0);
+        return date;
     }
 }
 
