@@ -9,7 +9,7 @@
         :style="{'max-height': maxHeight}"
     >
         <div class="permission-node" slot-scope="{node, data}">
-            <el-checkbox v-model="data.checked" v-if="data.path" @change="()=>{
+            <el-checkbox v-model="data.checked" v-if="data.permission" @change="()=>{
                 onCheckChange(data);
             }">{{ data.label }}
             </el-checkbox>
