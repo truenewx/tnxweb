@@ -9,3 +9,7 @@
 .text-transparent {
     color: transparent !important;
 }
+
+.bg-primary {
+    color: #ffffff;
+}
