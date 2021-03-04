@@ -41,9 +41,11 @@ function addMenuItemToTreeNodes(parentId, menuItems, treeNodes, permissions) {
 }
 
 function getTreeNodes(menu, permissions) {
-    let items = menu.getAssignableItems();
     const nodes = [];
-    addMenuItemToTreeNodes(undefined, items, nodes, permissions);
+    if (menu) {
+        let items = menu.getAssignableItems();
+        addMenuItemToTreeNodes(undefined, items, nodes, permissions);
+    }
     return nodes;
 }
 
@@ -54,6 +56,17 @@ function addCheckedNodePermissionTo(nodes, permissions) {
         }
         if (node.children) {
             addCheckedNodePermissionTo(node.children, permissions);
+        }
+    }
+}
+
+function setCheckdByPermission(nodes, permission, checked) {
+    if (nodes && permission) {
+        for (let node of nodes) {
+            if (node.permission === permission) {
+                node.checked = checked;
+            }
+            setCheckdByPermission(node.children, permission, checked);
         }
     }
 }
@@ -69,11 +82,16 @@ export default {
         maxHeight: String,
     },
     data() {
-        return {};
+        return {
+            nodes: getTreeNodes(this.menu, this.permissions)
+        };
     },
-    computed: {
-        nodes() {
-            return getTreeNodes(this.menu, this.permissions);
+    watch: {
+        menu(menu) {
+            this.nodes = getTreeNodes(menu, this.permissions);
+        },
+        permissions(permissions) {
+            this.nodes = getTreeNodes(this.menu, permissions);
         }
     },
     methods: {
@@ -99,14 +117,17 @@ export default {
                 let parentNode = this.getNode(node.parentId);
                 if (parentNode) {
                     parentNode.checked = true;
+                    setCheckdByPermission(this.nodes, parentNode.permission, true);
                 }
             } else { // 节点未选中，则下级节点必须全部未选中
                 if (node.children) {
                     node.children.forEach(child => {
                         child.checked = false;
+                        setCheckdByPermission(this.nodes, child.permission, false);
                     });
                 }
             }
+            setCheckdByPermission(this.nodes, node.permission, node.checked);
         },
         getPermissions() {
             const permissions = [];
