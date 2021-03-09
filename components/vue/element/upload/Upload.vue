@@ -124,41 +124,52 @@ export default {
             return this.$refs.upload ? this.$refs.upload.uploadFiles : [];
         },
     },
+    watch: {
+        value(newValue, oldValue) {
+            if (!oldValue && newValue) {
+                this._init();
+            }
+        }
+    },
     mounted() {
-        const vm = this;
-        vm.tnx.app.rpc.ensureLogined(function() {
-            if (vm.value) {
-                let storageUrls = Array.isArray(vm.value) ? vm.value : [vm.value];
-                vm.tnx.app.rpc.get('/metas', {storageUrls: storageUrls}, function(metas) {
-                    metas.forEach(meta => {
-                        if (meta) {
-                            vm.fileList.push({
-                                name: meta.name,
-                                url: vm._getFullReadUrl(meta.thumbnailReadUrl || meta.readUrl),
-                                previewUrl: vm._getFullReadUrl(meta.readUrl),
-                                storageUrl: meta.storageUrl,
-                            });
-                        }
+        this._init();
+    },
+    methods: {
+        _init: function() {
+            const vm = this;
+            vm.tnx.app.rpc.ensureLogined(function() {
+                if (vm.value) {
+                    let storageUrls = Array.isArray(vm.value) ? vm.value : [vm.value];
+                    vm.tnx.app.rpc.get('/metas', {storageUrls: storageUrls}, function(metas) {
+                        vm.fileList = [];
+                        metas.forEach(meta => {
+                            if (meta) {
+                                vm.fileList.push({
+                                    name: meta.name,
+                                    url: vm._getFullReadUrl(meta.thumbnailReadUrl || meta.readUrl),
+                                    previewUrl: vm._getFullReadUrl(meta.readUrl),
+                                    storageUrl: meta.storageUrl,
+                                });
+                            }
+                        });
+                        vm.$nextTick(function() {
+                            vm._loadUploadLimit();
+                        });
+                    }, {
+                        app: 'fss'
                     });
+                } else {
                     vm.$nextTick(function() {
                         vm._loadUploadLimit();
                     });
-                }, {
-                    app: 'fss'
-                });
-            } else {
-                vm.$nextTick(function() {
-                    vm._loadUploadLimit();
-                });
-            }
-        }, {
-            app: 'fss',
-            toLogin: function(loginFormUrl, originalUrl, originalMethod) {
-                return true;
-            }
-        });
-    },
-    methods: {
+                }
+            }, {
+                app: 'fss',
+                toLogin: function(loginFormUrl, originalUrl, originalMethod) {
+                    return true;
+                }
+            });
+        },
         _loadUploadLimit: function() {
             let vm = this;
             vm.tnx.app.rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
@@ -306,13 +317,14 @@ export default {
         _resizeFilePanel: function(file, fileList) {
             const $container = $('#' + this.id);
             const $upload = $('.el-upload', $container);
-            let uploadStyle = $upload.attr('style'); // 隐藏之前取出样式
             if (fileList.length >= this.uploadLimit.number) {
                 // 隐藏添加按钮
                 $upload.hide();
             }
             const fileId = this.getFileId(file);
             const $listItem = $('.el-upload-list__panel[data-file-id="' + fileId + '"]', $container).parent();
+            let uploadStyle = $upload.attr('style');
+            uploadStyle = uploadStyle.replace(/display:\s*none;/, ''); // 去掉隐藏样式
             $listItem.attr('style', uploadStyle);
             if (typeof this.width === 'string' && this.width.endsWith('%')) {
                 $listItem.parent().css({width: '100%'});
