@@ -1,22 +1,23 @@
 <template>
-    <el-checkbox-group v-model="model" v-if="selector === 'checkbox'">
+    <el-checkbox-group v-model="model" :disabled="disabled" v-if="selector === 'checkbox'">
         <el-checkbox v-for="item in items" :key="item[valueName]" :label="item[valueName]">
             {{ item[textName] }}
         </el-checkbox>
     </el-checkbox-group>
-    <el-radio-group v-model="model" class="ignore-feedback" v-else-if="selector === 'radio'">
+    <el-radio-group v-model="model" class="ignore-feedback" :disabled="disabled" v-else-if="selector === 'radio'">
         <el-radio :label="emptyValue" v-if="empty">{{ emptyText }}</el-radio>
         <el-radio v-for="item in items" :key="item[valueName]" :label="item[valueName]">
             {{ item[textName] }}
         </el-radio>
     </el-radio-group>
-    <el-radio-group v-model="model" class="ignore-feedback" v-else-if="selector === 'radio-button'">
+    <el-radio-group v-model="model" class="ignore-feedback" :disabled="disabled"
+        v-else-if="selector === 'radio-button'">
         <el-radio-button :label="emptyValue" v-if="empty">{{ emptyText }}</el-radio-button>
         <el-radio-button v-for="item in items" :key="item[valueName]" :label="item[valueName]">
             {{ item[textName] }}
         </el-radio-button>
     </el-radio-group>
-    <el-select v-model="model" class="ignore-feedback" :placeholder="placeholder" v-else>
+    <el-select v-model="model" class="ignore-feedback" :placeholder="placeholder" :disabled="disabled" v-else>
         <el-option class="text-muted" :value="emptyValue" :label="emptyText" v-if="empty"/>
         <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]" :label="item[textName]"/>
     </el-select>
@@ -50,6 +51,7 @@ export default {
             default: () => null,
         },
         placeholder: String,
+        disabled: Boolean,
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {

@@ -1,6 +1,7 @@
 <template>
     <el-select v-model="model" :loading="loading" :filterable="filterable" remote :remote-method="load"
-        :placeholder="finalPlaceholder" :title="title" :clearable="empty" default-first-option @clear="clear">
+        :placeholder="finalPlaceholder" :disabled="disabled" :title="title" :clearable="empty" default-first-option
+        @clear="clear">
         <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]" :label="item[textName]"/>
         <el-option label="还有更多结果..." disabled v-if="more"/>
     </el-select>
@@ -33,6 +34,7 @@ export default {
         empty: Boolean,
         filterable: Boolean,
         placeholder: [String, Array],
+        disabled: Boolean,
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {

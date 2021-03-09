@@ -1,7 +1,7 @@
 <template>
     <el-col class="d-flex" :span="span">
         <el-input-number ref="input" class="flex-grow-1" v-model="model" :min="min" :max="max" controls-position="right"
-            :placeholder="placeholder" @change="onChange"/>
+            :placeholder="placeholder" :disabled="disabled" @change="onChange"/>
         <div class="ml-2 flex-shrink-0 text-muted" v-if="append">{{ append }}</div>
     </el-col>
 </template>
@@ -18,6 +18,7 @@ export default {
             type: String,
             default: () => '请设置',
         },
+        disabled: Boolean,
         append: String,
     },
     data() {

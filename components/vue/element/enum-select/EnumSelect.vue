@@ -4,10 +4,10 @@
             type: type,
             subtype:subtype,
             grouped: true,
-        }" v-if="grouped"/>
+        }" :disabled="disabled" v-if="grouped"/>
     <tnxel-select v-model="model" :selector="selector" :items="items" value-name="key" text-name="caption"
         :default-value="defaultValue" :empty="empty" :empty-value="emptyValue" :placeholder="placeholder"
-        :change="change" v-else/>
+        :disabled="disabled" :change="change" v-else/>
 </template>
 
 <script>
@@ -38,6 +38,7 @@ export default {
             default: () => null,
         },
         placeholder: String,
+        disabled: Boolean,
         change: Function,
         grouped: {
             type: Boolean,

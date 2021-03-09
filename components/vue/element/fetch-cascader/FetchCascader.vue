@@ -1,6 +1,6 @@
 <template>
     <el-cascader v-model="model" class="ignore-feedback" :options="items" :props="options" :placeholder="placeholder"
-        :show-all-levels="showAllLevels" :clearable="empty"/>
+        :show-all-levels="showAllLevels" :clearable="empty" :disabled="disabled"/>
 </template>
 
 <script>
@@ -38,6 +38,7 @@ export default {
             type: String,
             default: '请选择',
         },
+        disabled: Boolean,
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {

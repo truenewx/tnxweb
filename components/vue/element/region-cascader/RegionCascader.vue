@@ -1,6 +1,6 @@
 <template>
     <el-cascader v-model="model" class="ignore-feedback" :options="region.subs" :props="options"
-        :placeholder="placeholder" :clearable="empty"/>
+        :placeholder="placeholder" :disabled="disabled" :clearable="empty"/>
 </template>
 
 <script>
@@ -25,6 +25,7 @@ export default {
             default: false,
         },
         placeholder: String,
+        disabled: Boolean,
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
     },
     data() {

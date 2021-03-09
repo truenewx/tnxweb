@@ -1,6 +1,6 @@
 <template>
     <el-date-picker :type="type" v-model="model" :value-format="format" :editable="false" :placeholder="placeholder"
-        :clearable="empty" :default-value="defaultDate" :picker-options="pickerOptions"/>
+        :clearable="empty" :default-value="defaultDate" :picker-options="pickerOptions" :disabled="disabled"/>
 </template>
 
 <script>
@@ -17,6 +17,7 @@ export default {
             type: String,
             default: '请选择',
         },
+        disabled: Boolean,
         empty: {
             type: Boolean,
             default: false,
