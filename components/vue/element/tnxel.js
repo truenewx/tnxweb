@@ -223,6 +223,15 @@ tnxel.date = {
             return cellValue.formatMinute();
         }
         return cellValue;
+    },
+    formatMonth: function(row, column, cellValue) {
+        if (typeof cellValue === 'number') {
+            cellValue = new Date(cellValue);
+        }
+        if (cellValue instanceof Date) {
+            return cellValue.formatMonth();
+        }
+        return cellValue;
     }
 };
 
