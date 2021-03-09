@@ -189,49 +189,19 @@ const tnxel = Object.assign({}, tnxvue, {
 
 tnxel.date = {
     formatDateTime: function(row, column, cellValue) {
-        if (typeof cellValue === 'number') {
-            cellValue = new Date(cellValue);
-        }
-        if (cellValue instanceof Date) {
-            return cellValue.formatDateTime();
-        }
-        return cellValue;
+        return new Date(cellValue).formatDateTime();
     },
     formatDate: function(row, column, cellValue) {
-        if (typeof cellValue === 'number') {
-            cellValue = new Date(cellValue);
-        }
-        if (cellValue instanceof Date) {
-            return cellValue.formatDate();
-        }
-        return cellValue;
+        return new Date(cellValue).formatDate();
     },
     formatTime: function(row, column, cellValue) {
-        if (typeof cellValue === 'number') {
-            cellValue = new Date(cellValue);
-        }
-        if (cellValue instanceof Date) {
-            return cellValue.formatTime();
-        }
-        return cellValue;
+        return new Date(cellValue).formatTime();
     },
     formatMinute: function(row, column, cellValue) {
-        if (typeof cellValue === 'number') {
-            cellValue = new Date(cellValue);
-        }
-        if (cellValue instanceof Date) {
-            return cellValue.formatMinute();
-        }
-        return cellValue;
+        return new Date(cellValue).formatMinute();
     },
     formatMonth: function(row, column, cellValue) {
-        if (typeof cellValue === 'number') {
-            cellValue = new Date(cellValue);
-        }
-        if (cellValue instanceof Date) {
-            return cellValue.formatMonth();
-        }
-        return cellValue;
+        return new Date(cellValue).formatMonth();
     }
 };
 
