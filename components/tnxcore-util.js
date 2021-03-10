@@ -82,6 +82,21 @@ Object.assign(Date.prototype, {
         let millis = this.getTime();
         millis += days * 24 * 60 * 60 * 1000;
         return new Date(millis);
+    },
+    plusMonths: function(months) {
+        let year = this.getFullYear();
+        let month = this.getMonth();
+        year += months / 12;
+        month += months % 12;
+        let date = new Date(this);
+        date.setFullYear(year);
+        date.setMonth(month);
+        return date;
+    },
+    plusYears: function(years) {
+        let date = new Date(this);
+        date.setFullYear(this.getFullYear() + years);
+        return date;
     }
 });
 
