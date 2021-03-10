@@ -3,8 +3,10 @@
         :rules="validationRules" :validate-on-rule-change="false" :inline-message="!vertical"
         :disabled="disabled" :class="theme ? ('theme-' + theme) : null" status-icon>
         <slot></slot>
-        <el-form-item class="w-100" v-if="submit">
-            <el-button :type="theme || 'primary'" @click="toSubmit">{{ _submitText }}</el-button>
+        <el-form-item class="w-100" v-if="submit !== undefined">
+            <el-button :type="theme || 'primary'" @click="toSubmit" v-if="submit !== false">
+                {{ _submitText }}
+            </el-button>
             <el-button type="default" @click="toCancel" v-if="cancel !== false">{{ cancelText }}</el-button>
         </el-form-item>
     </el-form>
@@ -29,7 +31,7 @@ export default {
         },
         rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
         rulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
-        submit: Function,
+        submit: [Function, Boolean],
         submitText: String,
         theme: String,
         cancel: {
