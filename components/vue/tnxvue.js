@@ -126,36 +126,36 @@ tnxvue.app.page.init = tnxvue.util.function.around(tnxvue.app.page.init, functio
 });
 
 Object.assign(tnxvue.app.page, {
-    startCache: function(model, intervalMillis, ignoredFields) {
+    startCache: function(router, model, intervalMillis, ignoredFields) {
         if (localStorage && intervalMillis && intervalMillis > 1000) { // 缓存间隔必须超过1秒
-            let anchor = this._readCache(undefined, function(cache) {
+            let path = this._readCache(router, undefined, function(cache) {
                 Object.assign(model, cache.model);
             });
 
-            if (anchor) {
+            if (path) {
                 let _this = this;
                 let intervalId = setInterval(function() {
-                    _this._storeCache(anchor, intervalId, model, ignoredFields);
+                    _this._storeCache(router, path, intervalId, model, ignoredFields);
                 }, intervalMillis);
             }
         }
         return model;
     },
-    _readCache: function(anchor, callback) {
+    _readCache: function(router, path, callback) {
         if (localStorage) {
-            anchor = anchor || tnxvue.util.net.getAnchor() || '/';
-            let cache = localStorage[anchor];
+            path = path || router.app.$route.path || '/';
+            let cache = localStorage[path];
             if (cache) {
                 cache = window.tnx.util.string.parseJson(cache);
                 if (typeof callback === 'function') {
                     callback.call(this, cache);
                 }
             }
-            return anchor;
+            return path;
         }
     },
-    _storeCache: function(anchor, intervalId, model, ignoredFields) {
-        if (anchor && intervalId) {
+    _storeCache: function(router, path, intervalId, model, ignoredFields) {
+        if (path && intervalId) {
             let data = {};
             if (Array.isArray(ignoredFields) && ignoredFields.length) {
                 Object.keys(model).forEach(key => {
@@ -166,31 +166,31 @@ Object.assign(tnxvue.app.page, {
             } else {
                 data = model;
             }
-            localStorage[anchor] = tnxvue.util.string.toJson({
+            localStorage[path] = tnxvue.util.string.toJson({
                 intervalId: intervalId,
                 model: data,
                 ignored: ignoredFields,
             });
         }
     },
-    saveCache: function(model) {
+    saveCache: function(router, model) {
         let intervalId;
         let ignoredFields;
-        let anchor = this._readCache(undefined, function(cache) {
+        let path = this._readCache(router, undefined, function(cache) {
             intervalId = cache.intervalId;
             ignoredFields = cache.ignored;
         });
-        this._storeCache(anchor, intervalId, model, ignoredFields);
+        this._storeCache(router, path, intervalId, model, ignoredFields);
     },
-    stopCache: function(anchor) {
-        return this._readCache(anchor, function(cache) {
+    stopCache: function(router, path) {
+        return this._readCache(router, path, function(cache) {
             clearInterval(cache.intervalId);
         });
     },
-    clearCache: function() {
-        let anchor = this.stopCache();
-        if (anchor) {
-            delete localStorage[anchor];
+    clearCache: function(router) {
+        let path = this.stopCache(router);
+        if (path) {
+            delete localStorage[path];
         }
     },
     /**

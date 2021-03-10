@@ -18,11 +18,11 @@ function addRoute(routes, superiorPath, item, fnImportPage) {
     }
 }
 
-function applyItemsToRoutes(items, routes, fnImportPage) {
+function applyItemsToRoutes(superiorPath, items, routes, fnImportPage) {
     if (items && items.length) {
         items.forEach(item => {
-            addRoute(routes, undefined, item, fnImportPage);
-            applyItemsToRoutes(item.subs, routes, fnImportPage);
+            addRoute(routes, superiorPath, item, fnImportPage);
+            applyItemsToRoutes(item.path, item.subs, routes, fnImportPage);
         });
     }
 }
@@ -39,11 +39,11 @@ export default function(VueRouter, menu, fnImportPage) {
     }
 
     const routes = [];
-    applyItemsToRoutes(items, routes, fnImportPage);
+    applyItemsToRoutes(undefined, items, routes, fnImportPage);
 
     const router = new VueRouter({routes});
     router.beforeEach((to, from, next) => {
-        window.tnx.app.page.stopCache(from.path);
+        window.tnx.app.page.stopCache(router, from.path);
         next();
     });
     router.afterEach((to, from) => {
