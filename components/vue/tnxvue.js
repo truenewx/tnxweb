@@ -194,11 +194,12 @@ Object.assign(tnxvue.app.page, {
         }
     },
     /**
-     * 清理前端数据模型，检查文件上传是否完成，转换多层嵌入字段数据使其符合服务端命令模型的基本要求
-     * @param model 前端数据模型
+     * 前端页面模型转换为后端命令模型，检查文件上传是否完成，去掉后端不需要的多余字段，转换多层嵌入字段数据使其符合服务端命令模型的基本要求
+     * @param model 前端页面模型
      * @param refs 页面中的组件引用集
+     * @param rules 字段校验规则，有则清除多余字段
      */
-    toCommandModel: function(vm, model) {
+    toCommandModel: function(vm, model, rules) {
         let result = {};
         if (model) {
             if (vm.$refs) {
@@ -214,11 +215,13 @@ Object.assign(tnxvue.app.page, {
             }
             let fieldNames = Object.keys(model);
             for (let fieldName of fieldNames) {
-                if (fieldName.contains('__')) {
-                    let path = fieldName.replaceAll('__', '.');
-                    tnxvue.util.object.setValue(result, path, model[fieldName]);
-                } else {
-                    result[fieldName] = model[fieldName];
+                if (!rules || rules[fieldName]) {
+                    if (fieldName.contains('__')) {
+                        let path = fieldName.replaceAll('__', '.');
+                        tnxvue.util.object.setValue(result, path, model[fieldName]);
+                    } else {
+                        result[fieldName] = model[fieldName];
+                    }
                 }
             }
         }
