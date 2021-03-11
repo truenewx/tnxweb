@@ -108,7 +108,7 @@ tnxvue.app.validator = validator;
 tnxvue.app.rpc.getMeta = tnxvue.util.function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
     getMeta.call(tnxvue.app.rpc, url, function(meta) {
         if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
-            meta.rules = validator.getRules(meta);
+            meta.$rules = validator.getRules(meta);
         }
         if (typeof callback === 'function') {
             callback.call(this, meta);
@@ -201,9 +201,9 @@ Object.assign(tnxvue.app.page, {
      * 前端页面模型转换为后端命令模型，检查文件上传是否完成，去掉后端不需要的多余字段，转换多层嵌入字段数据使其符合服务端命令模型的基本要求
      * @param model 前端页面模型
      * @param refs 页面中的组件引用集
-     * @param rules 字段校验规则，有则清除多余字段
+     * @param validFieldNames 有效的字段名称集，如有指定则清除模型中的无效字段
      */
-    toCommandModel: function(vm, model, rules) {
+    toCommandModel: function(vm, model, validFieldNames) {
         let result = {};
         if (model) {
             if (vm.$refs) {
@@ -219,7 +219,7 @@ Object.assign(tnxvue.app.page, {
             }
             let fieldNames = Object.keys(model);
             for (let fieldName of fieldNames) {
-                if (!rules || rules[fieldName]) {
+                if (!validFieldNames || !validFieldNames.length || validFieldNames.contains(fieldName)) {
                     if (fieldName.contains('__')) {
                         let path = fieldName.replaceAll('__', '.');
                         tnxvue.util.object.setValue(result, path, model[fieldName]);

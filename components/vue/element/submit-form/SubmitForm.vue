@@ -60,6 +60,7 @@ export default {
             validationRules: {},
             disabled: false,
             topOffset: 0,
+            fieldNames: [],
         };
     },
     computed: {
@@ -75,13 +76,14 @@ export default {
             const vm = this;
             window.tnx.app.rpc.getMeta(this.rules, meta => {
                 if (vm.rulesLoaded) {
-                    vm.rulesLoaded(meta.rules);
+                    vm.rulesLoaded(meta.$rules);
                 } else {
-                    vm.$emit('rules-loaded', meta.rules);
+                    vm.$emit('rules-loaded', meta.$rules);
                 }
-                vm.validationRules = meta.rules;
-                delete meta.rules;
+                vm.validationRules = meta.$rules;
+                delete meta.$rules;
                 this.$emit('meta', meta);
+                vm.fieldNames = Object.keys(meta);
             });
         } else if (this.rules) {
             this.validationRules = this.rules;
@@ -155,6 +157,9 @@ export default {
             } else if (this.cancel !== false) {
                 this.$router.back();
             }
+        },
+        getFieldNames() {
+            return this.fieldNames;
         }
     }
 }
