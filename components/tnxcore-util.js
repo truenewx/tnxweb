@@ -438,7 +438,7 @@ export const DateUtil = {
                 }
                 if (this.months > 0) {
                     s += this.months + '月';
-                } else if (this.years > 0) {
+                } else if (this.years > 0 && this.day > 0) {
                     s += '零';
                 }
                 if (this.days > 0) {
