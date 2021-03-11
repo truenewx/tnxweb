@@ -452,6 +452,17 @@ export const DateUtil = {
         let date = new Date();
         date.setHours(0, 0, 0, 0);
         return date;
+    },
+    monthsToYearMonth(months) {
+        if (months !== undefined && months !== null) {
+            months = parseInt(months);
+            if (!isNaN(months)) {
+                let year = Math.floor(months / 12);
+                let month = months % 12;
+                return (year >= 1 ? year + '年' : '') + month + '月';
+            }
+        }
+        return undefined;
     }
 }
 
