@@ -20,8 +20,8 @@ export default {
                 }
                 // 只有一个子节点的，需看其内容是否有效
                 let defaultSlot = this.$slots.default[0];
-                if (defaultSlot) {
-                    return defaultSlot.text;
+                if (defaultSlot && defaultSlot.text) {
+                    return defaultSlot.text.trim() !== '';
                 }
             }
             return false;
