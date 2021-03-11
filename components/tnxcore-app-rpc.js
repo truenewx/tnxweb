@@ -181,6 +181,9 @@ export default {
                             if (_this.handleErrors(errors, options)) {
                                 return;
                             }
+                        } else if (response.data.message) {
+                            console.error(response.data.message);
+                            return;
                         }
                         break;
                     }
