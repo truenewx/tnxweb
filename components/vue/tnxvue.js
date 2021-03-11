@@ -6,6 +6,17 @@ import Vue from 'vue';
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 import buildRouter from './tnxvue-router';
+import Span from './span';
+import Percent from './percent';
+
+const components = {
+    Div: {
+        name: 'TnxvueDiv',
+        template: '<div><slot></slot></div>'
+    },
+    Span,
+    Percent,
+};
 
 function getDefaultDialogButtons(type, callback, theme) {
     if (type) {
@@ -40,17 +51,6 @@ function getDefaultDialogButtons(type, callback, theme) {
     }
     return [];
 }
-
-const components = {
-    'Div': {
-        name: 'TnxvueDiv',
-        template: '<div><slot></slot></div>'
-    },
-    'Span': {
-        name: 'TnxvueSpan',
-        template: '<span><slot></slot></span>'
-    }
-};
 
 const tnxvue = Object.assign({}, tnxcore, {
     libs: Object.assign({}, tnxcore.libs, {Vue}),
