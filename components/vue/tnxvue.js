@@ -6,7 +6,7 @@ import Vue from 'vue';
 import tnxcore from '../tnxcore.js';
 import validator from './tnxvue-validator';
 import buildRouter from './tnxvue-router';
-import Span from './span';
+import Text from './text';
 import Percent from './percent';
 
 const components = {
@@ -14,7 +14,11 @@ const components = {
         name: 'TnxvueDiv',
         template: '<div><slot></slot></div>'
     },
-    Span,
+    Span: {
+        name: 'TnxvueSpan',
+        template: '<span><slot></slot></span>'
+    },
+    Text,
     Percent,
 };
 
