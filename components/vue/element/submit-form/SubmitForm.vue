@@ -3,7 +3,7 @@
         :rules="validationRules" :validate-on-rule-change="false" :inline-message="!vertical"
         :disabled="disabled" :class="theme ? ('theme-' + theme) : null" status-icon>
         <slot></slot>
-        <el-form-item class="w-100" v-if="submit !== undefined">
+        <el-form-item class="w-100" v-if="submit !== undefined && submit !== null">
             <el-button :type="theme || 'primary'" @click="toSubmit" v-if="submit !== false">
                 {{ _submitText }}
             </el-button>
@@ -23,7 +23,7 @@ export default {
          */
         container: {
             type: String,
-            default: () => 'main',
+            default: 'main',
         },
         model: {
             type: Object,
@@ -31,20 +31,23 @@ export default {
         },
         rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
         rulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
-        submit: [Function, Boolean],
+        submit: {
+            type: [Function, Boolean],
+            default: null,
+        },
         submitText: String,
         theme: String,
         cancel: {
             type: [String, Function, Boolean],
-            default: () => true
+            default: true
         },
         cancelText: {
             type: String,
-            default: () => '取消'
+            default: '取消'
         },
         vertical: {
             type: Boolean,
-            default: () => false
+            default: false
         },
         errorFocus: {
             type: Boolean,
