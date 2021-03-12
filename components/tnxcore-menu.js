@@ -49,9 +49,7 @@ function getDefaultPermission(path) {
     }
     // 许可所有中间的/替换为_
     permission = permission.replaceAll(/\//g, '_');
-    // 加上应用前缀
-    const baseApp = window.tnx.app.rpc.baseApp;
-    return baseApp ? (baseApp + '.' + permission) : permission;
+    return permission;
 }
 
 function applyGrantedItemToItems(authority, item, items) {
@@ -128,6 +126,7 @@ function buildLevel(items, parentLevel) {
 }
 
 const Menu = function Menu(config) {
+    this.app = config.app;
     this.caption = config.caption;
     this.items = buildLevel(config.items);
     this._url = config.url;

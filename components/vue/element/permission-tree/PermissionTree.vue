@@ -49,13 +49,17 @@ function getTreeNodes(menu, permissions) {
     return nodes;
 }
 
-function addCheckedNodePermissionTo(nodes, permissions) {
+function addCheckedNodePermissionTo(app, nodes, permissions) {
     for (let node of nodes) {
         if (node.checked && node.permission) {
-            permissions.push(node.permission);
+            let permission = node.permission;
+            if (app) {
+                permission = app + '.' + permission;
+            }
+            permissions.push(permission);
         }
         if (node.children) {
-            addCheckedNodePermissionTo(node.children, permissions);
+            addCheckedNodePermissionTo(app, node.children, permissions);
         }
     }
 }
@@ -129,9 +133,10 @@ export default {
             }
             setCheckdByPermission(this.nodes, node.permission, node.checked);
         },
-        getPermissions() {
+        getPermissions(withApp) {
+            let app = withApp ? this.menu.app : null;
             const permissions = [];
-            addCheckedNodePermissionTo(this.nodes, permissions);
+            addCheckedNodePermissionTo(app, this.nodes, permissions);
             return permissions;
         }
     }
