@@ -180,7 +180,7 @@ export default {
         toRemove(index) {
             let vm = this;
             let modelName = this.modelName ? ('该' + this.modelName) : '';
-            window.tnx.confirm('确定要移除' + modelName + '吗？', function(yes) {
+            window.tnx.confirm('确定要' + this.removeText + modelName + '吗？', function(yes) {
                 if (yes) {
                     if (vm.remove) {
                         vm.remove(index, function() {
