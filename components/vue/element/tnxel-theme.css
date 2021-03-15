@@ -143,7 +143,9 @@
     color: #909399 !important;
 }
 
-.bg-muted {
+.bg-muted,
+.el-table .bg-muted th,
+.el-table .bg-muted tr {
     background-color: #fafafa !important;
 }
 
