@@ -5,7 +5,7 @@
 
 <script>
 export default {
-    name: 'TnxelRegionSelect',
+    name: 'TnxelRegionCascader',
     props: {
         value: String,
         scope: {
