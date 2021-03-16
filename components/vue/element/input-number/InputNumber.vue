@@ -1,8 +1,9 @@
 <template>
-    <el-col class="d-flex" :span="span">
-        <el-input-number ref="input" class="flex-grow-1" v-model="model" :min="min" :max="max" controls-position="right"
-            :placeholder="placeholder" :disabled="disabled" @change="onChange"/>
-        <div class="ml-2 flex-shrink-0 text-muted" v-if="append">{{ append }}</div>
+    <el-col class="tnxel-input-number-group" :span="span">
+        <el-input-number ref="input" class="flex-grow-1" :class="{'rounded-right-0': suffix}" v-model="model" :min="min"
+            :max="max" controls-position="right" :placeholder="placeholder" :disabled="disabled" :controls="controls"
+            :step="step" :precision="precision" step-strictly @change="onChange"/>
+        <div class="el-input-group__append" v-if="suffix">{{ suffix }}</div>
     </el-col>
 </template>
 
@@ -20,10 +21,27 @@ export default {
         },
         disabled: Boolean,
         append: String,
+        controls: {
+            type: Boolean,
+            default: true,
+        },
+        step: Number,
+        precision: Number,
     },
     data() {
         return {
             model: this.value,
+        }
+    },
+    computed: {
+        suffix() {
+            if (this.append) {
+                return this.append;
+            }
+            if (this.$slots && this.$slots.append && this.$slots.append.length) {
+                return this.$slots.append[0].text;
+            }
+            return null;
         }
     },
     watch: {

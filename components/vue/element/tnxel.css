@@ -470,6 +470,32 @@ el-button {
     margin-bottom: 0.5rem;
 }
 
+.el-input-group__append, .el-input-group__prepend {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.rounded-right-0,
+.rounded-right-0 .el-input__inner {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.tnxel-input-number-group {
+    display: flex;
+}
+
+.tnxel-input-number-group .el-input-group__append {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    height: 38px;
+}
+
+.el-table .cell .tnxel-input-number-group .el-input-group__append {
+    height: auto;
+}
+
 .el-input-number.is-controls-right .el-input__inner {
     padding-left: 8px;
 }
