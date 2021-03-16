@@ -207,6 +207,13 @@ export const ObjectUtil = {
         let lastName = names[names.length - 1];
         obj[lastName] = value;
         return obj;
+    },
+    deepClone(obj) {
+        if (obj) {
+            let json = StringUtil.toJson(obj);
+            return StringUtil.parseJson(json);
+        }
+        return obj;
     }
 }
 
