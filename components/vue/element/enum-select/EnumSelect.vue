@@ -4,7 +4,7 @@
             type: type,
             subtype:subtype,
             grouped: true,
-        }" :disabled="disabled" v-if="grouped"/>
+        }" :disabled="disabled" :empty="empty" v-if="grouped"/>
     <tnxel-select v-model="model" :selector="selector" :items="items" value-name="key" text-name="caption"
         :default-value="defaultValue" :empty="empty" :empty-value="emptyValue" :placeholder="placeholder"
         :disabled="disabled" :change="change" v-else/>
@@ -61,23 +61,30 @@ export default {
     },
     created() {
         if (typeof this.type === 'string') {
-            let vm = this;
             if (this.type.toLowerCase() === 'boolean') {
-                vm.items = [{
+                this.items = [{
                     key: true,
                     caption: true.toText(),
                 }, {
                     key: false,
                     caption: false.toText(),
                 }];
+                this.initModel();
             } else {
+                let vm = this;
                 window.tnx.app.rpc.loadEnumItems(this.type, this.subtype, function(items) {
                     vm.items = items;
+                    vm.initModel();
                 });
             }
         }
-
     },
-    methods: {}
+    methods: {
+        initModel() {
+            if (!this.model && !this.empty && this.items && this.items.length) {
+                this.model = this.items[0].key;
+            }
+        }
+    }
 }
 </script>
