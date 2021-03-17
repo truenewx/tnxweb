@@ -2,7 +2,8 @@
     <el-col class="tnxel-input-number-group" :class="{'is-error': showRequiredError}" :span="span">
         <el-input-number ref="input" class="flex-grow-1" :class="{'rounded-right-0': suffix}" v-model.trim="model"
             :min="min" :max="max" controls-position="right" :placeholder="placeholder" :disabled="disabled"
-            :controls="controls" :step="step" :precision="precision" step-strictly @change="onChange"/>
+            :controls="controls" :step="step || Math.pow(10, -this.scale)" :precision="scale" step-strictly
+            @change="onChange"/>
         <div class="el-input-group__append" v-if="suffix">{{ suffix }}</div>
     </el-col>
 </template>
@@ -26,7 +27,10 @@ export default {
             default: true,
         },
         step: Number,
-        precision: Number,
+        scale: {
+            type: Number,
+            default: 0,
+        },
         required: Boolean,
     },
     data() {
