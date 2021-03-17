@@ -327,7 +327,7 @@ export const StringUtil = {
     idCard(idCardNo) {
         let birthday;
         let male;
-        if (idCardNo.length == 15) { // 15位身份证号码
+        if (idCardNo.length === 15) { // 15位身份证号码
             birthday = '19' + idCardNo.substr(6, 6);
             male = idCardNo.substr(14, 1);
         } else {

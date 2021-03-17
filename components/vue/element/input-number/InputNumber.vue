@@ -1,8 +1,8 @@
 <template>
-    <el-col class="tnxel-input-number-group" :span="span">
-        <el-input-number ref="input" class="flex-grow-1" :class="{'rounded-right-0': suffix}" v-model="model" :min="min"
-            :max="max" controls-position="right" :placeholder="placeholder" :disabled="disabled" :controls="controls"
-            :step="step" :precision="precision" step-strictly @change="onChange"/>
+    <el-col class="tnxel-input-number-group" :class="{'is-error': showRequiredError}" :span="span">
+        <el-input-number ref="input" class="flex-grow-1" :class="{'rounded-right-0': suffix}" v-model.trim="model"
+            :min="min" :max="max" controls-position="right" :placeholder="placeholder" :disabled="disabled"
+            :controls="controls" :step="step" :precision="precision" step-strictly @change="onChange"/>
         <div class="el-input-group__append" v-if="suffix">{{ suffix }}</div>
     </el-col>
 </template>
@@ -27,10 +27,12 @@ export default {
         },
         step: Number,
         precision: Number,
+        required: Boolean,
     },
     data() {
         return {
             model: this.value,
+            showRequiredError: false,
         }
     },
     computed: {
@@ -53,11 +55,22 @@ export default {
         }
     },
     methods: {
-        onChange(currentValue, oldValue) {
-            if (oldValue === undefined && currentValue !== undefined) {
-                this.$refs.input.focus();
+        validateRequired(focusError) {
+            if (this.required) {
+                this.showRequiredError = this.model === undefined || this.model === null || this.model === '';
+                if (this.showRequiredError && focusError) {
+                    this.focus();
+                }
+                return !this.showRequiredError;
             }
-        }
+            return true;
+        },
+        focus() {
+            this.$refs.input.focus();
+        },
+        onChange() {
+            this.validateRequired(false);
+        },
     }
 }
 </script>

@@ -111,6 +111,7 @@
 .border-danger,
 .theme-danger .el-checkbox__input.is-focus .el-checkbox__inner,
 .theme-danger .el-input__inner:focus,
+.is-error .el-input__inner,
 .theme-success .is-error .el-input__inner:focus,
 .theme-warning .is-error .el-input__inner:focus {
     border-color: #F56C6C !important;
