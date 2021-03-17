@@ -57,6 +57,7 @@ export default {
         },
         value(value) {
             this.model = this.value;
+            this.initModel();
         }
     },
     created() {
