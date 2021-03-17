@@ -205,6 +205,18 @@ tnxel.date = {
     }
 };
 
+tnxel.number = {
+    formatPercent: function(row, column, cellValue) {
+        if (typeof cellValue !== 'number') {
+            cellValue = parseFloat(cellValue);
+        }
+        if (!isNaN(cellValue)) {
+            return cellValue.toPercent();
+        }
+        return undefined;
+    }
+}
+
 tnxel.boolean = {
     items: {
         getText(type, value) {

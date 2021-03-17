@@ -15,7 +15,11 @@ Object.assign(Number.prototype, {
         return Math.round(this * p) / p;
     },
     toPercent(scale) {
-        return (this * 100).halfUp(scale) + '%';
+        if (typeof scale === 'number') {
+            return (this * 100).halfUp(scale) + '%';
+        } else {
+            return (this * 100) + '%';
+        }
     }
 });
 
