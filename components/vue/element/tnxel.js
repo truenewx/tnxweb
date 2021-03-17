@@ -244,8 +244,18 @@ tnxel.libs.Vue.use(tnxel);
 
 const rpc = tnxel.app.rpc;
 rpc.handleErrors = tnxel.util.function.around(rpc.handleErrors, function(handleErrors, errors, options) {
-    if (options && options.form && typeof options.form.disable === 'function') {
-        options.form.disable(false);
+    if (options && options.form) {
+        let forms;
+        if (Array.isArray(options.form)) {
+            forms = options.form;
+        } else {
+            forms = [options.form];
+        }
+        forms.forEach(form => {
+            if (typeof form.disable === 'function') {
+                form.disable(false);
+            }
+        });
     }
     return handleErrors.call(rpc, errors, options);
 });
