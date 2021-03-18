@@ -1,13 +1,16 @@
 <template>
     <tnxel-fetch-cascader v-model="model" url="/api/meta/enums" value-name="key" text-name="caption"
+        index-name="searchIndex" :disabled="disabled" :empty="empty" :filterable="filterable"
         :params="{
             type: type,
             subtype:subtype,
             grouped: true,
-        }" :disabled="disabled" :empty="empty" v-if="grouped"/>
-    <tnxel-select v-model="model" :selector="selector" :items="items" value-name="key" text-name="caption"
-        :default-value="defaultValue" :empty="empty" :empty-value="emptyValue" :placeholder="placeholder"
-        :disabled="disabled" :change="change" v-else/>
+        }" v-if="grouped"/>
+    <tnxel-select v-model="model" :selector="selector" :items="items"
+        value-name="key" text-name="caption" index-name="searchIndex"
+        :default-value="defaultValue" :empty="empty" :empty-value="emptyValue"
+        :placeholder="placeholder" :disabled="disabled" :filterable="filterable"
+        :change="change" v-else/>
 </template>
 
 <script>
@@ -43,7 +46,8 @@ export default {
         grouped: {
             type: Boolean,
             default: false,
-        }
+        },
+        filterable: Boolean,
     },
     data() {
         return {

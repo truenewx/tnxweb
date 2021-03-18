@@ -1,6 +1,7 @@
 <template>
-    <el-cascader v-model="model" class="ignore-feedback" :options="items" :props="options" :placeholder="placeholder"
-        :show-all-levels="showAllLevels" :clearable="empty" :disabled="disabled"/>
+    <el-cascader v-model="model" class="ignore-feedback" :options="items" :props="options"
+        :placeholder="placeholder" :show-all-levels="showAllLevels" :clearable="empty" :disabled="disabled"
+        :filterable="filterable" :filter-method="filter"/>
 </template>
 
 <script>
@@ -21,6 +22,10 @@ export default {
             type: String,
             default: () => 'name',
         },
+        indexName: {
+            type: String,
+            default: 'index',
+        },
         childrenName: {
             type: String,
             default: () => 'children',
@@ -40,6 +45,7 @@ export default {
         },
         disabled: Boolean,
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
+        filterable: Boolean,
     },
     data() {
         return {
@@ -114,6 +120,12 @@ export default {
                 vm.model = vm.getModel();
             });
         },
+        filter(node, keyword) {
+            let data = node.data;
+            return !keyword || window.tnx.util.string.matchesForEach(data[this.valueName], keyword)
+                || window.tnx.util.string.matchesForEach(data[this.textName], keyword)
+                || window.tnx.util.string.matchesForEach(data[this.indexName], keyword)
+        }
     }
 }
 </script>

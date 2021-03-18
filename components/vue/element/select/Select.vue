@@ -17,9 +17,13 @@
             {{ item[textName] }}
         </el-radio-button>
     </el-radio-group>
-    <el-select v-model="model" class="ignore-feedback" :placeholder="placeholder" :disabled="disabled" v-else>
+    <el-select v-model="model" class="ignore-feedback" :placeholder="placeholder" :disabled="disabled"
+        :filterable="filterable" :filter-method="filter" v-else>
         <el-option class="text-muted" :value="emptyValue" :label="emptyText" v-if="empty"/>
-        <el-option v-for="item in items" :key="item[valueName]" :value="item[valueName]" :label="item[textName]"/>
+        <template v-for="item in items">
+            <el-option :key="item[valueName]" :value="item[valueName]" :label="item[textName]"
+                v-if="!hiddenValues.contains(item[valueName])"/>
+        </template>
     </el-select>
 </template>
 
@@ -41,6 +45,10 @@ export default {
             type: String,
             default: 'text',
         },
+        indexName: {
+            type: String,
+            default: 'index',
+        },
         defaultValue: String,
         empty: {
             type: [Boolean, String],
@@ -53,10 +61,12 @@ export default {
         placeholder: String,
         disabled: Boolean,
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
+        filterable: Boolean,
     },
     data() {
         return {
             model: this.getModel(this.items),
+            hiddenValues: [],
         };
     },
     computed: {
@@ -128,6 +138,26 @@ export default {
                 }
             }
             return null;
+        },
+        filter(keyword) {
+            for (let item of this.items) {
+                let itemValue = item[this.valueName];
+                let hiddenIndex = this.hiddenValues.indexOf(itemValue);
+                if (this.matchesItem(item, keyword)) {
+                    if (hiddenIndex >= 0) { // 匹配且原本已隐藏的，则取消隐藏
+                        this.hiddenValues.splice(hiddenIndex, 1);
+                    }
+                } else {
+                    if (hiddenIndex < 0) { // 不匹配且原本未隐藏的，则进行隐藏
+                        this.hiddenValues.push(itemValue);
+                    }
+                }
+            }
+        },
+        matchesItem(item, keyword) {
+            return !keyword || window.tnx.util.string.matchesForEach(item[this.valueName], keyword)
+                || window.tnx.util.string.matchesForEach(item[this.textName], keyword)
+                || window.tnx.util.string.matchesForEach(item[this.indexName], keyword)
         }
     }
 }

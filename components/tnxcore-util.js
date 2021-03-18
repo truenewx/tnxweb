@@ -43,6 +43,13 @@ Object.assign(String.prototype, {
     contains(searchString) {
         return this.indexOf(searchString) >= 0;
     },
+    toCharArray() {
+        let array = [];
+        for (let i = 0; i < this.length; i++) {
+            array.push(this.charAt(i));
+        }
+        return array;
+    }
 });
 
 Object.assign(Date.prototype, {
@@ -344,6 +351,23 @@ export const StringUtil = {
             male: male === '1',
             serialNo: idCardNo
         };
+    },
+    matchesForEach(content, keyword) {
+        if (!content) { // 搜索内容为空，则无法匹配
+            return false;
+        }
+        if (!keyword) { // 搜索关键字为空，则全部匹配
+            return true;
+        }
+        let index = 0;
+        for (let c of keyword.toCharArray()) {
+            index = content.indexOf(c, index);
+            if (index < 0) { // 搜索关键字中有一个字符未被包含在内容中，则不匹配
+                return false;
+            }
+        }
+        // 遍历后没有不匹配的字符，则说明整理匹配
+        return true;
     }
 }
 
