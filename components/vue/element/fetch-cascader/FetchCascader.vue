@@ -45,6 +45,12 @@ export default {
         },
         disabled: Boolean,
         change: Function, // 选中值变化后的事件处理函数，由于比element的change事件传递更多参数，所以以prop的形式指定，以尽量节省性能
+        transferItems: {
+            type: Function,
+            default: function(items) {
+                return items;
+            }
+        },
         filterable: Boolean,
     },
     data() {
@@ -115,8 +121,7 @@ export default {
         load() {
             let vm = this;
             window.tnx.app.rpc.get(this.url, this.params, function(result) {
-                vm.items = result;
-
+                vm.items = vm.transferItems(result);
                 vm.model = vm.getModel();
             });
         },

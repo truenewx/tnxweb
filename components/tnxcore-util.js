@@ -353,11 +353,14 @@ export const StringUtil = {
         };
     },
     matchesForEach(content, keyword) {
-        if (!content) { // 搜索内容为空，则无法匹配
-            return false;
-        }
         if (!keyword) { // 搜索关键字为空，则全部匹配
             return true;
+        }
+        if (content !== undefined && content !== null) {
+            content += '';
+        }
+        if (!content) { // 搜索内容为空，则无法匹配
+            return false;
         }
         let index = 0;
         for (let c of keyword.toCharArray()) {
