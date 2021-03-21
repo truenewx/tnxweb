@@ -95,10 +95,7 @@ el-header a img,
 
 .el-form--label-top .el-form-item__label {
     padding-bottom: 0;
-}
-
-.el-dialog__body .el-form--label-top .el-form-item__label:first-child {
-    margin-top: -1rem;
+    line-height: 2rem;
 }
 
 .el-form--label-top .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
@@ -173,15 +170,18 @@ el-header a img,
     display: none;
 }
 
-.el-form-item__error {
-    position: unset;
-    margin-top: 4px;
+.el-form-item__error--inline {
+    margin: 2px 0;
+    padding-top: 0;
 }
 
-.el-form-item__error--inline {
-    margin-top: 4px;
-    margin-bottom: 4px;
-    padding-top: 0;
+.el-col-24 + .el-form-item__error--inline {
+    position: absolute;
+    top: 100%;
+}
+
+:not(.el-col-24) + .el-form-item__error--inline {
+    margin-left: 10px;
 }
 
 .el-form-item__content {
