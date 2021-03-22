@@ -2,8 +2,8 @@
     <div class="tnxel-tag-select">
         <el-input prefix-icon="el-icon-search" :placeholder="'可输入' + keywordCaption + '进行筛选'"
             :clearable="true" v-model="keyword" v-if="paged"/>
-        <div class="tnxel-tag-group" v-if="tags">
-            <el-tag v-for="tag in tags" :key="tag.key" :type="type" :size="tagSize"
+        <div class="tnxel-tag-group d-flex flex-wrap" v-if="tags">
+            <el-tag v-for="tag in tags" :key="tag.key" :type="theme" :size="tagSize"
                 :effect="isSelected(tag.key) ? 'dark' : 'plain'" @click="select(tag.key)">
                 {{ tag.text }}
             </el-tag>
@@ -32,9 +32,12 @@ export default {
             }
         },
         type: String,
+        subtype: String,
+        theme: String,
         tagSize: String,
         items: [Array, String],
         pageSize: Number,
+        click: Function,
         keyName: {
             type: String,
             default: 'key',
@@ -87,7 +90,15 @@ export default {
         },
     },
     created() {
-        this.query();
+        let vm = this;
+        if (vm.type && typeof vm.type === 'string') { // 如果传了type则优先加载枚举
+            window.tnx.app.rpc.loadEnumItems(vm.type, vm.subtype, function(items) {
+                vm.textName = "caption";
+                vm.toTags(items);
+            });
+        } else {
+            this.query();
+        }
     },
     methods: {
         query(pageNo) {
@@ -127,12 +138,15 @@ export default {
             return this.selectedKeys.contains(key);
         },
         select(key) {
-            const selectedKeyIndex = this.selectedKeys.indexOf(key);
-            if (selectedKeyIndex >= 0) {
-                this.selectedKeys.splice(selectedKeyIndex, 1);
-            } else {
-                this.selectedKeys.push(key);
+            if (!this.click || this.click(key)) {
+                const selectedKeyIndex = this.selectedKeys.indexOf(key);
+                if (selectedKeyIndex >= 0) {
+                    this.selectedKeys.splice(selectedKeyIndex, 1);
+                } else {
+                    this.selectedKeys.push(key);
+                }
             }
+
         },
         getSelectedKeys() {
             return this.selectedKeys;
