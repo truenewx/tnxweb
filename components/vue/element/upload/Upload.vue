@@ -324,8 +324,10 @@ export default {
             const fileId = this.getFileId(file);
             const $listItem = $('.el-upload-list__panel[data-file-id="' + fileId + '"]', $container).parent();
             let uploadStyle = $upload.attr('style');
-            uploadStyle = uploadStyle.replace(/display:\s*none;/, ''); // 去掉隐藏样式
-            $listItem.attr('style', uploadStyle);
+            if (uploadStyle) {
+                uploadStyle = uploadStyle.replace(/display:\s*none;/, ''); // 去掉隐藏样式
+                $listItem.attr('style', uploadStyle);
+            }
             if (typeof this.width === 'string' && this.width.endsWith('%')) {
                 $listItem.parent().css({width: '100%'});
             }
