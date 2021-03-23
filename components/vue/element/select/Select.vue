@@ -64,8 +64,12 @@ export default {
         filterable: Boolean,
     },
     data() {
+        let model = this.getModel(this.items);
+        if (model !== this.value) {
+            this.$emit('input', model);
+        }
         return {
-            model: this.getModel(this.items),
+            model: model,
             hiddenValues: [],
         };
     },
