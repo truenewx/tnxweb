@@ -22,6 +22,7 @@ export default {
             type: Array,
             required: true,
         },
+        base: [String, Object],
         space: [String, Number],
     },
     data() {
@@ -45,9 +46,9 @@ export default {
             this.activeIndex = index;
             let top = 0;
             if (index >= 0) {
-                let top0 = $('#' + this.items[0].target).offset().top;
+                let $base = this.base ? $(this.base) : $('#' + this.items[0].target);
                 let $target = $('#' + this.items[index].target);
-                top = $target.offset().top - top0 + this.topOffset;
+                top = $target.offset().top - $base.offset().top + this.topOffset;
             }
             $(this.container).scrollTop(top);
         },
