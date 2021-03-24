@@ -474,9 +474,7 @@ export const DateUtil = {
                 if (this.years > 0) {
                     s += this.years + '年';
                 }
-                if (this.months > 0) {
-                    s += this.months + '个月';
-                }
+                s += this.months + '个月';
                 return s;
             },
             toString: function() {
