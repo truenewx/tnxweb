@@ -40,7 +40,7 @@
 import $ from 'jquery';
 
 export default {
-    name: 'TnxelUpload',
+    name: 'TnxelFssUpload',
     props: {
         value: [String, Array],
         type: {
