@@ -27,6 +27,15 @@ function applyItemsToRoutes(superiorPath, items, routes, fnImportPage) {
     }
 }
 
+function instantiatePath(path, params) {
+    if (path && path.contains('/:') && params) {
+        Object.keys(params).forEach(key => {
+            path = path.replaceAll('/:' + key + '/', '/' + params[key] + '/');
+        });
+    }
+    return path;
+}
+
 export default function(VueRouter, menu, fnImportPage) {
     let items;
     if (Array.isArray(menu)) {
@@ -51,18 +60,19 @@ export default function(VueRouter, menu, fnImportPage) {
     });
     router.back = FunctionUtil.around(router.back, function(back, path) {
         let route = router.app.$route;
-        path = path || route.meta.superiorPath;
-        if (path) {
-            if (path.contains('/:') && route.params) {
-                Object.keys(route.params).forEach(key => {
-                    path = path.replaceAll('/:' + key + '/', '/' + route.params[key] + '/');
-                });
-            }
-            if (!path.contains('/:') && router.prev && router.prev.path !== path) {
-                router.replace(path);
-                return;
-            }
+        // 如果上一页路径为指定路径或上级菜单路径，则直接返回上一页
+        if (router.prev && (router.prev.path === path || router.prev.path === route.meta.superiorPath)) {
+            back.call(router);
+            return;
         }
+        // 否则替换到上级菜单页面
+        path = path || route.meta.superiorPath;
+        path = instantiatePath(path, route.params);
+        if (path) {
+            router.replace(path);
+            return;
+        }
+        // 直接返回上一页作为兜底
         back.call(router);
     });
     return router;
