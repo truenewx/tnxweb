@@ -8,7 +8,6 @@ import dialog from './dialog';
 import $ from 'jquery';
 
 import Alert from './alert';
-import Upload from './upload';
 import PermissionTree from './permission-tree';
 import QueryForm from './query-form';
 import SubmitForm from './submit-form';
@@ -26,12 +25,13 @@ import InputNumber from './input-number';
 import StepsNav from './steps-nav';
 import DatePicker from './date-picker';
 import DateRange from './date-range';
+import FssUpload from './fss-upload';
 import FssView from './fss-view';
 import Curd from './curd';
 
 const components = Object.assign({}, tnxvue.components, {
     Alert,
-    Upload,
+    FssUpload,
     PermissionTree,
     QueryForm,
     SubmitForm,
