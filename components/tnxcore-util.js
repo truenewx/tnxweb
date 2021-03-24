@@ -469,14 +469,24 @@ export const DateUtil = {
             years,
             months,
             days,
+            toMonthString() {
+                let s = '';
+                if (this.years > 0) {
+                    s += this.years + '年';
+                }
+                if (this.months > 0) {
+                    s += this.months + '个月';
+                }
+                return s;
+            },
             toString: function() {
                 let s = '';
                 if (this.years > 0) {
                     s += this.years + '年';
                 }
                 if (this.months > 0) {
-                    s += this.months + '月';
-                } else if (this.years > 0 && this.day > 0) {
+                    s += this.months + '个月';
+                } else if (this.years > 0 && this.days > 0) {
                     s += '零';
                 }
                 if (this.days > 0) {
