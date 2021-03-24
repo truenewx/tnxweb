@@ -497,7 +497,7 @@ export const DateUtil = {
             if (!isNaN(months)) {
                 let year = Math.floor(months / 12);
                 let month = months % 12;
-                return (year >= 1 ? year + '年' : '') + month + '月';
+                return (year >= 1 ? year + '年' : '') + month + '个月';
             }
         }
         return undefined;
