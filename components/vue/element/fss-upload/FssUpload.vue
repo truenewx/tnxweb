@@ -1,7 +1,7 @@
 <template>
     <el-upload ref="upload" class="d-none"
         :id="id"
-        name="files"
+        name="file"
         :action="action"
         :before-upload="beforeUpload"
         :on-progress="onProgress"
@@ -10,7 +10,6 @@
         :with-credentials="true"
         list-type="picture-card"
         :file-list="fileList"
-        :data="uploadParams"
         :headers="uploadHeaders"
         :multiple="uploadLimit.number > 1"
         :accept="uploadAccept">
@@ -77,9 +76,6 @@ export default {
                 capacity: '单个文件不能超过{0}',
                 extensions: '只能上传{0}文件',
                 excludedExtensions: '不能上传{0}文件',
-            },
-            uploadParams: {
-                fileIds: []
             },
             uploadHeaders: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -333,9 +329,8 @@ export default {
             }
             $listItem.parent().css({'min-height': $upload.outerHeight(true)});
         },
-        onSuccess: function(uploadedFiles, file, fileList) {
-            if (Array.isArray(uploadedFiles) && uploadedFiles.length) {
-                const uploadedFile = uploadedFiles[0]; // 该组件为一次只上传一个文件的上传模式
+        onSuccess: function(uploadedFile, file, fileList) {
+            if (uploadedFile) {
                 file.storageUrl = uploadedFile.storageUrl;
                 this.emitInput();
             }
