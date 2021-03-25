@@ -11,11 +11,11 @@
         list-type="picture-card"
         :file-list="fileList"
         :headers="uploadHeaders"
-        :multiple="uploadLimit.number > 1"
-        :accept="uploadAccept" v-if="uploadLimit">
+        :multiple="uploadLimit ? uploadLimit.number > 1 : false"
+        :accept="uploadAccept">
         <i slot="default" class="el-icon-plus"></i>
         <div slot="file" slot-scope="{file}" class="el-upload-list__panel" :data-file-id="getFileId(file)">
-            <img class="el-upload-list__item-thumbnail" :src="file.url" v-if="uploadLimit.imageable">
+            <img class="el-upload-list__item-thumbnail" :src="file.url" v-if="uploadLimit && uploadLimit.imageable">
             <div v-else>
                 <i class="el-icon-document"></i> {{ file.name }}
             </div>
@@ -23,7 +23,8 @@
                 <i class="el-icon-upload-success el-icon-check"></i>
             </label>
             <span class="el-upload-list__item-actions">
-                <span class="el-upload-list__item-preview" @click="previewFile(file)" v-if="uploadLimit.imageable">
+                <span class="el-upload-list__item-preview" @click="previewFile(file)"
+                    v-if="uploadLimit && uploadLimit.imageable">
                     <i class="el-icon-zoom-in"></i>
                 </span>
                 <span class="el-upload-list__item-delete" @click="removeFile(file)" v-if="!readOnly">
@@ -63,6 +64,12 @@ export default {
         },
         onSuccess: Function,
         onRemoved: Function,
+        handleErrors: {
+            type: Function,
+            default: function(errors) {
+                window.tnx.app.rpc.handleErrors(errors);
+            }
+        }
     },
     data() {
         const tnx = window.tnx;
@@ -125,21 +132,23 @@ export default {
         },
     },
     watch: {
-        uploadLimit(uploadLimit) {
+        uploadLimit() {
             const $container = $('#' + this.id);
             // 初始化显示尺寸
             let width = this.width;
             let height = this.height;
             let uploadSize = undefined;
-            if (uploadLimit.sizes && uploadLimit.sizes.length) {
-                uploadSize = uploadLimit.sizes[0];
+            if (this.uploadLimit.sizes && this.uploadLimit.sizes.length) {
+                uploadSize = this.uploadLimit.sizes[0];
             }
             if (uploadSize) {
                 width = width || uploadSize.width;
                 height = height || uploadSize.height;
             }
             width = width || 128;
-            height = height || (uploadLimit.imageable ? 128 : 40);
+            height = height || (this.uploadLimit.imageable ? 128 : 40);
+            let plusSize = Math.floor(Math.min(width, height) / 3);
+            plusSize = Math.max(16, Math.min(plusSize, 32));
 
             width = window.tnx.util.string.getPixelString(width);
             height = window.tnx.util.string.getPixelString(height);
@@ -149,8 +158,6 @@ export default {
                 height: height,
             });
 
-            let plusSize = Math.min($upload.width(), height) / 4;
-            plusSize = Math.max(16, Math.min(plusSize, 32)) || 16;
             $('.el-icon-plus', $upload).css({
                 fontSize: plusSize + 'px'
             });
@@ -281,7 +288,7 @@ export default {
         onError: function(error, file, fileList) {
             let message = JSON.parse(error.message);
             if (message && message.errors) {
-                this.tnx.app.rpc.handleErrors(message.errors);
+                this.handleErrors(message.errors);
             } else {
                 console.error(error.message);
             }
@@ -338,49 +345,3 @@ export default {
     }
 }
 </script>
-
-<style>
-.el-upload {
-    border-radius: .25rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-}
-
-.el-upload-list--picture-card {
-    display: inline-flex;
-    align-items: center;
-    max-width: 100%;
-}
-
-.el-upload-list--picture-card .el-upload-list__item {
-    width: 1rem;
-    height: 1rem;
-    transition: none;
-    border-radius: 4px;
-}
-
-.el-upload-list__panel {
-    width: 100%;
-    height: 100%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.el-upload-list--picture-card .el-upload-list__item-thumbnail {
-    object-fit: contain;
-}
-
-.el-upload-list--picture-card .el-upload-list__item-actions {
-    font-size: 1rem;
-}
-
-.el-form-item__content .el-upload__tip {
-    line-height: 1;
-    margin-top: 0;
-}
-
-</style>
