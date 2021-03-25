@@ -25,13 +25,13 @@ import InputNumber from './input-number';
 import StepsNav from './steps-nav';
 import DatePicker from './date-picker';
 import DateRange from './date-range';
+import Upload from './upload';
 import FssUpload from './fss-upload';
 import FssView from './fss-view';
 import Curd from './curd';
 
 const components = Object.assign({}, tnxvue.components, {
     Alert,
-    FssUpload,
     PermissionTree,
     QueryForm,
     SubmitForm,
@@ -49,6 +49,8 @@ const components = Object.assign({}, tnxvue.components, {
     StepsNav,
     DatePicker,
     DateRange,
+    Upload,
+    FssUpload,
     FssView,
     Curd,
 });
@@ -185,6 +187,33 @@ const tnxel = Object.assign({}, tnxvue, {
             window.tnx.loadingInstance = undefined;
         }
     },
+    validateUploaded(vm, reject) {
+        let result = true;
+        let formRef = null;
+        let refKeys = Object.keys(vm.$refs);
+        for (let refKey of refKeys) {
+            let refObj = vm.$refs[refKey];
+            if (Array.isArray(refObj)) {
+                for (let ref of refObj) {
+                    if (typeof ref.validateUploaded === 'function') {
+                        if (!ref.validateUploaded(reject)) {
+                            result = false;
+                        }
+                    }
+                }
+            } else if (refObj.$el.tagName === 'FORM' && typeof refObj.disable === 'function') {
+                formRef = refObj;
+            } else {
+                if (typeof refObj.validateUploaded === 'function') {
+                    result = refObj.validateUploaded(reject);
+                }
+            }
+        }
+        if (!result && formRef) {
+            formRef.disable(false);
+        }
+        return result;
+    }
 });
 
 tnxel.date = {
