@@ -5,7 +5,7 @@
         :action="action"
         :before-upload="beforeUpload"
         :on-progress="onProgress"
-        :on-success="onSuccess"
+        :on-success="_onSuccess"
         :on-error="onError"
         :with-credentials="true"
         list-type="picture-card"
@@ -22,6 +22,9 @@
             <label class="el-upload-list__item-status-label">
                 <i class="el-icon-upload-success el-icon-check"></i>
             </label>
+            <span class="el-upload-list__item-uploading" v-if="file.uploading">
+                <i class="el-icon-loading"></i>
+            </span>
             <span class="el-upload-list__item-actions">
                 <span class="el-upload-list__item-preview" @click="previewFile(file)"
                     v-if="uploadLimit && uploadLimit.imageable">
@@ -264,6 +267,7 @@ export default {
             });
         },
         onProgress: function(event, file, fileList) {
+            file.uploading = true;
             this._resizeFilePanel(file, fileList);
         },
         _resizeFilePanel: function(file, fileList) {
@@ -285,7 +289,14 @@ export default {
             }
             $listItem.parent().css({'min-height': $upload.outerHeight(true)});
         },
+        _onSuccess: function(uploadedFile, file, fileList) {
+            file.uploading = false;
+            if (this.onSuccess) {
+                this.onSuccess(uploadedFile, file, fileList);
+            }
+        },
         onError: function(error, file, fileList) {
+            $('#' + this.id + ' .el-upload').show();
             let message = JSON.parse(error.message);
             if (message && message.errors) {
                 this.handleErrors(message.errors);
