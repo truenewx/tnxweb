@@ -136,6 +136,11 @@ export default {
     },
     watch: {
         uploadLimit() {
+            this.render();
+        }
+    },
+    methods: {
+        render() {
             const $container = $('#' + this.id);
             // 初始化显示尺寸
             let width = this.width;
@@ -171,9 +176,7 @@ export default {
                     this._resizeFilePanel(file, this.fileList);
                 }
             }
-        }
-    },
-    methods: {
+        },
         getFileId: function(file) {
             if (!file.id) {
                 if (file.url) { // 有URL的文件通过URL即可唯一确定
