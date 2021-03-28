@@ -392,6 +392,10 @@ el-button {
     border-right-color: #EBEEF5;
 }
 
+span.el-tooltip {
+    cursor: default;
+}
+
 .el-dropdown-menu__item .el-avatar--icon i {
     margin: 0;
 }
@@ -560,4 +564,12 @@ el-button {
 .el-form-item__content .el-upload__tip {
     line-height: 1;
     margin-top: 0;
+}
+
+/**
+ * 页签中的图标显示在文本后
+ */
+.el-tabs__item .el-badge__content.is-fixed {
+    position: unset;
+    transform: translateY(20%) translateX(25%);
 }
