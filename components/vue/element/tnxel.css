@@ -575,5 +575,5 @@ span.el-tooltip {
 }
 
 .el-table__row .is-center .cell .w-fit-content {
-    width: auto;
+    width: auto !important;
 }
