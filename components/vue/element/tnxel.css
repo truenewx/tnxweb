@@ -571,5 +571,9 @@ span.el-tooltip {
  */
 .el-tabs__item .el-badge__content.is-fixed {
     position: unset;
-    transform: translateY(20%) translateX(25%);
+    transform: translateY(6px) translateX(8px);
+}
+
+.el-table__row .is-center .cell .w-fit-content {
+    width: auto;
 }
