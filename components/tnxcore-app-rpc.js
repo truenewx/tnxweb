@@ -194,9 +194,7 @@ export default {
                         break;
                     }
                     case 500: {
-                        _this.handleErrors({
-                            message: '非常抱歉，服务器出现了错误。不过放心，一切还在掌控之中...'
-                        }, options);
+                        _this.handle500Error(response.data.message, options);
                         break;
                     }
                 }
@@ -238,6 +236,12 @@ export default {
      */
     toLogin(loginFormUrl, originalUrl, originalMethod) {
         return false;
+    },
+    handle500Error(message, options) {
+        console.error(message);
+        this.handleErrors([{
+            message: '非常抱歉，服务器出现了错误。不过放心，一切还在掌控之中...'
+        }], options);
     },
     handleErrors(errors, options) {
         if (errors) {

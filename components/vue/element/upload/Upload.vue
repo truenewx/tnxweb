@@ -301,11 +301,18 @@ export default {
         onError: function(error, file, fileList) {
             $('#' + this.id + ' .el-upload').show();
             let message = JSON.parse(error.message);
-            if (message && message.errors) {
-                this.handleErrors(message.errors);
-            } else {
-                console.error(error.message);
+            if (message) {
+                if (message.status === 500) {
+                    this.tnx.app.rpc.handle500Error(message.message, {
+                        error: this.handleErrors
+                    });
+                    return;
+                } else if (message.errors) {
+                    this.handleErrors(message.errors);
+                    return;
+                }
             }
+            console.error(error.message);
         },
         removeFile: function(file) {
             this.uploadFiles.remove(function(f) {
