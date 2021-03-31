@@ -218,19 +218,34 @@ const tnxel = Object.assign({}, tnxvue, {
 
 tnxel.date = {
     formatDateTime: function(row, column, cellValue) {
-        return new Date(cellValue).formatDateTime();
+        if (cellValue) {
+            return new Date(cellValue).formatDateTime();
+        }
+        return undefined;
     },
     formatDate: function(row, column, cellValue) {
-        return new Date(cellValue).formatDate();
+        if (cellValue) {
+            return new Date(cellValue).formatDate();
+        }
+        return undefined;
     },
     formatTime: function(row, column, cellValue) {
-        return new Date(cellValue).formatTime();
+        if (cellValue) {
+            return new Date(cellValue).formatTime();
+        }
+        return undefined;
     },
     formatMinute: function(row, column, cellValue) {
-        return new Date(cellValue).formatMinute();
+        if (cellValue) {
+            return new Date(cellValue).formatMinute();
+        }
+        return undefined;
     },
     formatMonth: function(row, column, cellValue) {
-        return new Date(cellValue).formatMonth();
+        if (cellValue) {
+            return new Date(cellValue).formatMonth();
+        }
+        return undefined;
     }
 };
 
