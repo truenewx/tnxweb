@@ -48,6 +48,10 @@
     color: #ffffff;
 }
 
+.bg-success-light {
+    background-color: #F0F9EB !important;
+}
+
 .border-success,
 .theme-success .el-checkbox__input.is-focus .el-checkbox__inner,
 .theme-success .el-input__inner:focus {
@@ -78,6 +82,10 @@
     color: #ffffff;
 }
 
+.bg-warning-light {
+    background-color: #FDF6EC !important;
+}
+
 .border-warning,
 .theme-warning .el-checkbox__input.is-focus .el-checkbox__inner,
 .theme-warning .el-input__inner:focus {
@@ -106,6 +114,10 @@
 .bg-danger {
     background-color: #F56C6C !important;
     color: #ffffff;
+}
+
+.bg-danger-light {
+    background-color: #FEF0F0 !important;
 }
 
 .border-danger,
