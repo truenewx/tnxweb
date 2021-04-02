@@ -196,8 +196,9 @@ const tnxel = Object.assign({}, tnxvue, {
             if (Array.isArray(refObj)) {
                 for (let ref of refObj) {
                     if (typeof ref.validateUploaded === 'function') {
-                        if (!ref.validateUploaded(reject)) {
+                        if (ref.validateUploaded(reject) === false) {
                             result = false;
+                            break;
                         }
                     }
                 }
@@ -205,7 +206,10 @@ const tnxel = Object.assign({}, tnxvue, {
                 formRef = refObj;
             } else {
                 if (typeof refObj.validateUploaded === 'function') {
-                    result = refObj.validateUploaded(reject);
+                    if (refObj.validateUploaded(reject) === false) {
+                        result = false;
+                        break;
+                    }
                 }
             }
         }
