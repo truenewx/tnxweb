@@ -319,16 +319,20 @@ export default {
             key = subtype;
             subtype = undefined;
         }
-        const mappingKey = subtype ? (type + '-' + subtype) : type;
-        let items = this._enumItemsMapping[mappingKey];
-        let caption = this._getEnumCaption(items, key);
-        if (caption) {
-            callback(caption);
+        if (key === undefined || key === null) {
+            callback('');
         } else {
-            let _this = this;
-            this.loadEnumItems(type, function(items) {
-                callback(_this._getEnumCaption(items, key));
-            });
+            const mappingKey = subtype ? (type + '-' + subtype) : type;
+            let items = this._enumItemsMapping[mappingKey];
+            let caption = this._getEnumCaption(items, key);
+            if (caption) {
+                callback(caption);
+            } else {
+                let _this = this;
+                this.loadEnumItems(type, function(items) {
+                    callback(_this._getEnumCaption(items, key));
+                });
+            }
         }
     },
     _getEnumCaption(items, key) {
