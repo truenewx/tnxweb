@@ -297,24 +297,30 @@ export default {
             subtype = undefined;
         }
         const mapping = this._enumItemsMapping;
-        const key = subtype ? (type + '-' + subtype) : type;
-        if (mapping[key]) {
+        const mappingKey = subtype ? (type + '-' + subtype) : type;
+        if (mapping[mappingKey]) {
             if (typeof callback === 'function') {
-                callback(mapping[key]);
+                callback(mapping[mappingKey]);
             }
         } else {
             this.get('/api/meta/enums', {
                 type, subtype
             }, function(items) {
-                mapping[key] = items;
+                mapping[mappingKey] = items;
                 if (typeof callback === 'function') {
                     callback(items);
                 }
             });
         }
     },
-    resolveEnumCaption(type, key, callback) {
-        let items = this._enumItemsMapping[type];
+    resolveEnumCaption(type, subtype, key, callback) {
+        if (typeof key === 'function') {
+            callback = key;
+            key = subtype;
+            subtype = undefined;
+        }
+        const mappingKey = subtype ? (type + '-' + subtype) : type;
+        let items = this._enumItemsMapping[mappingKey];
         let caption = this._getEnumCaption(items, key);
         if (caption) {
             callback(caption);

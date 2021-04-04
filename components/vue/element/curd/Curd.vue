@@ -1,7 +1,7 @@
 <template>
     <el-col :span="span">
         <el-button :type="btnType" :icon="btnIcon" @click="toAdd" v-if="addable">{{ addText }}</el-button>
-        <el-table :data="data" border stripe v-if="showEmpty || (list && list.length)">
+        <el-table :data="list" border stripe v-if="showEmpty || (list && list.length)">
             <slot></slot>
             <el-table-column label="操作" header-align="center" align="center" width="100px"
                 v-if="updatable || removeable">
@@ -74,27 +74,24 @@ export default {
             list: this.value,
         }
     },
-    computed: {
-        data() {
-            if (this.formatter && this.list && this.list.length) {
-                let data = [];
-                for (let model of this.list) {
-                    data.push(this.formatter(model));
-                }
-                return data;
-            }
-            return this.list;
-        }
-    },
     watch: {
-        list(value) {
-            this.$emit('input', value);
+        list() {
+            this.format();
+            this.$emit('input', this.list);
         },
         value(value) {
             this.list = value;
+            this.format();
         }
     },
     methods: {
+        format() {
+            if (this.formatter && this.list && this.list.length) {
+                for (let i = 0; i < this.list.length; i++) {
+                    this.list[i] = this.formatter(this.list[i]);
+                }
+            }
+        },
         toAdd() {
             let vm = this;
             window.tnx.open(this.page, this.pageProps, {
