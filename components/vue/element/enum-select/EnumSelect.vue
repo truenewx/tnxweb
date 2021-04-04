@@ -60,8 +60,10 @@ export default {
             this.$emit('input', value);
         },
         value(value) {
-            this.model = this.value;
-            this.initModel();
+            if (this.model !== value) {
+                this.model = value;
+                this.initModel();
+            }
         }
     },
     created() {
