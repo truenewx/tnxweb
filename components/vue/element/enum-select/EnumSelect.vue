@@ -60,10 +60,8 @@ export default {
             this.$emit('input', value);
         },
         value(value) {
-            if (this.model !== value) {
-                this.model = value;
-                this.initModel();
-            }
+            this.model = value;
+            this.initModel();
         }
     },
     created() {
@@ -88,7 +86,7 @@ export default {
     },
     methods: {
         initModel() {
-            if (!this.model && !this.empty && this.items && this.items.length) {
+            if ((this.model === undefined || this.model === null) && !this.empty && this.items && this.items.length) {
                 this.model = this.items[0].key;
             }
         }
