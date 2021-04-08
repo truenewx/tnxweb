@@ -66,6 +66,11 @@ el-header a img,
     right: 24px;
 }
 
+.el-table .cell .el-badge__content.is-dot {
+    top: 2px;
+    left: 3px;
+}
+
 .el-divider__text, .el-link {
     font-weight: unset;
     font-size: unset;
