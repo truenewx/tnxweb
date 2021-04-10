@@ -49,6 +49,13 @@ Object.assign(String.prototype, {
             array.push(this.charAt(i));
         }
         return array;
+    },
+    // 部分浏览器没有这个方法支持
+    replaceAll(regex, replcement) {
+        if (typeof regex === 'string') {
+            regex = new RegExp(regex, "gm");
+        }
+        return this.replace(regex, replcement);
     }
 });
 
