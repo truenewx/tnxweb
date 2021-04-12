@@ -240,7 +240,7 @@ export default {
     handle500Error(message, options) {
         console.error(message);
         this.handleErrors([{
-            message: '非常抱歉，服务器出现了错误。不过放心，一切还在掌控之中...'
+            message: '哎呀，非常抱歉服务器出了点小小的错误，这并不影响你的其它操作，我们会尽快修正这个错误。'
         }], options);
     },
     handleErrors(errors, options) {
