@@ -36,7 +36,7 @@ Object.assign(String.prototype, {
         }
         let s = this;
         for (let i = 0; i < args.length; i++) {
-            s = s.replaceAll('{' + i + '}', args[i]);
+            s = s.replace('{' + i + '}', args[i]);
         }
         return s;
     },
