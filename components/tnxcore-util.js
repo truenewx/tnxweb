@@ -533,6 +533,56 @@ export const NetUtil = {
         }
         return undefined;
     },
+    getParameterString() {
+        let href = window.location.href;
+        let index = href.indexOf('?');
+        if (index >= 0) {
+            let parameterString = href.substr(index + 1);
+            index = parameterString.indexOf('#');
+            if (index >= 0) {
+                parameterString = parameterString.substr(0, index);
+            }
+            return parameterString;
+        }
+        return '';
+    },
+    getParameters() {
+        let params = {};
+        let parameterString = this.getParameterString();
+        if (parameterString) {
+            let array = parameterString.split('&');
+            for (let parameter of array) {
+                let index = parameter.indexOf('=');
+                if (index > 0) {
+                    let paramName = parameter.substr(0, index);
+                    let paramValue = parameter.substr(index + 1);
+                    if (params[paramName]) {
+                        params[paramName] = [params[paramName]];
+                        params[paramName].push(paramValue);
+                    } else {
+                        params[paramName] = paramValue;
+                    }
+                }
+            }
+        }
+        return params;
+    },
+    getParamValue(name) {
+        let parameterString = this.getParameterString();
+        if (parameterString) {
+            let array = parameterString.split('&');
+            for (let parameter of array) {
+                let index = parameter.indexOf('=');
+                if (index > 0) {
+                    let paramName = parameter.substr(0, index);
+                    if (paramName === name) {
+                        return parameter.substr(index + 1);
+                    }
+                }
+            }
+        }
+        return undefined;
+    },
     /**
      * 将指定对象中的所有字段拼凑成形如a=a1&b=b1的字符串
      * @param object 对象

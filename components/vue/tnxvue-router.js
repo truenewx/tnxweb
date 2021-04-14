@@ -56,7 +56,12 @@ export default function(VueRouter, menu, fnImportPage) {
         next();
     });
     router.afterEach((to, from) => {
-        router.prev = from;
+        // 前后路径相同，但全路径不同（意味着参数不同），则需要刷新页面，否则页面不会刷新
+        if (to.path === from.path && to.fullPath !== from.fullPath) {
+            window.location.reload();
+        } else {
+            router.prev = from;
+        }
     });
     router.back = FunctionUtil.around(router.back, function(back, path) {
         let route = router.app.$route;

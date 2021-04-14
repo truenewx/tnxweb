@@ -48,9 +48,16 @@ export default {
             if (Object.keys(this.value).length) {
                 this.$emit('input', {});
                 if (this.clear) {
-                    this.clear();
+                    if (this.clear() === false) {
+                        return;
+                    }
                 }
-                this.toQuery();
+                let parameters = window.tnx.util.net.getParameters();
+                if (Object.keys(parameters).length) {
+                    this.$router.replace(this.$route.path);
+                } else {
+                    this.toQuery();
+                }
             }
         }
     }
