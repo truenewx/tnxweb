@@ -70,3 +70,7 @@ ul {
 span.nowrap {
     white-space: nowrap;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
