@@ -221,7 +221,7 @@ Object.assign(tnxvue.app.page, {
             for (let fieldName of fieldNames) {
                 if (!validFieldNames || !validFieldNames.length || validFieldNames.contains(fieldName)) {
                     if (fieldName.contains('__')) {
-                        let path = fieldName.replaceAll('__', '.');
+                        let path = fieldName.replace('__', '.');
                         tnxvue.util.object.setValue(result, path, model[fieldName]);
                     } else {
                         result[fieldName] = model[fieldName];

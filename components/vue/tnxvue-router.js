@@ -30,7 +30,7 @@ function applyItemsToRoutes(superiorPath, items, routes, fnImportPage) {
 function instantiatePath(path, params) {
     if (path && path.contains('/:') && params) {
         Object.keys(params).forEach(key => {
-            path = path.replaceAll('/:' + key + '/', '/' + params[key] + '/');
+            path = path.replace('/:' + key + '/', '/' + params[key] + '/');
         });
     }
     return path;

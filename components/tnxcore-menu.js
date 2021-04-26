@@ -39,7 +39,7 @@ function getDefaultPermission(path) {
         path += '/';
     }
     // 移除可能包含的路径变量
-    let permission = path.replaceAll(/\/:[^\/]+\//g, '/');
+    let permission = path.replace(/\/:[^\/]+\//g, '/');
     // 去掉许可头尾的/
     if (permission.startsWith('/')) {
         permission = permission.substr(1);
@@ -48,7 +48,7 @@ function getDefaultPermission(path) {
         permission = permission.substr(0, permission.length - 1);
     }
     // 许可所有中间的/替换为_
-    permission = permission.replaceAll(/\//g, '_');
+    permission = permission.replace(/\//g, '_');
     return permission;
 }
 
@@ -283,7 +283,7 @@ Menu.prototype.resolveItemPathParams = function(vm, item) {
             // 替换路径参数
             let params = vm.$route.params;
             Object.keys(params).forEach(key => {
-                path = path.replaceAll('/:' + key + '/', '/' + params[key] + '/');
+                path = path.replace('/:' + key + '/', '/' + params[key] + '/');
             });
             path = path.substr(0, path.length - 1); // 去掉末尾的/
         }
