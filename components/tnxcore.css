@@ -71,6 +71,11 @@ span.nowrap {
     white-space: nowrap;
 }
 
+[role="button"],
 .cursor-pointer {
     cursor: pointer;
+}
+
+.text-transparent {
+    color: transparent !important;
 }
