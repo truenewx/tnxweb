@@ -60,7 +60,7 @@ Object.assign(String.prototype, {
 });
 
 Object.assign(Date.prototype, {
-    format: function(pattern) {
+    format(pattern) {
         let date = {
             'M+': this.getMonth() + 1, // 月份
             'd+': this.getDate(), // 日
@@ -81,27 +81,27 @@ Object.assign(Date.prototype, {
         }
         return pattern;
     },
-    formatDateTime: function() {
+    formatDateTime() {
         return this.format(DateUtil.patterns.dateTime);
     },
-    formatDate: function() {
+    formatDate() {
         return this.format(DateUtil.patterns.date);
     },
-    formatTime: function() {
+    formatTime() {
         return this.format(DateUtil.patterns.time);
     },
-    formatMinute: function() {
+    formatMinute() {
         return this.format(DateUtil.patterns.minute);
     },
-    formatMonth: function() {
+    formatMonth() {
         return this.format(DateUtil.patterns.month);
     },
-    plusDays: function(days) {
+    plusDays(days) {
         let millis = this.getTime();
         millis += days * 24 * 60 * 60 * 1000;
         return new Date(millis);
     },
-    plusMonths: function(months) {
+    plusMonths(months) {
         let year = this.getFullYear();
         let month = this.getMonth();
         year += months / 12;
@@ -111,27 +111,10 @@ Object.assign(Date.prototype, {
         date.setMonth(month);
         return date;
     },
-    plusYears: function(years) {
+    plusYears(years) {
         let date = new Date(this);
         date.setFullYear(this.getFullYear() + years);
         return date;
-    }
-});
-
-Object.assign(Element.prototype, {
-    /**
-     * 获取不是指定标签的第一个子节点
-     * @param tagName 标签名
-     * @return ChildNode 不是指定标签的第一个子节点，没有则返回undefined
-     */
-    getFirstChildWithoutTagName(tagName) {
-        const children = this.childNodes;
-        for (let i = 0; i < children.length; i++) {
-            if (children[i].tagName && children[i].tagName !== tagName.toUpperCase()) {
-                return children[i];
-            }
-        }
-        return undefined;
     }
 });
 
@@ -187,7 +170,7 @@ Object.assign(Array.prototype, {
 });
 
 Object.assign(Boolean.prototype, {
-    toText: function() {
+    toText() {
         if (this === true) {
             return '是';
         } else if (this === false) {
@@ -197,8 +180,25 @@ Object.assign(Boolean.prototype, {
     }
 });
 
+Object.assign(Element.prototype, {
+    /**
+     * 获取不是指定标签的第一个子节点
+     * @param tagName 标签名
+     * @return ChildNode 不是指定标签的第一个子节点，没有则返回undefined
+     */
+    getFirstChildWithoutTagName(tagName) {
+        const children = this.childNodes;
+        for (let i = 0; i < children.length; i++) {
+            if (children[i].tagName && children[i].tagName !== tagName.toUpperCase()) {
+                return children[i];
+            }
+        }
+        return undefined;
+    }
+});
+
 export const ObjectUtil = {
-    toKeyValueArray: function(object, valueFunction) {
+    toKeyValueArray(object, valueFunction) {
         if (object) {
             let array = [];
             Object.keys(object).forEach(key => {
@@ -215,7 +215,7 @@ export const ObjectUtil = {
         }
         return undefined;
     },
-    setValue: function(obj, fieldPath, value) {
+    setValue(obj, fieldPath, value) {
         var names = fieldPath.split('.');
         for (let i = 0; i < names.length - 1; i++) {
             let name = names[i];
@@ -236,7 +236,7 @@ export const ObjectUtil = {
 }
 
 export const FunctionUtil = {
-    around: function(target, around) {
+    around(target, around) {
         const _this = this;
         return function() {
             const args = [target];
@@ -273,7 +273,7 @@ export const MathUtil = {
      * @param max 最大值
      * @returns {number} 随机整数值
      */
-    randomInt: function(min, max) {
+    randomInt(min, max) {
         if (min > max) { // 最小值如果大于最大值，则互换
             let temp = min;
             min = max;
@@ -290,7 +290,7 @@ export const MathUtil = {
 export const StringUtil = {
     toJson: JSON.stringify,
     parseJson: JSON.parse,
-    random: function(length, chars) {
+    random(length, chars) {
         if (length >= 0) {
             chars = chars || 'abcdefghijklmnopqrstuvwxyz'; // 默认取值范围为所有小写字母
             let s = '';
@@ -484,7 +484,7 @@ export const DateUtil = {
                 s += this.months + '个月';
                 return s;
             },
-            toString: function() {
+            toString() {
                 let s = '';
                 if (this.years > 0) {
                     s += this.years + '年';
@@ -588,7 +588,7 @@ export const NetUtil = {
      * @param object 对象
      * @returns {string} 拼凑成的字符串
      */
-    toParameterString: function(object) {
+    toParameterString(object) {
         let s = '';
         if (typeof object === 'object') {
             Object.keys(object).forEach(key => {
