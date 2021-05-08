@@ -1428,6 +1428,12 @@
     }
 }
 
+.clearfix::after {
+    display: block;
+    clear: both;
+    content: "";
+}
+
 .fixed-top {
     position: fixed;
     top: 0;
