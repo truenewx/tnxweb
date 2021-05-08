@@ -59,6 +59,14 @@ Object.assign(String.prototype, {
     }
 });
 
+export const DATE_PATTERNS = {
+    dateTime: 'yyyy-MM-dd HH:mm:ss',
+    date: 'yyyy-MM-dd',
+    time: 'HH:mm:ss',
+    minute: 'yyyy-MM-dd HH:mm',
+    month: 'yyyy-MM',
+}
+
 Object.assign(Date.prototype, {
     format(pattern) {
         let date = {
@@ -82,19 +90,19 @@ Object.assign(Date.prototype, {
         return pattern;
     },
     formatDateTime() {
-        return this.format(DateUtil.patterns.dateTime);
+        return this.format(DATE_PATTERNS.dateTime);
     },
     formatDate() {
-        return this.format(DateUtil.patterns.date);
+        return this.format(DATE_PATTERNS.date);
     },
     formatTime() {
-        return this.format(DateUtil.patterns.time);
+        return this.format(DATE_PATTERNS.time);
     },
     formatMinute() {
-        return this.format(DateUtil.patterns.minute);
+        return this.format(DATE_PATTERNS.minute);
     },
     formatMonth() {
-        return this.format(DateUtil.patterns.month);
+        return this.format(DATE_PATTERNS.month);
     },
     plusDays(days) {
         let millis = this.getTime();
@@ -382,13 +390,6 @@ export const StringUtil = {
 }
 
 export const DateUtil = {
-    patterns: {
-        dateTime: 'yyyy-MM-dd HH:mm:ss',
-        date: 'yyyy-MM-dd',
-        time: 'HH:mm:ss',
-        minute: 'yyyy-MM-dd HH:mm',
-        month: 'yyyy-MM',
-    },
     format(date, pattern) {
         if (typeof date === 'number') {
             date = new Date(date);
@@ -399,16 +400,16 @@ export const DateUtil = {
         return undefined;
     },
     formatDate(date) {
-        return this.format(date, this.patterns.date);
+        return this.format(date, DATE_PATTERNS.date);
     },
     formatTime(date) {
-        return this.format(date, this.patterns.time);
+        return this.format(date, DATE_PATTERNS.time);
     },
     formatDateTime(date) {
-        return this.format(date, this.patterns.dateTime);
+        return this.format(date, DATE_PATTERNS.dateTime);
     },
     formatMinute(date) {
-        return this.format(date, this.patterns.minute);
+        return this.format(date, DATE_PATTERNS.minute);
     },
     /**
      * 将指定yyyy-MM-dd型的日期转换为yyyy-MM的月份格式
