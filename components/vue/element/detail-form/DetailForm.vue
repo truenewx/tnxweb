@@ -2,8 +2,11 @@
     <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
         class="tnxel-detail-form" :class="formClass">
         <slot></slot>
-        <el-form-item class="w-100" v-if="back !== false">
-            <el-button :type="theme || 'default'" @click="toBack">{{ backText }}</el-button>
+        <el-form-item class="w-100" v-if="update !== false || back !== false">
+            <el-button :type="theme || 'primary'" icon="el-icon-edit" @click="toUpdate" v-if="update !== false">
+                {{ updateText }}
+            </el-button>
+            <el-button type="default" @click="toBack">{{ backText }}</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -19,6 +22,14 @@ export default {
             },
         },
         theme: String,
+        update: {
+            type: Function,
+            default: () => false
+        },
+        updateText: {
+            type: String,
+            default: () => '修改'
+        },
         back: {
             type: [String, Function, Boolean],
             default: () => true
@@ -52,6 +63,11 @@ export default {
         }
     },
     methods: {
+        toUpdate() { // 为了避免传递事件参数，不直接使用update()
+            if (this.update) {
+                this.update();
+            }
+        },
         toBack() {
             if (typeof this.back === 'function') {
                 this.back();
