@@ -3,7 +3,7 @@
         class="tnxel-detail-form" :class="formClass">
         <slot></slot>
         <el-form-item class="w-100" v-if="update !== false || back !== false">
-            <el-button :type="theme || 'primary'" icon="el-icon-edit" @click="toUpdate" v-if="update !== false">
+            <el-button :type="theme || 'primary'" @click="toUpdate" v-if="update !== undefined && update !== null">
                 {{ updateText }}
             </el-button>
             <el-button type="default" @click="toBack">{{ backText }}</el-button>
@@ -24,7 +24,6 @@ export default {
         theme: String,
         update: {
             type: Function,
-            default: () => false
         },
         updateText: {
             type: String,
