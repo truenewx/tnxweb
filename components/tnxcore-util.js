@@ -439,6 +439,12 @@ export const DateUtil = {
         }
         return [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
     },
+    betweenDays(earlierDate, laterDate) {
+        earlierDate = new Date(earlierDate);
+        laterDate = new Date(laterDate);
+        // 如果earlierDate晚于laterDate，则返回负值
+        return (laterDate.getTime() - earlierDate.getTime()) / 1000 / 60 / 60 / 24;
+    },
     betweenDate(earlierDate, laterDate) {
         earlierDate = new Date(earlierDate);
         let year1 = earlierDate.getFullYear();
