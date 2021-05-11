@@ -59,7 +59,7 @@ Object.assign(String.prototype, {
     }
 });
 
-export const DATE_PATTERNS = {
+const DATE_PATTERNS = {
     dateTime: 'yyyy-MM-dd HH:mm:ss',
     date: 'yyyy-MM-dd',
     time: 'HH:mm:ss',
@@ -390,6 +390,7 @@ export const StringUtil = {
 }
 
 export const DateUtil = {
+    patterns: DATE_PATTERNS,
     format(date, pattern) {
         if (typeof date === 'number') {
             date = new Date(date);
