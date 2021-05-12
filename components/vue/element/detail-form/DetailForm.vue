@@ -2,17 +2,14 @@
     <el-form :label-position="vertical ? 'top' : 'right'" label-width="auto" ref="form" :model="model"
         class="tnxel-detail-form" :class="formClass">
         <slot></slot>
-        <el-form-item class="w-100" v-if="update !== false || back !== false">
-            <el-button :type="theme || 'primary'" @click="toUpdate" v-if="update !== undefined && update !== null">
-                {{ updateText }}
-            </el-button>
-            <el-button type="default" @click="toBack">{{ backText }}</el-button>
+        <el-form-item class="w-100" v-if="update || back !== false">
+            <el-button :type="theme || 'primary'" @click="toUpdate" v-if="update">{{ updateText }}</el-button>
+            <el-button type="default" @click="toBack" v-if="back !== false">{{ backText }}</el-button>
         </el-form-item>
     </el-form>
 </template>
 
 <script>
-
 export default {
     name: 'TnxelDetailForm',
     props: {
