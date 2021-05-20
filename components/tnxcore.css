@@ -45,8 +45,16 @@ a.plain:focus {
     width: fit-content !important;
 }
 
-.font-size-100 {
+.fs-1r {
     font-size: 1rem !important;
+}
+
+.fs-p80 {
+    font-size: 80%;
+}
+
+.fs-p120 {
+    font-size: 120%;
 }
 
 .strong {
