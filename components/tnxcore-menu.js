@@ -134,6 +134,7 @@ const Menu = function Menu(config) {
     this.authority = {
         type: null,
         rank: null,
+        app: null,
         permissions: [],
     };
 }
@@ -241,25 +242,14 @@ Menu.prototype.loadGrantedItems = function(callback) {
         callback(this._grantedItems);
     } else {
         const _this = this;
-        window.tnx.app.rpc.get(this._url, function(authorities) {
-            if (authorities && authorities.length) {
-                authorities.forEach(auth => {
-                    switch (auth.kind) {
-                        case 'TYPE':
-                            _this.authority.type = auth.name;
-                            break;
-                        case 'RANK':
-                            _this.authority.rank = auth.name;
-                            break;
-                        case 'PERMISSION':
-                            _this.authority.permissions.push(auth.name);
-                            break;
-                    }
-                });
-            } else {
-                authorities.permissions = authorities.permissions || [];
-                _this.authority = authorities;
+        window.tnx.app.rpc.get(this._url, function(authority) {
+            if (authority && authority.length) {
+                authority = authority[0];
             }
+            authority = authority || {};
+            authority.permissions = authority.permissions || [];
+            _this.authority = authority;
+
             _this._grantedItems = [];
             _this.items.forEach(item => {
                 applyGrantedItemToItems(_this.authority, item, _this._grantedItems);
