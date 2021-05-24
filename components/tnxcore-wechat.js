@@ -64,5 +64,4 @@ WebApp.prototype.login = function(containerId, redirectUri, options) {
     });
 };
 
-export {WebApp};
-export default {WebApp}
+export default WebApp;
