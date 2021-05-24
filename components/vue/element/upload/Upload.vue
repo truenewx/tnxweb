@@ -76,16 +76,9 @@ export default {
     },
     data() {
         const tnx = window.tnx;
-        const rpc = tnx.app.rpc;
-        let alone = false;
-        if (this.appName) {
-            let baseUrl = rpc.apps[this.appName];
-            alone = baseUrl && !baseUrl.startsWith(rpc.getBaseUrl());
-        }
         return {
             tnx: tnx,
             id: 'upload-container-' + tnx.util.string.random(32),
-            alone: alone, // 上传目标应用是否独立于当前应用而单独部署
             tipMessages: {
                 number: '最多只能上传{0}个文件',
                 capacity: '单个文件不能超过{0}',
@@ -240,12 +233,13 @@ export default {
             const rpc = this.tnx.app.rpc;
             return new Promise(function(resolve, reject) {
                 if (vm.validate(file)) {
-                    if (vm.alone) {
-                        // 确保在上传目标应用中已登录
+                    let fssApp = vm.tnx.fss.getAppName();
+                    // fss单独部署，且上传目标即为fss服务，则需确保用户在fss服务中已登录
+                    if (fssApp && vm.action.startsWith(vm.tnx.fss.getBaseUrl())) {
                         rpc.ensureLogined(function() {
                             resolve(file);
                         }, {
-                            app: vm.appName,
+                            app: fssApp,
                             toLogin: function(loginFormUrl, originalUrl, originalMethod) {
                                 // 此时已可知在CAS服务器上未登录，即未登录任一服务
                                 reject(file);

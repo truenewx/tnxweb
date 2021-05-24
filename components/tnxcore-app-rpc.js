@@ -85,7 +85,7 @@ export default {
         this.request(url, options);
     },
     request(url, options) {
-        if (options.app) {
+        if (options.app && url.startsWith('/')) {
             const appBaseUrl = this.apps[options.app];
             if (appBaseUrl) {
                 url = appBaseUrl + url;

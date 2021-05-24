@@ -30,17 +30,16 @@ export default {
         load() {
             if (this.url && this.url.startsWith('fss://')) {
                 let rpc = window.tnx.app.rpc;
-                let options = {
-                    app: 'fss'
-                };
                 let vm = this;
                 rpc.ensureLogined(function() {
-                    rpc.get('/meta', {
+                    rpc.get(window.tnx.fss.getBaseUrl() + '/meta', {
                         storageUrl: vm.url
                     }, function(meta) {
                         vm.meta = meta;
-                    }, options);
-                }, options);
+                    });
+                }, {
+                    app: window.tnx.fss.getAppName()
+                });
             }
         }
     }

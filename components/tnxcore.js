@@ -4,13 +4,15 @@
  */
 
 import util from './tnxcore-util';
-import app from "./tnxcore-app";
+import app from './tnxcore-app';
+import fss from './tnxcore-fss';
 import wechat from './tnxcore-wechat';
 
 const tnxcore = {
     libs: {},
     util: util,
     app: app,
+    fss: fss,
     wechat: wechat,
     alert(message, title, callback) {
         if (typeof title === 'function') {

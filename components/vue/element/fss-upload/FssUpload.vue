@@ -1,6 +1,6 @@
 <template>
-    <tnxel-upload ref="upload" :app-name="fss" :action="action" :upload-limit="uploadLimit" :file-list="fileList"
-        :read-only="readOnly" :width="width" :height="height" :on-success="onSuccess" :on-removed="emitInput"/>
+    <tnxel-upload ref="upload" :action="action" :upload-limit="uploadLimit" :file-list="fileList" :read-only="readOnly"
+        :width="width" :height="height" :on-success="onSuccess" :on-removed="emitInput"/>
 </template>
 
 <script>
@@ -31,14 +31,9 @@ export default {
     },
     data() {
         const tnx = window.tnx;
-        const rpc = tnx.app.rpc;
-        let action = rpc.apps.fss + '/upload/' + this.type;
-        if (this.scope) {
-            action += '/' + this.scope;
-        }
         return {
             tnx: tnx,
-            action: action,
+            action: tnx.fss.getUploadUrl(this.type, this.scope),
             uploadLimit: {},
             fileList: [],
         };
@@ -50,7 +45,7 @@ export default {
     },
     watch: {
         value(newValue, oldValue) {
-            if (!oldValue && newValue) {
+            if (!oldValue && newValue && !this.equals(this.fileList, newValue)) {
                 this._init();
             }
         }
@@ -59,12 +54,37 @@ export default {
         this._init();
     },
     methods: {
+        equals: function(fileList, storageUrls) {
+            if (!Array.isArray(storageUrls)) {
+                storageUrls = [storageUrls];
+            }
+            if (fileList.length !== storageUrls.length) {
+                return false;
+            }
+            // 每一个存储地址都必须在文件清单中找到对应文件
+            for (let storageUrl of storageUrls) {
+                if (!this.contains(fileList, storageUrl)) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        contains: function(fileList, storageUrl) {
+            for (let file of fileList) {
+                if (file.storageUrl === storageUrl) {
+                    return true;
+                }
+            }
+            return false;
+        },
         _init: function() {
             const vm = this;
             vm.tnx.app.rpc.ensureLogined(function() {
                 if (vm.value) {
                     let storageUrls = Array.isArray(vm.value) ? vm.value : [vm.value];
-                    vm.tnx.app.rpc.get('/metas', {storageUrls: storageUrls}, function(metas) {
+                    vm.tnx.app.rpc.get(vm.tnx.fss.getBaseUrl() + '/metas', {
+                        storageUrls: storageUrls
+                    }, function(metas) {
                         vm.fileList = [];
                         metas.forEach(meta => {
                             if (meta) {
@@ -79,8 +99,6 @@ export default {
                         vm.$nextTick(function() {
                             vm._loadUploadLimit();
                         });
-                    }, {
-                        app: 'fss'
                     });
                 } else {
                     vm.$nextTick(function() {
@@ -88,19 +106,20 @@ export default {
                     });
                 }
             }, {
-                app: 'fss',
+                app: vm.tnx.fss.getAppName(),
                 toLogin: function(loginFormUrl, originalUrl, originalMethod) {
                     return true;
                 }
             });
         },
         _loadUploadLimit: function() {
-            let vm = this;
-            vm.tnx.app.rpc.get('/upload-limit/' + vm.type, function(uploadLimit) {
-                vm.uploadLimit = uploadLimit;
-            }, {
-                app: 'fss'
-            });
+            // 上传限制为空才执行加载，避免多次重复加载
+            if (Object.keys(this.uploadLimit).length === 0) {
+                let vm = this;
+                vm.tnx.fss.loadUploadLimit(this.type, function(uploadLimit) {
+                    vm.uploadLimit = uploadLimit;
+                });
+            }
         },
         _getFullReadUrl: function(readUrl) {
             if (readUrl && readUrl.startsWith('//')) {
@@ -111,6 +130,7 @@ export default {
         onSuccess: function(uploadedFile, file, fileList) {
             if (uploadedFile) {
                 file.storageUrl = uploadedFile.storageUrl;
+                this.fileList = fileList;
                 this.emitInput();
             }
         },
