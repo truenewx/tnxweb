@@ -17,9 +17,9 @@
 }(window, document);
 // 以上来自于 http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js
 
-const WebApp = function WebApp(appId, productDomain) {
+export const WebApp = function WebApp(appId, productContextUri) {
     this.appId = appId;
-    this.productDomain = productDomain; // 微信接口要求必须为生产环境域名
+    this.productContextUri = productContextUri; // 微信接口要求必须为生产环境域名
 }
 
 WebApp.prototype.login = function(containerId, redirectUri, options) {
@@ -27,8 +27,10 @@ WebApp.prototype.login = function(containerId, redirectUri, options) {
     const protocol = window.location.protocol;
     const host = window.location.host;
 
-    let url = protocol + '//' + this.productDomain;
-    if (host !== this.productDomain) { // 不是生产环境则借助于生产环境的直接重定向能力进行再跳转
+    let url = protocol + '//' + this.productContextUri;
+    if (this.productContextUri.startsWith(host)) {
+        url += redirectUri;
+    } else { // 不是生产环境则借助于生产环境的直接重定向能力进行再跳转
         url += '/redirect/';
         if (redirectUri.startsWith('/')) { // 目标跳转地址是相对地址，则加上当前网站根地址
             url += protocol.substr(0, protocol.length - 1) + '/' + host + redirectUri;
@@ -41,8 +43,6 @@ WebApp.prototype.login = function(containerId, redirectUri, options) {
             url += redirectUri.substr(0, index); // 协议部分
             url += redirectUri.substr(index + 2);
         }
-    } else {
-        url += redirectUri;
     }
 
     let state = undefined;
