@@ -24,7 +24,10 @@
     background-color: #409EFF !important;
 }
 
-.bg-primary .el-menu-item a {
+.bg-primary .el-menu > .el-menu-item,
+.bg-primary .el-menu > .el-menu-item a,
+.bg-primary .el-menu > .el-submenu .el-submenu__title,
+.bg-primary .el-menu > .el-submenu .el-submenu__title i {
     color: #ffffff;
 }
 
@@ -32,6 +35,7 @@
 .bg-primary .el-menu-item.is-active a,
 .bg-primary .el-menu-item a:hover {
     color: #409EFF;
+    background-color: #fff;
 }
 
 .border-primary {
