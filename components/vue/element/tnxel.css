@@ -267,6 +267,10 @@ el-button {
     margin-left: 5px;
 }
 
+.el-button--text {
+    font-size: inherit;
+}
+
 .el-alert {
     width: unset;
     margin-bottom: 1rem;
