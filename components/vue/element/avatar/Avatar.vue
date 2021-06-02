@@ -60,27 +60,29 @@ export default {
         load() {
             if (this.url && this.url.startsWith('fss://')) {
                 let rpc = window.tnx.app.rpc;
-                let options = {
-                    app: 'fss'
-                };
                 let vm = this;
                 rpc.ensureLogined(function() {
+                    let fssBaseUrl = window.tnx.fss.getBaseUrl();
                     if (vm.preview) {
-                        rpc.get('/meta', {
+                        rpc.get(fssBaseUrl + '/meta', {
                             storageUrl: vm.url
                         }, function(meta) {
                             vm.src = meta.thumbnailReadUrl;
                             vm.previewSrcList = [meta.readUrl];
-                        }, options);
+                        });
                     } else {
-                        rpc.get('/read-url', {
+                        rpc.get(fssBaseUrl + '/read-url', {
                             storageUrl: vm.url,
                             thumbnail: true,
                         }, function(readUrl) {
                             vm.src = readUrl;
-                        }, options);
+                        });
                     }
-                }, options);
+                }, {
+                    app: window.tnx.fss.getAppName()
+                });
+            } else {
+                this.src = this.url;
             }
         }
     }
