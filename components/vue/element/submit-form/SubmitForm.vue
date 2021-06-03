@@ -30,6 +30,7 @@ export default {
             required: true,
         },
         rules: [String, Object], // 加载字段校验规则的URL地址，或规则集对象
+        rulesApp: String, // 加载字段校验规则的应用名称
         rulesLoaded: Function, // 规则集加载后的附加处理函数，仅在rule为字符串类型的URL地址时有效
         submit: {
             type: [Function, Boolean],
@@ -84,7 +85,7 @@ export default {
                 delete meta.$rules;
                 this.$emit('meta', meta);
                 vm.fieldNames = Object.keys(meta);
-            });
+            }, this.rulesApp);
         } else if (this.rules) {
             this.validationRules = this.rules;
         }

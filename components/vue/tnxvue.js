@@ -99,15 +99,15 @@ tnxvue.app.isProduction = function() {
 
 // 元数据到async-validator组件规则的转换处理
 tnxvue.app.validator = validator;
-tnxvue.app.rpc.getMeta = tnxvue.util.function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback) {
+tnxvue.app.rpc.getMeta = tnxvue.util.function.around(tnxvue.app.rpc.getMeta, function(getMeta, url, callback, app) {
     getMeta.call(tnxvue.app.rpc, url, function(meta) {
         if (meta) { // meta已被缓存，所以直接修改其内容，以便同步缓存
             meta.$rules = validator.getRules(meta);
+            if (typeof callback === 'function') {
+                callback.call(this, meta);
+            }
         }
-        if (typeof callback === 'function') {
-            callback.call(this, meta);
-        }
-    });
+    }, app);
 });
 
 tnxvue.app.page.init = tnxvue.util.function.around(tnxvue.app.page.init, function(init, page, container) {

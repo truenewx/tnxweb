@@ -273,21 +273,24 @@ export default {
         this.get(this._ensureLoginedUrl, callback, options);
     },
     _metas: {},
-    getMeta(urlOrType, callback) {
+    getMeta(urlOrType, callback, app) {
+        const metaKey = app ? (app + ':/' + urlOrType) : urlOrType;
         const metas = this._metas;
-        if (metas[urlOrType]) {
+        if (metas[metaKey]) {
             if (typeof callback === 'function') {
-                callback(metas[urlOrType]);
+                callback(metas[metaKey]);
             }
         } else {
             let url = '/api/meta/' + (urlOrType.contains('/') ? 'method' : 'model');
             let params = urlOrType.contains('/') ? {url: urlOrType} : {type: urlOrType};
             this.get(url, params, function(meta) {
-                metas[urlOrType] = meta;
-                if (typeof callback === 'function') {
-                    callback(meta);
+                if (meta) {
+                    metas[metaKey] = meta;
+                    if (typeof callback === 'function') {
+                        callback(meta);
+                    }
                 }
-            });
+            }, {app});
         }
     },
     _enumItemsMapping: {},
