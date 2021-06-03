@@ -23,18 +23,22 @@ const components = {
 };
 
 function getDefaultDialogButtons(type, callback, theme) {
-    if (type && typeof callback === 'function') {
+    if (callback !== false) {
         if (type === 'confirm') {
             return [{
                 text: '取消',
                 click(close) {
-                    return callback.call(this, false, close);
+                    if (typeof callback === 'function') {
+                        return callback.call(this, false, close);
+                    }
                 }
             }, {
                 text: '确定',
                 type: theme || 'primary',
                 click(close) {
-                    return callback.call(this, true, close);
+                    if (typeof callback === 'function') {
+                        return callback.call(this, true, close);
+                    }
                 }
             }];
         } else {
@@ -42,7 +46,9 @@ function getDefaultDialogButtons(type, callback, theme) {
                 text: '确定',
                 type: theme || 'primary',
                 click(close) {
-                    return callback.call(this, close);
+                    if (typeof callback === 'function') {
+                        return callback.call(this, close);
+                    }
                 }
             }];
         }
